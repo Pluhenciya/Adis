@@ -1,5 +1,6 @@
 ﻿using Adis.Bll.Dtos;
 using Adis.Bll.Interfaces;
+using Adis.Dm;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Adis.Api.Controllers
@@ -40,6 +41,38 @@ namespace Adis.Api.Controllers
             catch (ArgumentException ex)
             {
                 return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Внутренняя ошибка сервера: " + ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Возвращает список проектов
+        /// </summary>
+        /// <remarks>
+        /// Примеры запросов:
+        ///
+        ///     GET /api/projects?status=1
+        ///     GET /api/projects?targetDate=2024-05-15
+        ///     GET /api/projects?startDateFrom=2024-01-01&amp;startDateTo=2024-06-30
+        ///     GET /api/projects?status=2&amp;targetDate=2024-07-01
+        /// </remarks>
+        /// <param name="status">Статус отфильтрованных проектов</param>
+        /// <param name="targetDate">Дата, в которую проект будет выполняться (yyyy-MM-dd)</param>
+        /// <param name="startDateFrom">Начальная дата диапазона (yyyy-MM-dd)</param>
+        /// <param name="startDateTo">Конечная дата диапазона (yyyy-MM-dd)</param>
+        [HttpGet]
+        public async Task<IActionResult> GetProjects(
+            [FromQuery] Status? status,
+            [FromQuery] string? targetDate,
+            [FromQuery] string? startDateFrom,
+            [FromQuery] string? startDateTo)
+        {
+            try
+            {
+                return Ok(await _projectService.GetProjects(status, targetDate, startDateFrom, startDateTo));
             }
             catch (Exception ex)
             {

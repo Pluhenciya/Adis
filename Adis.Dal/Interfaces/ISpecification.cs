@@ -14,7 +14,7 @@ namespace Adis.Dal.Interfaces
         Expression<Func<T, bool>>? Criteria { get; }
 
         /// <summary>
-        /// Лямбда-выражение с подключением связанных таблиц
+        /// Лямбда-выражения с подключением связанных таблиц
         /// </summary>
         List<Expression<Func<T, object>>> Includes { get; }
     }

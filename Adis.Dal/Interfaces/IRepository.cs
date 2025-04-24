@@ -17,7 +17,7 @@ namespace Adis.Dal.Interfaces
         /// </summary>
         /// <param name="specification">Фильтры и подключение связанных таблиц</param>
         /// <returns>Список объектов данного типа</returns>
-        Task<IEnumerable<T>> GetAsync(ISpecification<T> specification);
+        Task<IEnumerable<T>> GetAsync(ISpecification<T>? specification = null);
 
         /// <summary>
         /// Возвращает объект данного типа по идентификатору
