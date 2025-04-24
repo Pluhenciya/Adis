@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace Adis.Bll.Services
 {
+    /// <inheritdoc cref="IProjectService"/>
     public class ProjectService : IProjectService
     {
         private readonly IMapper _mapper;
@@ -24,6 +25,10 @@ namespace Adis.Bll.Services
 
         public async Task<ProjectDto> AddProject(ProjectDto project)
         {
+            if(project.Budget < 0)
+                throw new ArgumentException("Бюджет не может быть отрицательным");
+            if(project.StartDate > project.EndDate)
+                throw new ArgumentException("Дата оканчания не может быть меньше чем дата начала");
             return _mapper.Map<ProjectDto>(await _projectRepository.AddAsync(_mapper.Map<Project>(project)));
         }
     }

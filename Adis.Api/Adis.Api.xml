@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Adis.Api</name>
+    </assembly>
+    <members>
+        <member name="T:Adis.Api.Controllers.ProjectsController">
+            <summary>
+            Позволяет управлять проектами
+            </summary>
+            <param name="projectService"></param>
+        </member>
+        <member name="M:Adis.Api.Controllers.ProjectsController.#ctor(Adis.Bll.Interfaces.IProjectService)">
+            <summary>
+            Позволяет управлять проектами
+            </summary>
+            <param name="projectService"></param>
+        </member>
+        <member name="M:Adis.Api.Controllers.ProjectsController.AddProject(Adis.Bll.Dtos.ProjectDto)">
+             <summary>
+             Добавляет новый проект
+             </summary>
+             <remarks>
+             Пример запроса:
+            
+                 POST /api/projects
+                 {
+                     "name": "Проект Apollo",
+                     "budget": 2500000.50,
+                     "startDate": "2024-01-01",
+                     "endDate": "2024-12-31"
+                 }
+            
+             </remarks>
+             <param name="project">Данные нового проекта</param>
+        </member>
+    </members>
+</doc>
