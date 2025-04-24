@@ -1,3 +1,12 @@
+using Adis.Bll.Interfaces;
+using Adis.Bll.Profiles;
+using Adis.Bll.Services;
+using Adis.Dal.Data;
+using Adis.Dal.Interfaces;
+using Adis.Dal.Repositories;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -5,6 +14,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+{
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+});
 
 builder.Services.AddCors(options =>
 {
@@ -16,13 +32,19 @@ builder.Services.AddCors(options =>
     });
 });
 
-var app = builder.Build();
+builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
+builder.Services.AddScoped<IProjectService, ProjectService>();
+builder.Services.AddAutoMapper(typeof(ProjectProfile));
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+builder.Services.AddSwaggerGen(options =>
 {
-    app.MapOpenApi();
-}
+    var basePath = AppContext.BaseDirectory;
+
+    var xmlPath = Path.Combine(basePath, "Adis.Api.xml");
+    options.IncludeXmlComments(xmlPath);
+});
+
+var app = builder.Build();
 
 app.UseHttpsRedirection();
 
@@ -31,5 +53,8 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.UseCors("AllowFrontend");
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.Run();
