@@ -36,7 +36,7 @@ namespace Adis.Api.Controllers
         {
             try
             {
-                return Ok(await _projectService.AddProject(project));
+                return Ok(await _projectService.AddProjectAsync(project));
             }
             catch (ArgumentException ex)
             {
@@ -72,7 +72,41 @@ namespace Adis.Api.Controllers
         {
             try
             {
-                return Ok(await _projectService.GetProjects(status, targetDate, startDateFrom, startDateTo));
+                return Ok(await _projectService.GetProjectsAsync(status, targetDate, startDateFrom, startDateTo));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Внутренняя ошибка сервера: " + ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Обновляет данные проекта на новые
+        /// </summary>
+        /// <remarks>
+        /// Пример запроса:
+        ///
+        ///     POST /api/projects
+        ///     {
+        ///         "id_product": 1,
+        ///         "name": "​Капитальный ремонт автомобильной дороги Красноборск – Хмелевская на участке км 0+000 – км 2+757 (устройство электроосвещения) в Красноборском районе Архангельской области. 1 пусковой комплекс",
+        ///         "budget": 49041762.00,
+        ///         "startDate": "2024-01-01",
+        ///         "endDate": "2024-12-31"
+        ///     }
+        ///
+        /// </remarks>
+        /// <param name="project">Новые данные проекта</param>
+        [HttpPut]
+        public async Task<IActionResult> UpdateProject(ProjectDto project)
+        {
+            try
+            {
+                return Ok(await _projectService.UpdateProjectAsync(project));
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
             }
             catch (Exception ex)
             {

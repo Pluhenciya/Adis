@@ -17,7 +17,7 @@ namespace Adis.Dal.Interfaces
         /// </summary>
         /// <param name="status">Статус отфильтрованных проектов</param>
         /// <param name="targetDate">Дата, в которую проект будет выполнятся</param>
-        /// <param name="startDateFrom">Дата начала диапозона поиска проета</param>
+        /// <param name="startDateFrom">Дата начала диапозона поиска проекта</param>
         /// <param name="startDateTo">Дата конца диапозона поиска проекта</param>
         /// <returns>Отфильтрованный список проетов</returns>
         public Task<IEnumerable<Project>> GetFilteredProjectsAsync(

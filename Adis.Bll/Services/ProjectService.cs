@@ -18,7 +18,7 @@ namespace Adis.Bll.Services
             _projectRepository = projectRepository;
         }
 
-        public async Task<ProjectDto> AddProject(ProjectDto project)
+        public async Task<ProjectDto> AddProjectAsync(ProjectDto project)
         {
             if (project.Budget < 0)
                 throw new ArgumentException("Бюджет не может быть отрицательным");
@@ -27,7 +27,7 @@ namespace Adis.Bll.Services
             return _mapper.Map<ProjectDto>(await _projectRepository.AddAsync(_mapper.Map<Project>(project)));
         }
 
-        public async Task<IEnumerable<ProjectDto>> GetProjects(Status? status, string? targetDate, string? startDateFrom, string? startDateTo)
+        public async Task<IEnumerable<ProjectDto>> GetProjectsAsync(Status? status, string? targetDate, string? startDateFrom, string? startDateTo)
         {
             // Парсинг дат из query-параметров
             DateOnly? parsedTargetDate = ParseDate(targetDate);
@@ -41,6 +41,29 @@ namespace Adis.Bll.Services
                 parsedStartDateTo);
 
             return _mapper.Map<IEnumerable<ProjectDto>>(projects);
+        }
+
+        public async Task<ProjectDto> UpdateProjectAsync(ProjectDto project)
+        {
+            try
+            {
+                var existingProject = await _projectRepository.GetByIdAsync(project.IdProduct);
+
+                if (project.Budget < 0)
+                    throw new ArgumentException("Бюджет не может быть отрицательным");
+                if (project.StartDate > project.EndDate)
+                    throw new ArgumentException("Дата оканчания не может быть меньше чем дата начала");
+
+                _mapper.Map(project, existingProject);
+
+                var updatedProject = await _projectRepository.UpdateAsync(existingProject);
+
+                return _mapper.Map<ProjectDto>(updatedProject);
+            }
+            catch (KeyNotFoundException)
+            {
+                throw new ArgumentException("Проекта с таким идентификатором не существует");
+            }
         }
 
         /// <summary>
