@@ -43,6 +43,11 @@ namespace Adis.Bll.Services
             return _mapper.Map<IEnumerable<ProjectDto>>(projects);
         }
 
+        /// <summary>
+        /// Парсит строку в дату
+        /// </summary>
+        /// <param name="dateString">Дата в строке</param>
+        /// <returns>Дата типа DateOnly</returns>
         private DateOnly? ParseDate(string? dateString)
         {
             if (string.IsNullOrEmpty(dateString))

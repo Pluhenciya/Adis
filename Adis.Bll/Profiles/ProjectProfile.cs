@@ -9,6 +9,9 @@ using AutoMapper;
 
 namespace Adis.Bll.Profiles
 {
+    /// <summary>
+    /// Профиль для настройки AutoMapper для проектов
+    /// </summary>
     public class ProjectProfile : Profile
     {
         public ProjectProfile() 

@@ -51,11 +51,18 @@ namespace Adis.Api.Controllers
         /// <summary>
         /// Возвращает список проектов
         /// </summary>
+        /// <remarks>
+        /// Примеры запросов:
+        ///
+        ///     GET /api/projects?status=1
+        ///     GET /api/projects?targetDate=2024-05-15
+        ///     GET /api/projects?startDateFrom=2024-01-01&amp;startDateTo=2024-06-30
+        ///     GET /api/projects?status=2&amp;targetDate=2024-07-01
+        /// </remarks>
         /// <param name="status">Статус отфильтрованных проектов</param>
-        /// <param name="targetDate">Дата, в которую проект будет выполнятся</param>
-        /// <param name="startDateFrom">Дата начала диапозона поиска проета</param>
-        /// <param name="startDateTo">Дата конца диапозона поиска проекта</param>
-        /// <returns>Список проектов</returns>
+        /// <param name="targetDate">Дата, в которую проект будет выполняться (yyyy-MM-dd)</param>
+        /// <param name="startDateFrom">Начальная дата диапазона (yyyy-MM-dd)</param>
+        /// <param name="startDateTo">Конечная дата диапазона (yyyy-MM-dd)</param>
         [HttpGet]
         public async Task<IActionResult> GetProjects(
             [FromQuery] Status? status,
