@@ -18,12 +18,23 @@ namespace Adis.Bll.Interfaces
         /// </summary>
         /// <param name="project">Данные нового проекта</param>
         /// <returns>Созданный проект</returns>
-        public Task<ProjectDto> AddProject(ProjectDto project);
+        public Task<ProjectDto> AddProjectAsync(ProjectDto project);
 
         /// <summary>
         /// Возвращает список проектов
         /// </summary>
+        /// <param name="status">Статус отфильтрованных проектов</param>
+        /// <param name="targetDate">Дата, в которую проект будет выполнятся</param>
+        /// <param name="startDateFrom">Дата начала диапозона поиска проекта</param>
+        /// <param name="startDateTo">Дата конца диапозона поиска проекта</param>
         /// <returns>Список проектов</returns>
-        public Task<IEnumerable<ProjectDto>> GetProjects(Status? status, string? targetDate, string? startDateFrom, string? startDateTo);
+        public Task<IEnumerable<ProjectDto>> GetProjectsAsync(Status? status, string? targetDate, string? startDateFrom, string? startDateTo);
+
+        /// <summary>
+        /// Заполняет проект новыми данными
+        /// </summary>
+        /// <param name="project">Новые данные проекта</param>
+        /// <returns>Изменненый проект</returns>
+        public Task<ProjectDto> UpdateProjectAsync(ProjectDto project);
     }
 }
