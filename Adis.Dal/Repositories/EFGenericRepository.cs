@@ -34,7 +34,7 @@ namespace Adis.Dal.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<T>> GetAsync(ISpecification<T> specification)
+        public async Task<IEnumerable<T>> GetAsync(ISpecification<T>? specification = null)
         {
             return await ApplySpecification(specification).ToListAsync();
         }
@@ -51,7 +51,7 @@ namespace Adis.Dal.Repositories
             await _dbContext.SaveChangesAsync();
             return entry.Entity;
         }
-        private IQueryable<T> ApplySpecification(ISpecification<T> specification)
+        private IQueryable<T> ApplySpecification(ISpecification<T>? specification)
         {
             return SpecificationEvaluator.GetQuery(_dbContext.Set<T>().AsQueryable(), specification);
         }
