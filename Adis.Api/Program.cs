@@ -1,4 +1,9 @@
+using Adis.Bll.Interfaces;
+using Adis.Bll.Profiles;
+using Adis.Bll.Services;
 using Adis.Dal.Data;
+using Adis.Dal.Interfaces;
+using Adis.Dal.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,6 +30,10 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod();
     });
 });
+
+builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
+builder.Services.AddScoped<IProjectService, ProjectService>();
+builder.Services.AddAutoMapper(typeof(ProjectProfile));
 
 var app = builder.Build();
 

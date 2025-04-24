@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace Adis.Dal.Repositories
 {
+    /// <inheritdoc cref="IProjectRepository"/>
     public class ProjectRepository : EFGenericRepository<Project>, IProjectRepository
     {
         public ProjectRepository(AppDbContext dbContext) : base(dbContext)

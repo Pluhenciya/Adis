@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace Adis.Dal.Specifications
 {
+    /// <summary>
+    /// Позволяет использовать спецификации в EFCore
+    /// </summary>
     public static class SpecificationEvaluator
     {
         public static IQueryable<T> GetQuery<T>(
