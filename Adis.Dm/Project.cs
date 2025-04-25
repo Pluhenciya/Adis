@@ -45,5 +45,15 @@ namespace Adis.Dm
         /// Статус проекта
         /// </summary>
         public Status Status { get; set; }
+
+        /// <summary>
+        /// Идентификатор пользователя создавшего проект
+        /// </summary>
+        public int IdUser { get; set; }
+
+        /// <summary>
+        /// Пользователь создавший проект
+        /// </summary>
+        public virtual User User { get; set; } = null!;
     }
 }

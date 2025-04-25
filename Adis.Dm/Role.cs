@@ -6,9 +6,18 @@ using System.Threading.Tasks;
 
 namespace Adis.Dm
 {
+    /// <summary>
+    /// Роль
+    /// </summary>
     public enum Role
     {
+        /// <summary>
+        /// Администратор
+        /// </summary>
         Admin,
+        /// <summary>
+        /// Проектировщик
+        /// </summary>
         Projecter
     }
 }
