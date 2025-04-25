@@ -18,6 +18,8 @@ namespace Adis.Bll.Services
             _projectRepository = projectRepository;
         }
 
+        /// <inheritdoc/>
+        /// <exception cref="ArgumentException">Возникает когда данные проекта не прошли валидацию</exception>
         public async Task<ProjectDto> AddProjectAsync(ProjectDto project)
         {
             if (project.Budget < 0)
@@ -43,6 +45,8 @@ namespace Adis.Bll.Services
             return _mapper.Map<IEnumerable<ProjectDto>>(projects);
         }
 
+        /// <inheritdoc/>
+        /// <exception cref="ArgumentException">Возникает когда данные проекта не прошли валидацию</exception>
         public async Task<ProjectDto> UpdateProjectAsync(ProjectDto project)
         {
             try

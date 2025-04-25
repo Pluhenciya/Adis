@@ -31,10 +31,13 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod();
     });
 });
+builder.Services.AddAutoMapper(typeof(ProjectProfile), typeof(UserProfile));
 
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
-builder.Services.AddAutoMapper(typeof(ProjectProfile));
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddSwaggerGen(options =>
 {
