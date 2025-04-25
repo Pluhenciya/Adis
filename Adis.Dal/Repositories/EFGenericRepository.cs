@@ -25,6 +25,8 @@ namespace Adis.Dal.Repositories
             return entry.Entity;
         }
 
+        /// <inheritdoc/>
+        /// <exception cref="KeyNotFoundException">Возникает когда объект с таким идентификаторм не существует</exception>
         public async Task DeleteAsync(int id)
         {
             var entity = await _dbContext.FindAsync<T>(id)
@@ -39,6 +41,8 @@ namespace Adis.Dal.Repositories
             return await ApplySpecification(specification).ToListAsync();
         }
 
+        /// <inheritdoc/>
+        /// <exception cref="KeyNotFoundException">Возникает когда объект с таким идентификаторм не существует</exception>
         public async Task<T> GetByIdAsync(int id)
         {
             return await _dbContext.FindAsync<T>(id)
