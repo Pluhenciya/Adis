@@ -23,9 +23,9 @@ namespace Adis.Bll.Dtos
         public string Email { get; set; } = null!;
 
         /// <summary>
-        /// Хэш пароля пользователя
+        /// Пароль пользователя
         /// </summary>
-        public string PasswordHash { get; set; } = null!;
+        public string Password { get; set; } = null!;
 
         /// <summary>
         /// Роль пользователя

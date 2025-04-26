@@ -4,8 +4,10 @@ using Adis.Bll.Interfaces;
 using Adis.Dal.Interfaces;
 using Adis.Dm;
 using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,12 +17,17 @@ namespace Adis.Bll.Services
     /// <inheritdoc cref="IUserService"/>
     public class UserService : IUserService
     {
-        private readonly IUserRepository _userRepository;
+        private readonly UserManager<User> _userManager;
+        private readonly RoleManager<Role> _roleManager;
         private readonly IMapper _mapper;
 
-        public UserService(IUserRepository userRepository, IMapper mapper) 
+        public UserService(
+            UserManager<User> userManager,
+            RoleManager<Role> roleManager,
+            IMapper mapper)
         {
-            _userRepository = userRepository;
+            _userManager = userManager;
+            _roleManager = roleManager;
             _mapper = mapper;
         }
 
@@ -28,14 +35,39 @@ namespace Adis.Bll.Services
         /// <exception cref="ArgumentException">Возникает когда данные пользователя не прошли валидацию</exception>
         public async Task<UserDto> AddUserAsync(UserDto userDto)
         {
-            if (await _userRepository.GetUserByEmailAsync(userDto.Email) != null)
-                throw new ArgumentException("Эта почта уже занята другим пользователем");
+            // Валидация входных данных
+            if (!new EmailAddressAttribute().IsValid(userDto.Email))
+                throw new ArgumentException("Некорректный email");
 
-            userDto.PasswordHash = HashHelper.ComputeSha256Hash(userDto.PasswordHash);
+            if (string.IsNullOrWhiteSpace(userDto.Role))
+                throw new ArgumentException("Роль обязательна для заполнения");
+
+            // Проверка существования пользователя
+            var existingUser = await _userManager.FindByEmailAsync(userDto.Email);
+            if (existingUser != null)
+                throw new ArgumentException("Пользователь с таким email уже существует");
+
+            // Проверка существования роли
+            var roleExists = await _roleManager.RoleExistsAsync(userDto.Role);
+            if (!roleExists)
+                throw new ArgumentException($"Роль '{userDto.Role}' не существует");
+
+            // Создание пользователя
             var user = _mapper.Map<User>(userDto);
-            user.Roles = new List<Role> { };
+            user.UserName = userDto.Email; // Для Identity требуется UserName
 
-            return _mapper.Map<UserDto>(await _userRepository.AddAsync(user));
+            var result = await _userManager.CreateAsync(user, userDto.Password);
+            if (!result.Succeeded)
+                throw new ArgumentException(string.Join(", ", result.Errors.Select(e => e.Description)));
+
+            // Назначение роли
+            var roleResult = await _userManager.AddToRoleAsync(user, userDto.Role);
+            if (!roleResult.Succeeded)
+                throw new ArgumentException("Ошибка назначения роли");
+
+            var createdUser = _mapper.Map<UserDto>(user);
+            createdUser.Role = user.Roles.FirstOrDefault()!.Name!;
+            return createdUser;
         }
     }
 }

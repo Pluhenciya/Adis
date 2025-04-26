@@ -4,16 +4,6 @@
         <name>Adis.Api</name>
     </assembly>
     <members>
-        <member name="T:Adis.Api.Controllers.AuthController">
-            <summary>
-            Позволяет авторизоваться в API пользователям
-            </summary>
-        </member>
-        <member name="M:Adis.Api.Controllers.AuthController.#ctor(Microsoft.AspNetCore.Identity.UserManager{Adis.Dm.User},Microsoft.AspNetCore.Identity.SignInManager{Adis.Dm.User},Duende.IdentityServer.Services.ITokenService)">
-            <summary>
-            Позволяет авторизоваться в API пользователям
-            </summary>
-        </member>
         <member name="T:Adis.Api.Controllers.ProjectsController">
             <summary>
             Позволяет управлять проектами
