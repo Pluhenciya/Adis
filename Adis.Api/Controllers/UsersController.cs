@@ -2,6 +2,7 @@
 using Adis.Bll.Interfaces;
 using Adis.Bll.Services;
 using Adis.Dm;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Adis.Api.Controllers
@@ -11,6 +12,7 @@ namespace Adis.Api.Controllers
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class UsersController(IUserService userService) : ControllerBase
     {
         private readonly IUserService _userService = userService;

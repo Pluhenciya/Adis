@@ -23,7 +23,7 @@ namespace Adis.Api.Controllers
 
             return result.Success
                 ? Ok(new AuthResponse { AccessToken = result.Token, ExpiresIn = result.ExpiresIn, TokenType = "Bearer"})
-                : Unauthorized(new { Errors = result.Errors });
+                : Unauthorized(new { result.Errors });
         }
     }
 

@@ -66,7 +66,7 @@ namespace Adis.Bll.Services
                 throw new ArgumentException("Ошибка назначения роли");
 
             var createdUser = _mapper.Map<UserDto>(user);
-            createdUser.Role = user.Roles.FirstOrDefault()!.Name!;
+            createdUser.Role = userDto.Role;
             return createdUser;
         }
     }
