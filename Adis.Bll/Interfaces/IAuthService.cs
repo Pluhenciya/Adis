@@ -4,6 +4,8 @@ namespace Adis.Bll.Interfaces
 {
     public interface IAuthService
     {
-        Task<AuthResult> LoginAsync(string email, string password);
+        public Task<AuthResult> LoginAsync(string email, string password);
+
+        public Task<AuthResult> RefreshTokenAsync(string token, string refreshToken);
     }
 }

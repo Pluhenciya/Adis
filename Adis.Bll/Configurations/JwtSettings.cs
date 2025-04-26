@@ -11,6 +11,7 @@ namespace Adis.Bll.Configurations
         public string Key { get; set; } = null!;
         public string Issuer { get; set; } = null!;
         public string Audience { get; set; } = null!;
-        public TimeSpan TokenLifetime { get; set; } = TimeSpan.FromHours(1);
+        public TimeSpan TokenLifetime { get; set; } = TimeSpan.FromMinutes(15);
+        public TimeSpan RefreshTokenLifetime { get; set; } = TimeSpan.FromDays(7);
     }
 }

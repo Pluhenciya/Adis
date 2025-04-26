@@ -80,6 +80,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JWT"));
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
 builder.Services.AddSwaggerGen(options =>
 {

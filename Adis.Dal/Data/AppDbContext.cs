@@ -282,6 +282,79 @@ namespace Adis.Dal.Data
                 entity.Property(ur => ur.UserId)
                     .HasColumnName("id_user");
             });
+
+            modelBuilder.Entity<RefreshToken>(entity =>
+            {
+                entity.ToTable("refresh_tokens");
+
+                // Первичный ключ
+                entity.HasKey(rt => rt.IdRefreshToken)
+                    .HasName("PRIMARY");
+
+                // Конфигурация свойств
+                entity.Property(rt => rt.IdRefreshToken)
+                    .HasColumnName("id_refresh_token")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(rt => rt.Token)
+                    .HasColumnName("token")
+                    .HasMaxLength(512)
+                    .IsRequired();
+
+                entity.Property(rt => rt.Expires)
+                    .HasColumnName("expires_at")
+                    .HasColumnType("datetime")
+                    .IsRequired();
+
+                entity.Property(rt => rt.Created)
+                    .HasColumnName("created_at")
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                entity.Property(rt => rt.CreatedByIp)
+                    .HasColumnName("created_by_ip")
+                    .HasMaxLength(45);
+
+                entity.Property(rt => rt.Revoked)
+                    .HasColumnName("revoked_at")
+                    .HasColumnType("datetime");
+
+                entity.Property(rt => rt.RevokedByIp)
+                    .HasColumnName("revoked_by_ip")
+                    .HasMaxLength(45);
+
+                entity.Property(rt => rt.ReplacedByToken)
+                    .HasColumnName("replaced_by_token")
+                    .HasMaxLength(512);
+
+                // Внешний ключ к пользователю
+                entity.Property(rt => rt.IdUser)
+                    .HasColumnName("user_id")
+                    .IsRequired();
+
+                entity.HasOne(rt => rt.User)
+                    .WithMany(u => u.RefreshTokens)
+                    .HasForeignKey(rt => rt.IdUser)
+                    .HasConstraintName("fk_refresh_tokens_users")
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                // Индексы
+                entity.HasIndex(rt => rt.Token)
+                    .HasDatabaseName("ix_refresh_tokens_token")
+                    .IsUnique();
+
+                entity.HasIndex(rt => rt.IdUser)
+                    .HasDatabaseName("ix_refresh_tokens_user_id");
+
+                // Проверочные ограничения
+                entity.ToTable(t => t.HasCheckConstraint(
+                    "chk_refresh_tokens_expiration",
+                    "expires_at > created_at"));
+
+                entity.ToTable(t => t.HasCheckConstraint(
+                    "chk_refresh_tokens_revoked",
+                    "revoked_at IS NULL OR revoked_at > created_at"));
+            });
         }
     }
 }

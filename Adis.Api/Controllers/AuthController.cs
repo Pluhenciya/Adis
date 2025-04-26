@@ -22,9 +22,24 @@ namespace Adis.Api.Controllers
             var result = await _authService.LoginAsync(request.Email, request.Password);
 
             return result.Success
-                ? Ok(new AuthResponse { AccessToken = result.Token, ExpiresIn = result.ExpiresIn, TokenType = "Bearer"})
+                ? Ok(new AuthResponse { AccessToken = result.Token, ExpiresIn = result.ExpiresIn, TokenType = "Bearer", RefreshToken = result.RefreshToken })
                 : Unauthorized(new { result.Errors });
         }
-    }
 
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
+        {
+            var result = await _authService.RefreshTokenAsync(request.AccessToken, request.RefreshToken);
+
+            return result.Success
+                ? Ok(new AuthResponse
+                {
+                    AccessToken = result.Token,
+                    ExpiresIn = result.ExpiresIn,
+                    TokenType = "Bearer",
+                    RefreshToken = result.RefreshToken
+                })
+                : BadRequest(new { result.Errors });
+        }
+    }
 }
