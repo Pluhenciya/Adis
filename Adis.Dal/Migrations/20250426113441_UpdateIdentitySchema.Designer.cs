@@ -4,6 +4,7 @@ using Adis.Dal.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Adis.Dal.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250426113441_UpdateIdentitySchema")]
+    partial class UpdateIdentitySchema
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -78,73 +81,6 @@ namespace Adis.Dal.Migrations
                             t.HasCheckConstraint("chk_projects_budget", "budget >= 0");
 
                             t.HasCheckConstraint("chk_projects_dates", "start_date <= end_date");
-                        });
-                });
-
-            modelBuilder.Entity("Adis.Dm.RefreshToken", b =>
-                {
-                    b.Property<int>("IdRefreshToken")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id_refresh_token");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("IdRefreshToken"));
-
-                    b.Property<DateTime>("Created")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
-                        .HasColumnName("created_at")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                    b.Property<string>("CreatedByIp")
-                        .IsRequired()
-                        .HasMaxLength(45)
-                        .HasColumnType("varchar(45)")
-                        .HasColumnName("created_by_ip");
-
-                    b.Property<DateTime>("Expires")
-                        .HasColumnType("datetime")
-                        .HasColumnName("expires_at");
-
-                    b.Property<int>("IdUser")
-                        .HasColumnType("int")
-                        .HasColumnName("user_id");
-
-                    b.Property<string>("ReplacedByToken")
-                        .HasMaxLength(512)
-                        .HasColumnType("varchar(512)")
-                        .HasColumnName("replaced_by_token");
-
-                    b.Property<DateTime?>("Revoked")
-                        .HasColumnType("datetime")
-                        .HasColumnName("revoked_at");
-
-                    b.Property<string>("RevokedByIp")
-                        .HasMaxLength(45)
-                        .HasColumnType("varchar(45)")
-                        .HasColumnName("revoked_by_ip");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasMaxLength(512)
-                        .HasColumnType("varchar(512)")
-                        .HasColumnName("token");
-
-                    b.HasKey("IdRefreshToken")
-                        .HasName("PRIMARY");
-
-                    b.HasIndex("IdUser")
-                        .HasDatabaseName("ix_refresh_tokens_user_id");
-
-                    b.HasIndex("Token")
-                        .IsUnique()
-                        .HasDatabaseName("ix_refresh_tokens_token");
-
-                    b.ToTable("refresh_tokens", null, t =>
-                        {
-                            t.HasCheckConstraint("chk_refresh_tokens_expiration", "expires_at > created_at");
-
-                            t.HasCheckConstraint("chk_refresh_tokens_revoked", "revoked_at IS NULL OR revoked_at > created_at");
                         });
                 });
 
@@ -435,18 +371,6 @@ namespace Adis.Dal.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Adis.Dm.RefreshToken", b =>
-                {
-                    b.HasOne("Adis.Dm.User", "User")
-                        .WithMany("RefreshTokens")
-                        .HasForeignKey("IdUser")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_refresh_tokens_users");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.HasOne("Adis.Dm.Role", null)
@@ -516,8 +440,6 @@ namespace Adis.Dal.Migrations
             modelBuilder.Entity("Adis.Dm.User", b =>
                 {
                     b.Navigation("Projects");
-
-                    b.Navigation("RefreshTokens");
                 });
 #pragma warning restore 612, 618
         }

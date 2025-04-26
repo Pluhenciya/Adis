@@ -7,10 +7,8 @@ using System.Threading.Tasks;
 
 namespace Adis.Dal.Interfaces
 {
-    /// <summary>
-    /// Позоляет управлять данными пользователей
-    /// </summary>
-    public interface IUserRepository : IRepository<User>
+    public interface IRefreshTokenRepository : IRepository<RefreshToken>
     {
+        public Task<RefreshToken?> GetRefreshTokenByIdUserWithTokenAsync(string token, int idUser);
     }
 }

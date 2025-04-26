@@ -4,6 +4,7 @@ using Adis.Dal.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Adis.Dal.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250426181645_AddRefreshToken")]
+    partial class AddRefreshToken
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -111,6 +114,7 @@ namespace Adis.Dal.Migrations
                         .HasColumnName("user_id");
 
                     b.Property<string>("ReplacedByToken")
+                        .IsRequired()
                         .HasMaxLength(512)
                         .HasColumnType("varchar(512)")
                         .HasColumnName("replaced_by_token");
@@ -120,6 +124,7 @@ namespace Adis.Dal.Migrations
                         .HasColumnName("revoked_at");
 
                     b.Property<string>("RevokedByIp")
+                        .IsRequired()
                         .HasMaxLength(45)
                         .HasColumnType("varchar(45)")
                         .HasColumnName("revoked_by_ip");

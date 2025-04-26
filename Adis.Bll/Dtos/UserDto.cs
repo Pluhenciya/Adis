@@ -15,7 +15,7 @@ namespace Adis.Bll.Dtos
         /// <summary>
         /// Идентификатор пользователя
         /// </summary>
-        public int IdUser { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// Почта пользователя
@@ -23,14 +23,14 @@ namespace Adis.Bll.Dtos
         public string Email { get; set; } = null!;
 
         /// <summary>
-        /// Хэш пароля пользователя
+        /// Пароль пользователя
         /// </summary>
-        public string PasswordHash { get; set; } = null!;
+        public string Password { get; set; } = null!;
 
         /// <summary>
         /// Роль пользователя
         /// </summary>
-        public Role Role { get; set; }
+        public string Role { get; set; } = null!;
 
         /// <summary>
         /// ФИО пользователя

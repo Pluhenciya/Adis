@@ -16,11 +16,6 @@ namespace Adis.Dal.Repositories
         public UserRepository(AppDbContext dbContext) : base(dbContext)
         {
         }
-
-        public async Task<User?> GetUserByEmailAsync(string email)
-        {
-            return (await GetAsync(new UserByEmailSpecification(email))).FirstOrDefault();
-        }
     }
 }
         
