@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,30 +7,9 @@ using System.Threading.Tasks;
 
 namespace Adis.Dm
 {
-    /// <summary>
-    /// Основная модель пользователя
-    /// </summary>
-    public class User
+    public class User : IdentityUser<int> 
     {
-        /// <summary>
-        /// Идентификатор пользователя
-        /// </summary>
-        public int IdUser { get; set; }
-
-        /// <summary>
-        /// Почта пользователя
-        /// </summary>
-        public string Email { get; set; } = null!;
-
-        /// <summary>
-        /// Хэш пароля пользователя
-        /// </summary>
-        public string PasswordHash { get; set; } = null!;
-
-        /// <summary>
-        /// Роль пользователя
-        /// </summary>
-        public Role Role { get; set; }
+        public virtual IEnumerable<Role> Roles { get; set; } = null!;
 
         /// <summary>
         /// ФИО пользователя
@@ -37,7 +17,7 @@ namespace Adis.Dm
         public string? FullName { get; set; }
 
         /// <summary>
-        /// Время создателя проекта
+        /// Время создания пользователя
         /// </summary>
         public DateTime CreatedAt { get; set; }
 

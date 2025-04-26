@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace Adis.Bll.Profiles
 {
+    /// <summary>
+    /// Профиль для настройки AutoMapper для пользователей
+    /// </summary>
     public class UserProfile : Profile
     {
         public UserProfile() 

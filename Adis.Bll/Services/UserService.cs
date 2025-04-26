@@ -32,8 +32,10 @@ namespace Adis.Bll.Services
                 throw new ArgumentException("Эта почта уже занята другим пользователем");
 
             userDto.PasswordHash = HashHelper.ComputeSha256Hash(userDto.PasswordHash);
+            var user = _mapper.Map<User>(userDto);
+            user.Roles = new List<Role> { };
 
-            return _mapper.Map<UserDto>(await _userRepository.AddAsync(_mapper.Map<User>(userDto)));
+            return _mapper.Map<UserDto>(await _userRepository.AddAsync(user));
         }
     }
 }

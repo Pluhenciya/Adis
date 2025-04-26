@@ -2,6 +2,7 @@
 using Adis.Bll.Interfaces;
 using Adis.Dm;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace Adis.Api.Controllers
 {
@@ -26,12 +27,19 @@ namespace Adis.Api.Controllers
         ///         "name": "​Капитальный ремонт автомобильной дороги Красноборск – Хмелевская на участке км 0+000 – км 2+757 (устройство электроосвещения) в Красноборском районе Архангельской области. 1 пусковой комплекс",
         ///         "budget": 49041762.00,
         ///         "startDate": "2024-01-01",
-        ///         "endDate": "2024-12-31"
+        ///         "endDate": "2024-12-31",
+        ///         "status": "draft"
         ///     }
         ///
         /// </remarks>
         /// <param name="project">Данные нового проекта</param>
+        /// <response code="200">Успешное выполнение</response>
+        /// <response code="400">Ошибка валидации данных</response>
+        /// <response code="500">Ошибка сервера</response>
         [HttpPost]
+        [ProducesResponseType(typeof(ProjectDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> AddProject(ProjectDto project)
         {
             try
@@ -92,7 +100,8 @@ namespace Adis.Api.Controllers
         ///         "name": "​Капитальный ремонт автомобильной дороги Красноборск – Хмелевская на участке км 0+000 – км 2+757 (устройство электроосвещения) в Красноборском районе Архангельской области. 1 пусковой комплекс",
         ///         "budget": 49041762.00,
         ///         "startDate": "2024-01-01",
-        ///         "endDate": "2024-12-31"
+        ///         "endDate": "2024-12-31",
+        ///         "status": "draft"
         ///     }
         ///
         /// </remarks>

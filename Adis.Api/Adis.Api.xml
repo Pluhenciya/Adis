@@ -4,6 +4,16 @@
         <name>Adis.Api</name>
     </assembly>
     <members>
+        <member name="T:Adis.Api.Controllers.AuthController">
+            <summary>
+            Позволяет авторизоваться в API пользователям
+            </summary>
+        </member>
+        <member name="M:Adis.Api.Controllers.AuthController.#ctor(Microsoft.AspNetCore.Identity.UserManager{Adis.Dm.User},Microsoft.AspNetCore.Identity.SignInManager{Adis.Dm.User},Duende.IdentityServer.Services.ITokenService)">
+            <summary>
+            Позволяет авторизоваться в API пользователям
+            </summary>
+        </member>
         <member name="T:Adis.Api.Controllers.ProjectsController">
             <summary>
             Позволяет управлять проектами
@@ -28,11 +38,15 @@
                      "name": "​Капитальный ремонт автомобильной дороги Красноборск – Хмелевская на участке км 0+000 – км 2+757 (устройство электроосвещения) в Красноборском районе Архангельской области. 1 пусковой комплекс",
                      "budget": 49041762.00,
                      "startDate": "2024-01-01",
-                     "endDate": "2024-12-31"
+                     "endDate": "2024-12-31",
+                     "status": "draft"
                  }
             
              </remarks>
              <param name="project">Данные нового проекта</param>
+             <response code="200">Успешное выполнение</response>
+             <response code="400">Ошибка валидации данных</response>
+             <response code="500">Ошибка сервера</response>
         </member>
         <member name="M:Adis.Api.Controllers.ProjectsController.GetProjects(System.Nullable{Adis.Dm.Status},System.String,System.String,System.String)">
              <summary>
@@ -64,11 +78,40 @@
                      "name": "​Капитальный ремонт автомобильной дороги Красноборск – Хмелевская на участке км 0+000 – км 2+757 (устройство электроосвещения) в Красноборском районе Архангельской области. 1 пусковой комплекс",
                      "budget": 49041762.00,
                      "startDate": "2024-01-01",
-                     "endDate": "2024-12-31"
+                     "endDate": "2024-12-31",
+                     "status": "draft"
                  }
             
              </remarks>
              <param name="project">Новые данные проекта</param>
+        </member>
+        <member name="T:Adis.Api.Controllers.UsersController">
+            <summary>
+            Позволяет управлять пользователями
+            </summary>
+        </member>
+        <member name="M:Adis.Api.Controllers.UsersController.#ctor(Adis.Bll.Interfaces.IUserService)">
+            <summary>
+            Позволяет управлять пользователями
+            </summary>
+        </member>
+        <member name="M:Adis.Api.Controllers.UsersController.AddUser(Adis.Bll.Dtos.UserDto)">
+             <summary>
+             Добавляет пользователей
+             </summary>
+             <remarks>
+             Пример запроса:
+            
+                 POST /api/users
+                 {
+                     "email": "ivan.petrov@example.com",
+                     "passwordHash": "1234",
+                     "role": "admin", 
+                     "fullName": "Петров Иван Сергеевич"
+                 }
+            
+             </remarks>
+             <param name="user">Данные нового пользователя</param>
         </member>
     </members>
 </doc>

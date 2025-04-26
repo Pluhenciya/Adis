@@ -6,12 +6,31 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Adis.Api.Controllers
 {
+    /// <summary>
+    /// Позволяет управлять пользователями
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController(IUserService userService) : ControllerBase
     {
         private readonly IUserService _userService = userService;
 
+        /// <summary>
+        /// Добавляет пользователей
+        /// </summary>
+        /// <remarks>
+        /// Пример запроса:
+        ///
+        ///     POST /api/users
+        ///     {
+        ///         "email": "ivan.petrov@example.com",
+        ///         "passwordHash": "1234",
+        ///         "role": "admin", 
+        ///         "fullName": "Петров Иван Сергеевич"
+        ///     }
+        ///
+        /// </remarks>
+        /// <param name="user">Данные нового пользователя</param>
         [HttpPost]
         public async Task<IActionResult> AddUser(UserDto user)
         {

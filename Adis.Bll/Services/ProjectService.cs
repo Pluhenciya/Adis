@@ -22,8 +22,6 @@ namespace Adis.Bll.Services
         /// <exception cref="ArgumentException">Возникает когда данные проекта не прошли валидацию</exception>
         public async Task<ProjectDto> AddProjectAsync(ProjectDto project)
         {
-            if (project.Budget < 0)
-                throw new ArgumentException("Бюджет не может быть отрицательным");
             if (project.StartDate > project.EndDate)
                 throw new ArgumentException("Дата оканчания не может быть меньше чем дата начала");
             return _mapper.Map<ProjectDto>(await _projectRepository.AddAsync(_mapper.Map<Project>(project)));
@@ -53,8 +51,6 @@ namespace Adis.Bll.Services
             {
                 var existingProject = await _projectRepository.GetByIdAsync(project.IdProduct);
 
-                if (project.Budget < 0)
-                    throw new ArgumentException("Бюджет не может быть отрицательным");
                 if (project.StartDate > project.EndDate)
                     throw new ArgumentException("Дата оканчания не может быть меньше чем дата начала");
 
