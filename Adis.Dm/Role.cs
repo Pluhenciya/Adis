@@ -13,6 +13,9 @@ namespace Adis.Dm
     /// </summary>
     public class Role : IdentityRole<int>
     {
+        /// <summary>
+        /// Пользователи с этой ролью
+        /// </summary>
         public virtual IEnumerable<User> Users { get; set; } = null!;
     }
 }

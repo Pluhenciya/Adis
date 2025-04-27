@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 
 namespace Adis.Bll.Services
 {
+    /// <inheritdoc cref="IAuthService"/>
     public class AuthService : IAuthService
     {
         private readonly UserManager<User> _userManager;
@@ -108,7 +109,7 @@ namespace Adis.Bll.Services
         {
             var principal = GetPrincipalFromExpiredToken(token);
             var idUser = principal.FindFirstValue(ClaimTypes.NameIdentifier);
-            var user = await _userManager.FindByIdAsync(idUser);
+            var user = await _userManager.FindByIdAsync(idUser!);
 
             if (user == null)
                 return ErrorResult("Invalid token");

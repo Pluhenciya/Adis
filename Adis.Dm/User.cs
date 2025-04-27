@@ -26,6 +26,9 @@ namespace Adis.Dm
         /// </summary>
         public virtual IEnumerable<Project> Projects { get; set; } = null!;
 
+        /// <summary>
+        /// Токены обновления этого пользователя
+        /// </summary>
         public virtual IEnumerable<RefreshToken> RefreshTokens { get; set; }= null!;
     }
 }

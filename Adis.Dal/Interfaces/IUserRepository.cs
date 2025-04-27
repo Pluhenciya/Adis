@@ -12,6 +12,10 @@ namespace Adis.Dal.Interfaces
     /// </summary>
     public interface IUserRepository : IRepository<User>
     {
+        /// <summary>
+        /// Возвращает пользователя с ролью
+        /// </summary>
+        /// <returns>Пользователь с ролью</returns>
         public Task<IEnumerable<User>> GetUsersWithRoleAsync();
     }
 }

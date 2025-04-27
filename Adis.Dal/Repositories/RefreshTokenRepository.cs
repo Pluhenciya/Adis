@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace Adis.Dal.Repositories
 {
+    /// <inheritdoc cref="IRefreshTokenRepository"/>
     public class RefreshTokenRepository : EFGenericRepository<RefreshToken>, IRefreshTokenRepository
     {
         public RefreshTokenRepository(AppDbContext dbContext) : base(dbContext)

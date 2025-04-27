@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace Adis.Dal.Specifications
 {
+    /// <summary>
+    /// Спецификация для получения пользователей с ролью
+    /// </summary>
     public class UserWithRoleSpecification : Specification<User>
     {
         public UserWithRoleSpecification() 

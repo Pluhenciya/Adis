@@ -1,6 +1,7 @@
 ﻿using Adis.Dm;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,16 +21,20 @@ namespace Adis.Bll.Dtos
         /// <summary>
         /// Почта пользователя
         /// </summary>
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Почта обязательна")]
+        [EmailAddress]
         public string Email { get; set; } = null!;
 
         /// <summary>
         /// Пароль пользователя
         /// </summary>
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Пароль обязателен")]
         public string Password { get; set; } = null!;
 
         /// <summary>
         /// Роль пользователя
         /// </summary>
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Роль обязательна")]
         public string Role { get; set; } = null!;
 
         /// <summary>

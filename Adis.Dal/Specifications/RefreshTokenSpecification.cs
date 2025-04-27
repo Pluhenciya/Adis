@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace Adis.Dal.Specifications
 {
+    /// <summary>
+    /// Спецификация для получения токена обновления по его значению и идентификатору пользователя, которому он принадлежит
+    /// </summary>
     public class RefreshTokenSpecification : Specification<RefreshToken>
     {
         public RefreshTokenSpecification(string token, int idUser)
