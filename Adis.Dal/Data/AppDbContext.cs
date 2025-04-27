@@ -200,12 +200,8 @@ namespace Adis.Dal.Data
 
                 entity.HasMany(r => r.Users)
                     .WithMany(u => u.Roles)
-                    .UsingEntity<Dictionary<string, object>>(
-                            "user_has_roles",
-                            j => j.HasOne<User>().WithMany().HasForeignKey("user_id"),
-                            j => j.HasOne<Role>().WithMany().HasForeignKey("role_id"),
-                            j => j.ToTable("user_has_roles"));
-                        });
+                    .UsingEntity<IdentityUserRole<int>>();
+            });
 
             modelBuilder.Entity<IdentityUserClaim<int>>().ToTable("user_claims");
             modelBuilder.Entity<IdentityUserLogin<int>>().ToTable("user_logins");

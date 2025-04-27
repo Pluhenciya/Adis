@@ -16,6 +16,12 @@ namespace Adis.Dal.Repositories
         public UserRepository(AppDbContext dbContext) : base(dbContext)
         {
         }
+
+        public async Task<IEnumerable<User>> GetUsersWithRoleAsync()
+        {
+            UserWithRoleSpecification specification = new UserWithRoleSpecification();
+            return await GetAsync(specification);
+        }
     }
 }
         

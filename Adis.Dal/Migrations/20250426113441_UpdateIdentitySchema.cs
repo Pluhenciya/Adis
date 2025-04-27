@@ -398,11 +398,11 @@ namespace Adis.Dal.Migrations
                 name: "roles");
 
             migrationBuilder.DropIndex(
-                name: "EmailIndex",
+                name: "ix_email",
                 table: "users");
 
             migrationBuilder.DropIndex(
-                name: "UserNameIndex",
+                name: "ix_user_name",
                 table: "users");
 
             migrationBuilder.DropColumn(
@@ -512,7 +512,8 @@ namespace Adis.Dal.Migrations
                 column: "id_user",
                 principalTable: "users",
                 principalColumn: "id_user",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction,
+                onUpdate: ReferentialAction.Cascade);
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Adis.Bll.Dtos;
-using Adis.Bll.Helpers;
 using Adis.Bll.Interfaces;
 using Adis.Dal.Interfaces;
 using Adis.Dm;
@@ -20,15 +19,18 @@ namespace Adis.Bll.Services
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<Role> _roleManager;
         private readonly IMapper _mapper;
+        private readonly IUserRepository _userRepository;
 
         public UserService(
             UserManager<User> userManager,
             RoleManager<Role> roleManager,
-            IMapper mapper)
+            IMapper mapper,
+            IUserRepository userRepository)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _mapper = mapper;
+            _userRepository = userRepository;
         }
 
         /// <inheritdoc/>
@@ -68,6 +70,11 @@ namespace Adis.Bll.Services
             var createdUser = _mapper.Map<UserDto>(user);
             createdUser.Role = userDto.Role;
             return createdUser;
+        }
+
+        public async Task<IEnumerable<UserDto>> GetUsersAsync()
+        {
+            return _mapper.Map<IEnumerable<UserDto>>(await _userRepository.GetUsersWithRoleAsync());
         }
     }
 }

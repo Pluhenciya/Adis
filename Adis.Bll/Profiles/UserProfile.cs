@@ -16,7 +16,8 @@ namespace Adis.Bll.Profiles
     {
         public UserProfile() 
         {
-            CreateMap<User, UserDto>().ReverseMap();
+            CreateMap<User, UserDto>().ForMember("Role", opt => opt.MapFrom(u => u.Roles.FirstOrDefault()!.Name!.ToString()));
+            CreateMap<UserDto, User>();
         }
     }
 }
