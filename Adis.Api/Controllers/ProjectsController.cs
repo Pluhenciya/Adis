@@ -28,7 +28,8 @@ namespace Adis.Api.Controllers
         ///         "budget": 49041762.00,
         ///         "startDate": "2024-01-01",
         ///         "endDate": "2024-12-31",
-        ///         "status": "draft"
+        ///         "status": "draft",
+        ///         "idUser": 1
         ///     }
         ///
         /// </remarks>
@@ -66,6 +67,10 @@ namespace Adis.Api.Controllers
         /// <param name="targetDate">Дата, в которую проект будет выполняться (yyyy-MM-dd)</param>
         /// <param name="startDateFrom">Начальная дата диапазона (yyyy-MM-dd)</param>
         /// <param name="startDateTo">Конечная дата диапазона (yyyy-MM-dd)</param>
+        /// <param name="page">Номер страницы для пагинации</param>
+        /// <param name="pageSize">Количество записей на страницы</param>
+        /// <param name="sortField">Свойство, по которому сортировать</param>
+        /// <param name="sortOrder">Сортировать по возрастанию или по убыванию</param>
         /// <response code="200">Успешное выполнение</response>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<ProjectDto>), (int)HttpStatusCode.OK)]
@@ -73,9 +78,32 @@ namespace Adis.Api.Controllers
             [FromQuery] Status? status,
             [FromQuery] string? targetDate,
             [FromQuery] string? startDateFrom,
-            [FromQuery] string? startDateTo)
+            [FromQuery] string? startDateTo,
+            [FromQuery] string sortField = "StartDate",
+            [FromQuery] string sortOrder = "desc",
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10)
         {
-                return Ok(await _projectService.GetProjectsAsync(status, targetDate, startDateFrom, startDateTo));
+            if (page < 1) page = 1;
+            if (pageSize < 1 || pageSize > 100) pageSize = 10;
+
+            var result = await _projectService.GetProjectsAsync(
+                status,
+                targetDate,
+                startDateFrom,
+                startDateTo,
+                sortField,
+                sortOrder,
+                page,
+                pageSize);
+
+            return Ok(new ProjectsResponseDto
+            {
+                Projects = result.Items,
+                TotalCount = result.TotalCount,
+                Page = page,
+                PageSize = pageSize
+            });
         }
 
         /// <summary>
@@ -91,7 +119,8 @@ namespace Adis.Api.Controllers
         ///         "budget": 49041762.00,
         ///         "startDate": "2024-01-01",
         ///         "endDate": "2024-12-31",
-        ///         "status": "draft"
+        ///         "status": "draft",
+        ///         "idUser": 1
         ///     }
         ///
         /// </remarks>

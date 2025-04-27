@@ -19,11 +19,19 @@ namespace Adis.Dal.Interfaces
         /// <param name="targetDate">Дата, в которую проект будет выполнятся</param>
         /// <param name="startDateFrom">Дата начала диапозона поиска проекта</param>
         /// <param name="startDateTo">Дата конца диапозона поиска проекта</param>
-        /// <returns>Отфильтрованный список проетов</returns>
-        public Task<IEnumerable<Project>> GetFilteredProjectsAsync(
-            Status? status = null,
-            DateOnly? targetDate = null,
-            DateOnly? startDateFrom = null,
-            DateOnly? startDateTo = null);
+        /// <param name="page">Номер страницы для пагинации</param>
+        /// <param name="pageSize">Количество записей на страницы</param>
+        /// <param name="sortField">Свойство, по которому сортировать</param>
+        /// <param name="sortOrder">Сортировать по возрастанию или по убыванию</param>
+        /// <returns>Отфильтрованный список проетов и их общее количество</returns>
+        Task<(IEnumerable<Project>, int)> GetFilteredProjectsAsync(
+        Status? status = null,
+        DateOnly? targetDate = null,
+        DateOnly? startDateFrom = null,
+        DateOnly? startDateTo = null,
+        string sortField = "StartDate",
+        string sortOrder = "desc",
+        int page = 1,
+        int pageSize = 10);
     }
 }

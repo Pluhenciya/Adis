@@ -1,0 +1,76 @@
+<!-- project-list.component.html -->
+<div class="container">
+    <div class="filters">
+      <mat-form-field appearance="outline">
+        <mat-label>Статус</mat-label>
+        <mat-select [(value)]="statusFilter" (selectionChange)="applyFilter()">
+          <mat-option value="">Все</mat-option>
+          <mat-option value="draft">Черновик</mat-option>
+          <mat-option value="inProgress">Выполняется</mat-option>
+          <mat-option value="completed">Завершен</mat-option>
+          <mat-option value="overdue">Просрочен</mat-option>
+        </mat-select>
+      </mat-form-field>
+  
+      <mat-form-field appearance="outline">
+        <mat-label>Дата создания</mat-label>
+        <input matInput [matDatepicker]="picker" 
+               (dateChange)="applyFilter()" 
+               [(ngModel)]="dateFilter">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+  
+      <button mat-raised-button color="warn" (click)="resetFilters()">
+        Сбросить фильтры
+      </button>
+    </div>
+  
+    <div class="table-container">
+      <div *ngIf="isLoading" class="loading-overlay">
+        <mat-spinner diameter="50"></mat-spinner>
+      </div>
+      
+      <table mat-table [dataSource]="dataSource" matSort>
+        <!-- Name Column -->
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Название проекта</th>
+          <td mat-cell *matCellDef="let project">{{ project.name }}</td>
+        </ng-container>
+  
+        <!-- Status Column -->
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Статус</th>
+          <td mat-cell *matCellDef="let project">
+            <mat-chip [ngClass]="project.status">
+              {{ project.status | titlecase }}
+            </mat-chip>
+          </td>
+        </ng-container>
+  
+        <!-- Created At Column -->
+        <ng-container matColumnDef="createdAt">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Дата создания</th>
+          <td mat-cell *matCellDef="let project">
+            {{ project.createdAt | date: 'dd.MM.yyyy' }}
+          </td>
+        </ng-container>
+  
+        <!-- Budget Column -->
+        <ng-container matColumnDef="budget">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Бюджет</th>
+          <td mat-cell *matCellDef="let project">
+            {{ project.budget | currency }}
+          </td>
+        </ng-container>
+  
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+  
+      <mat-paginator [pageSizeOptions]="[10, 20, 50]" 
+                     showFirstLastButtons
+                     aria-label="Select page of projects">
+      </mat-paginator>
+    </div>
+  </div>

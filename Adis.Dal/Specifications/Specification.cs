@@ -1,4 +1,5 @@
 ﻿using Adis.Dal.Interfaces;
+using Adis.Dm;
 using LinqKit;
 using System;
 using System.Collections.Generic;
@@ -22,6 +23,11 @@ namespace Adis.Dal.Specifications
 
         public Expression<Func<T, bool>>? Criteria { get; protected set; }
         public List<Expression<Func<T, object>>> Includes { get; } = new();
+        public Expression<Func<T, object>>? OrderBy { get; private set; }
+        public Expression<Func<T, object>>? OrderByDescending { get; private set; }
+        public int Take { get; private set; }
+        public int Skip { get; private set; }
+        public bool IsPagingEnabled { get; private set; }
 
         /// <summary>
         /// Добавляет связанную таблицу
@@ -41,6 +47,39 @@ namespace Adis.Dal.Specifications
             Criteria = Criteria == null
                 ? newCriteria
                 : PredicateBuilder.And(Criteria, newCriteria);
+        }
+
+        protected void ApplyOrderBy(Expression<Func<T, object>> orderByExpression)
+        {
+            OrderBy = orderByExpression;
+            OrderByDescending = null;
+        }
+
+        protected void ApplyOrderByDescending(Expression<Func<T, object>> orderByDescendingExpression)
+        {
+            OrderByDescending = orderByDescendingExpression;
+            OrderBy = null;
+        }
+
+        // Методы для пагинации
+        protected void ApplyPaging(int skip, int take)
+        {
+            if (take <= 0)
+                throw new ArgumentException("Take must be greater than 0", nameof(take));
+
+            if (skip < 0)
+                throw new ArgumentException("Skip must be greater than or equal to 0", nameof(skip));
+
+            Skip = skip;
+            Take = take;
+            IsPagingEnabled = true;
+        }
+
+        protected void DisablePaging()
+        {
+            IsPagingEnabled = false;
+            Skip = 0;
+            Take = 0;
         }
     }
 }

@@ -85,6 +85,11 @@ namespace Adis.Dal.Data
                 entity.ToTable(t => t.HasCheckConstraint("chk_projects_budget", "budget >= 0"));
 
                 entity.ToTable(t => t.HasCheckConstraint("chk_projects_dates", "start_date <= end_date"));
+
+                entity.HasOne(p => p.User)
+                    .WithMany(u => u.Projects)
+                    .HasForeignKey(p => p.IdUser)
+                    .HasConstraintName("fk_projects_user");
             });
 
             modelBuilder.Entity<User>(entity =>

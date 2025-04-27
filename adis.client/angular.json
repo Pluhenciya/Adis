@@ -37,7 +37,8 @@
               }
             ],
             "styles": [
-              "src/styles.css"
+              "@angular/material/prebuilt-themes/azure-blue.css",
+              "src/styles.scss"
             ],
             "scripts": []
           },
@@ -77,7 +78,8 @@
           },
           "defaultConfiguration": "development",
           "options": {
-            "port": 59422
+            "port": 59422,
+            "proxyConfig": "src/proxy.conf.json"
           }
         },
         "extract-i18n": {
@@ -98,7 +100,8 @@
               }
             ],
             "styles": [
-              "src/styles.css"
+              "@angular/material/prebuilt-themes/azure-blue.css",
+              "src/styles.scss"
             ],
             "scripts": [],
             "karmaConfig": "karma.conf.js"
