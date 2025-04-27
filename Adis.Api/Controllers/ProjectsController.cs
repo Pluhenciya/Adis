@@ -35,11 +35,9 @@ namespace Adis.Api.Controllers
         /// <param name="project">Данные нового проекта</param>
         /// <response code="200">Успешное выполнение</response>
         /// <response code="400">Ошибка валидации данных</response>
-        /// <response code="500">Ошибка сервера</response>
         [HttpPost]
         [ProducesResponseType(typeof(ProjectDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> AddProject(ProjectDto project)
         {
             try
@@ -49,10 +47,6 @@ namespace Adis.Api.Controllers
             catch (ArgumentException ex)
             {
                 return BadRequest(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "Внутренняя ошибка сервера: " + ex.Message);
             }
         }
 
@@ -66,26 +60,22 @@ namespace Adis.Api.Controllers
         ///     GET /api/projects?targetDate=2024-05-15
         ///     GET /api/projects?startDateFrom=2024-01-01&amp;startDateTo=2024-06-30
         ///     GET /api/projects?status=2&amp;targetDate=2024-07-01
+        ///     
         /// </remarks>
         /// <param name="status">Статус отфильтрованных проектов</param>
         /// <param name="targetDate">Дата, в которую проект будет выполняться (yyyy-MM-dd)</param>
         /// <param name="startDateFrom">Начальная дата диапазона (yyyy-MM-dd)</param>
         /// <param name="startDateTo">Конечная дата диапазона (yyyy-MM-dd)</param>
+        /// <response code="200">Успешное выполнение</response>
         [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<ProjectDto>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetProjects(
             [FromQuery] Status? status,
             [FromQuery] string? targetDate,
             [FromQuery] string? startDateFrom,
             [FromQuery] string? startDateTo)
         {
-            try
-            {
                 return Ok(await _projectService.GetProjectsAsync(status, targetDate, startDateFrom, startDateTo));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "Внутренняя ошибка сервера: " + ex.Message);
-            }
         }
 
         /// <summary>
@@ -94,7 +84,7 @@ namespace Adis.Api.Controllers
         /// <remarks>
         /// Пример запроса:
         ///
-        ///     POST /api/projects
+        ///     PUT /api/projects
         ///     {
         ///         "idProduct": 1,
         ///         "name": "​Капитальный ремонт автомобильной дороги Красноборск – Хмелевская на участке км 0+000 – км 2+757 (устройство электроосвещения) в Красноборском районе Архангельской области. 1 пусковой комплекс",
@@ -106,7 +96,11 @@ namespace Adis.Api.Controllers
         ///
         /// </remarks>
         /// <param name="project">Новые данные проекта</param>
+        /// <response code="200">Успешное выполнение</response>
+        /// <response code="400">Ошибка валидации данных</response>
         [HttpPut]
+        [ProducesResponseType(typeof(ProjectDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> UpdateProject(ProjectDto project)
         {
             try
@@ -116,10 +110,6 @@ namespace Adis.Api.Controllers
             catch (ArgumentException ex)
             {
                 return BadRequest(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "Внутренняя ошибка сервера: " + ex.Message);
             }
         }
     }

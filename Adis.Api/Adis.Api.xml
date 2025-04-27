@@ -4,6 +4,51 @@
         <name>Adis.Api</name>
     </assembly>
     <members>
+        <member name="T:Adis.Api.Controllers.AuthController">
+            <summary>
+            Позволяет авторизовываться пользавателям
+            </summary>
+        </member>
+        <member name="M:Adis.Api.Controllers.AuthController.#ctor(Adis.Bll.Interfaces.IAuthService)">
+            <summary>
+            Позволяет авторизовываться пользавателям
+            </summary>
+        </member>
+        <member name="M:Adis.Api.Controllers.AuthController.Login(Adis.Bll.Dtos.Auth.LoginRequest)">
+             <summary>
+             Возврашает два токена для Bearer авторизации по данным для входа
+             </summary>
+             <remarks>
+             Пример запроса:
+            
+                 POST /api/auth/login
+                 {
+                     "email": "ivan.petrov@example.com",
+                     "password": "Ispp1234_"
+                 }
+            
+             </remarks>
+             <param name="request">Данные для авторизации(почта и пароль)</param>
+             <response code="200">Успешное выполнение</response>
+             <response code="401">Ошибка авторизации</response>
+        </member>
+        <member name="M:Adis.Api.Controllers.AuthController.RefreshToken(Adis.Bll.Dtos.Auth.RefreshTokenRequest)">
+             <summary>
+             Возврашает два токена для Bearer авторизации по токену обновления
+             </summary>
+             <remarks>
+             Пример запроса:
+            
+                 POST /api/auth/login
+                 {
+                     "accessToken": "access_token",
+                     "refreshToken": "refresh_token"
+                 }
+            
+             </remarks>
+             <param name="request">Токены для обновления</param>
+             <response code="200">Успешное выполнение</response>
+        </member>
         <member name="T:Adis.Api.Controllers.ProjectsController">
             <summary>
             Позволяет управлять проектами
@@ -36,7 +81,6 @@
              <param name="project">Данные нового проекта</param>
              <response code="200">Успешное выполнение</response>
              <response code="400">Ошибка валидации данных</response>
-             <response code="500">Ошибка сервера</response>
         </member>
         <member name="M:Adis.Api.Controllers.ProjectsController.GetProjects(System.Nullable{Adis.Dm.Status},System.String,System.String,System.String)">
              <summary>
@@ -49,11 +93,13 @@
                  GET /api/projects?targetDate=2024-05-15
                  GET /api/projects?startDateFrom=2024-01-01&amp;startDateTo=2024-06-30
                  GET /api/projects?status=2&amp;targetDate=2024-07-01
+                 
              </remarks>
              <param name="status">Статус отфильтрованных проектов</param>
              <param name="targetDate">Дата, в которую проект будет выполняться (yyyy-MM-dd)</param>
              <param name="startDateFrom">Начальная дата диапазона (yyyy-MM-dd)</param>
              <param name="startDateTo">Конечная дата диапазона (yyyy-MM-dd)</param>
+             <response code="200">Успешное выполнение</response>
         </member>
         <member name="M:Adis.Api.Controllers.ProjectsController.UpdateProject(Adis.Bll.Dtos.ProjectDto)">
              <summary>
@@ -62,7 +108,7 @@
              <remarks>
              Пример запроса:
             
-                 POST /api/projects
+                 PUT /api/projects
                  {
                      "idProduct": 1,
                      "name": "​Капитальный ремонт автомобильной дороги Красноборск – Хмелевская на участке км 0+000 – км 2+757 (устройство электроосвещения) в Красноборском районе Архангельской области. 1 пусковой комплекс",
@@ -74,6 +120,8 @@
             
              </remarks>
              <param name="project">Новые данные проекта</param>
+             <response code="200">Успешное выполнение</response>
+             <response code="400">Ошибка валидации данных</response>
         </member>
         <member name="T:Adis.Api.Controllers.UsersController">
             <summary>
@@ -87,7 +135,7 @@
         </member>
         <member name="M:Adis.Api.Controllers.UsersController.AddUser(Adis.Bll.Dtos.UserDto)">
              <summary>
-             Добавляет пользователей
+             Добавляет пользователя
              </summary>
              <remarks>
              Пример запроса:
@@ -102,6 +150,20 @@
             
              </remarks>
              <param name="user">Данные нового пользователя</param>
+             <response code="200">Успешное выполнение</response>
+             <response code="400">Ошибка валидации данных</response>
+        </member>
+        <member name="M:Adis.Api.Controllers.UsersController.GetUsers">
+             <summary>
+             Возвращает список пользователей
+             </summary>
+             <remarks>
+             Пример запроса:
+            
+                 GET /api/users
+            
+             </remarks>
+             <response code="200">Успешное выполнение</response>
         </member>
     </members>
 </doc>
