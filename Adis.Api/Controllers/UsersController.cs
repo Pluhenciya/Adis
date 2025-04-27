@@ -49,5 +49,18 @@ namespace Adis.Api.Controllers
                 return StatusCode(500, "Внутренняя ошибка сервера: " + ex.Message);
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetUsers()
+        {
+            try
+            {
+                return Ok(await _userService.GetUsersAsync());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Внутренняя ошибка сервера: " + ex.Message);
+            }
+        }
     }
 }

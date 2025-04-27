@@ -18,5 +18,7 @@ namespace Adis.Bll.Interfaces
         /// <param name="userDto">Данные нового пользователя</param>
         /// <returns>Созданный пользователь</returns>
         public Task<UserDto> AddUserAsync(UserDto userDto);
+
+        public Task<IEnumerable<UserDto>> GetUsersAsync();
     }
 }

@@ -12,5 +12,6 @@ namespace Adis.Dal.Interfaces
     /// </summary>
     public interface IUserRepository : IRepository<User>
     {
+        public Task<IEnumerable<User>> GetUsersWithRoleAsync();
     }
 }

@@ -4,6 +4,7 @@ using Adis.Dal.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Adis.Dal.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250427130411_FixUserHasRole")]
+    partial class FixUserHasRole
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -408,6 +411,21 @@ namespace Adis.Dal.Migrations
                     b.ToTable("user_tokens", (string)null);
                 });
 
+            modelBuilder.Entity("user_has_roles", b =>
+                {
+                    b.Property<int>("id_role")
+                        .HasColumnType("int");
+
+                    b.Property<int>("id_user")
+                        .HasColumnType("int");
+
+                    b.HasKey("id_role", "id_user");
+
+                    b.HasIndex("id_user");
+
+                    b.ToTable("user_has_roles", (string)null);
+                });
+
             modelBuilder.Entity("Adis.Dm.Project", b =>
                 {
                     b.HasOne("Adis.Dm.User", "User")
@@ -479,6 +497,21 @@ namespace Adis.Dal.Migrations
                     b.HasOne("Adis.Dm.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("user_has_roles", b =>
+                {
+                    b.HasOne("Adis.Dm.Role", null)
+                        .WithMany()
+                        .HasForeignKey("id_role")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Adis.Dm.User", null)
+                        .WithMany()
+                        .HasForeignKey("id_user")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
