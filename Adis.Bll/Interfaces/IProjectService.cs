@@ -27,8 +27,20 @@ namespace Adis.Bll.Interfaces
         /// <param name="targetDate">Дата, в которую проект будет выполнятся</param>
         /// <param name="startDateFrom">Дата начала диапозона поиска проекта</param>
         /// <param name="startDateTo">Дата конца диапозона поиска проекта</param>
+        /// <param name="page">Номер страницы для пагинации</param>
+        /// <param name="pageSize">Количество записей на страницы</param>
+        /// <param name="sortField">Свойство, по которому сортировать</param>
+        /// <param name="sortOrder">Сортировать по возрастанию или по убыванию</param>
         /// <returns>Список проектов</returns>
-        public Task<IEnumerable<ProjectDto>> GetProjectsAsync(Status? status, string? targetDate, string? startDateFrom, string? startDateTo);
+        public Task<PaginatedResult<ProjectDto>> GetProjectsAsync(
+        Status? status,
+        string? targetDate,
+        string? startDateFrom,
+        string? startDateTo,
+        string sortField = "StartDate",
+        string sortOrder = "desc",
+        int page = 1,
+        int pageSize = 10);
 
         /// <summary>
         /// Заполняет проект новыми данными

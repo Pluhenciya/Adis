@@ -55,9 +55,42 @@ namespace Adis.Dal.Repositories
             await _dbContext.SaveChangesAsync();
             return entry.Entity;
         }
-        private IQueryable<T> ApplySpecification(ISpecification<T>? specification)
+        private IQueryable<T> ApplySpecification(ISpecification<T>? spec)
         {
-            return SpecificationEvaluator.GetQuery(_dbContext.Set<T>().AsQueryable(), specification);
+            var query = _dbContext.Set<T>().AsQueryable();
+
+            if (spec == null) return query;
+
+            // Включаем связанные сущности
+            if (spec.Includes != null)
+            {
+                query = spec.Includes
+                    .Aggregate(query, (current, include) => current.Include(include));
+            }
+
+            // Фильтрация
+            if (spec.Criteria != null)
+            {
+                query = query.Where(spec.Criteria);
+            }
+
+            // Сортировка
+            if (spec.OrderBy != null)
+            {
+                query = query.OrderBy(spec.OrderBy);
+            }
+            else if (spec.OrderByDescending != null)
+            {
+                query = query.OrderByDescending(spec.OrderByDescending);
+            }
+
+            // Пагинация
+            if (spec.IsPagingEnabled)
+            {
+                query = query.Skip(spec.Skip).Take(spec.Take);
+            }
+
+            return query;
         }
     }
 }

@@ -27,20 +27,35 @@ namespace Adis.Bll.Services
             return _mapper.Map<ProjectDto>(await _projectRepository.AddAsync(_mapper.Map<Project>(project)));
         }
 
-        public async Task<IEnumerable<ProjectDto>> GetProjectsAsync(Status? status, string? targetDate, string? startDateFrom, string? startDateTo)
+        public async Task<PaginatedResult<ProjectDto>> GetProjectsAsync(
+            Status? status,
+            string? targetDate,
+            string? startDateFrom,
+            string? startDateTo,
+            string sortField = "StartDate",
+            string sortOrder = "desc",
+            int page = 1,
+            int pageSize = 10)
         {
-            // Парсинг дат из query-параметров
-            DateOnly? parsedTargetDate = ParseDate(targetDate);
-            DateOnly? parsedStartDateFrom = ParseDate(startDateFrom);
-            DateOnly? parsedStartDateTo = ParseDate(startDateTo);
+            var parsedTargetDate = ParseDate(targetDate);
+            var parsedStartDateFrom = ParseDate(startDateFrom);
+            var parsedStartDateTo = ParseDate(startDateTo);
 
-            var projects = await _projectRepository.GetFilteredProjectsAsync(
+            var (projects, totalCount) = await _projectRepository.GetFilteredProjectsAsync(
                 status,
                 parsedTargetDate,
                 parsedStartDateFrom,
-                parsedStartDateTo);
+                parsedStartDateTo,
+                sortField,
+                sortOrder,
+                page,
+                pageSize);
 
-            return _mapper.Map<IEnumerable<ProjectDto>>(projects);
+            return new PaginatedResult<ProjectDto>
+            {
+                Items = _mapper.Map<IEnumerable<ProjectDto>>(projects),
+                TotalCount = totalCount
+            };
         }
 
         /// <inheritdoc/>
