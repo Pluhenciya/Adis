@@ -78,6 +78,8 @@ namespace Adis.Dal.Specifications
                 "name" => p => p.Name,
                 "startdate" => p => p.StartDate,
                 "budget" => p => p.Budget,
+                "idproject" => p => p.IdProject,
+                "createdat" => p => p.CreatedAt,
                 _ => null
             };
         }

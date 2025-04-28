@@ -36,11 +36,11 @@ namespace Adis.Dal.Data
             {
                 entity.ToTable("projects");
 
-                entity.HasKey(p => p.IdProduct)
+                entity.HasKey(p => p.IdProject)
                     .HasName("PRIMARY");
 
-                entity.Property(p => p.IdProduct)
-                    .HasColumnName("id_product");
+                entity.Property(p => p.IdProject)
+                    .HasColumnName("id_project");
 
                 entity.Property(p => p.Name)
                     .HasColumnName("name")
@@ -65,6 +65,11 @@ namespace Adis.Dal.Data
                     .HasColumnName("end_date")
                     .HasColumnType("date")
                     .IsRequired();
+
+                entity.Property(p => p.CreatedAt)
+                    .HasColumnName("created_at")
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                 entity.Property(p => p.Status)
                     .HasColumnName("status")

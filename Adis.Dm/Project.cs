@@ -14,7 +14,7 @@ namespace Adis.Dm
         /// <summary>
         /// Идентификатор проекта
         /// </summary>
-        public int IdProduct { get; set; }
+        public int IdProject { get; set; }
 
         /// <summary>
         /// Название проекта
@@ -45,6 +45,11 @@ namespace Adis.Dm
         /// Статус проекта
         /// </summary>
         public Status Status { get; set; }
+
+        /// <summary>
+        /// Время создания
+        /// </summary>
+        public DateTime CreatedAt { get; set; }
 
         /// <summary>
         /// Идентификатор пользователя создавшего проект

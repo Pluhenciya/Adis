@@ -54,6 +54,11 @@ namespace Adis.Bll.Dtos
         [Required(AllowEmptyStrings = false, ErrorMessage = "Статус проекта обязателен")]
         public Status Status { get; set; }
 
+        /// <summary>
+        /// Время создания
+        /// </summary>
+        public DateTime? CreatedAt { get; set; }
+
         [Required(ErrorMessage = "Идентификатор пользователя обязателен")]
         public int IdUser { get; set; }
     }

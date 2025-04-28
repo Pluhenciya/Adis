@@ -1,9 +1,10 @@
 export interface Project {
-    id: number;
+    idProduct: number;
     name: string;
     status: 'draft' | 'inProgress' | 'completed' | 'overdue';
-    createdAt: Date;
+    description: string;
     budget: number;
     startDate?: Date;
     endDate?: Date;
+    createdAt: Date;
   }

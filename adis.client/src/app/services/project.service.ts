@@ -4,9 +4,18 @@ import { Observable } from 'rxjs';
 import { Project } from '../models/project.model';
 import { environment } from '../environments/environment';
 
+interface ProjectsResponse {
+  projects: Project[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}
+
+
 @Injectable({
   providedIn: 'root'
 })
+
 export class ProjectService {
   private apiUrl = environment.apiUrl;
 
@@ -18,10 +27,10 @@ export class ProjectService {
     sortField?: string;
     sortOrder?: 'asc' | 'desc';
     status?: string;
-    targetDate?: Date;
+    targetDate?: string; 
     startDateFrom?: Date;
     startDateTo?: Date;
-  }): Observable<{ projects: Project[]; totalCount: number }> {
+  }): Observable<ProjectsResponse> {
     let httpParams = new HttpParams()
       .set('page', requestParams.page.toString())
       .set('pageSize', requestParams.pageSize.toString());
@@ -36,7 +45,7 @@ export class ProjectService {
       httpParams = httpParams.set('status', requestParams.status);
     }
     if (requestParams.targetDate) {
-      httpParams = httpParams.set('targetDate', requestParams.targetDate.toISOString());
+      httpParams = httpParams.set('targetDate', requestParams.targetDate);
     }
     if (requestParams.startDateFrom) {
       httpParams = httpParams.set('startDateFrom', requestParams.startDateFrom.toISOString());
@@ -45,7 +54,7 @@ export class ProjectService {
       httpParams = httpParams.set('startDateTo', requestParams.startDateTo.toISOString());
     }
 
-    return this.http.get<{ projects: Project[]; totalCount: number }>(`${this.apiUrl}/projects`, {
+    return this.http.get<ProjectsResponse>(`${this.apiUrl}/projects`, {
       params: httpParams
     });
   }
