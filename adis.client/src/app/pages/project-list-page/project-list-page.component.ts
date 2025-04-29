@@ -15,6 +15,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { startWith, switchMap, tap } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
+import { ProjectFormComponent } from '../../components/project-form/project-form.component';
 
 const rangeLabel: string = 'из';
 const itemsPerPageLabel: string = 'Элементов на странице:';
@@ -70,7 +72,7 @@ export function getPaginatorIntl(): MatPaginatorIntl {
  ]
 })
 export class ProjectListPageComponent implements OnInit {
-  displayedColumns: string[] = ['name', 'status', 'dates', 'createdAt', 'budget'];
+  displayedColumns: string[] = ['name', 'status', 'dates', 'createdAt', 'budget', 'actions'];
   dataSource = new MatTableDataSource<Project>();
   pageIndex:number = 0;
   pageSize:number = 10;
@@ -83,6 +85,7 @@ export class ProjectListPageComponent implements OnInit {
   @ViewChild(MatSort) sort!: MatSort;
 
   constructor(
+    private dialog: MatDialog,
     private projectService: ProjectService
   ) {}
 
@@ -257,4 +260,16 @@ export class ProjectListPageComponent implements OnInit {
     this.loadProjectsData();
   }
   
+  openProjectForm(project?: Project): void {
+    const dialogRef = this.dialog.open(ProjectFormComponent, {
+      width: '600px',
+      data: { project }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loadProjectsData().subscribe();
+      }
+    });
+  }
 }

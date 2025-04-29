@@ -16,7 +16,7 @@ namespace Adis.Bll.Dtos
         /// <summary>
         /// Идентификатор проекта
         /// </summary>
-        public int IdProduct { get; set; }
+        public int IdProject { get; set; }
 
         /// <summary>
         /// Название проекта
@@ -59,6 +59,9 @@ namespace Adis.Bll.Dtos
         /// </summary>
         public DateTime? CreatedAt { get; set; }
 
+        /// <summary>
+        /// Идентификатор пользователя, который создал проект
+        /// </summary>
         [Required(ErrorMessage = "Идентификатор пользователя обязателен")]
         public int IdUser { get; set; }
     }

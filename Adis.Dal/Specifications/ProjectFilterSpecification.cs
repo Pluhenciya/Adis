@@ -71,6 +71,11 @@ namespace Adis.Dal.Specifications
             ApplyPaging((page - 1) * pageSize, pageSize);
         }
 
+        /// <summary>
+        /// Возвращает лямбда-выражение с указанием свойства для сортировки
+        /// </summary>
+        /// <param name="sortField">Строковое название свойства</param>
+        /// <returns>Лямбда-выражение для сортировки</returns>
         private Expression<Func<Project, object>>? GetOrderExpression(string sortField)
         {
             return sortField?.ToLower() switch
