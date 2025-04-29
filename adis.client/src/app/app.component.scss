@@ -1,0 +1,87 @@
+.hidden-header {
+    display: none !important;
+  }
+
+  :host {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  .app-header {
+    flex: 0 0 auto;
+  
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+  
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 500;
+        font-size: 1.2rem;
+  
+        mat-icon {
+          transform: scale(1.2);
+        }
+      }
+  
+      .auth-section {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        gap: 20px;
+  
+        .login-button {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 8px 20px;
+          border-radius: 25px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
+          &:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+          }
+        }
+      }
+    }
+  }
+  
+  .main-content {
+    flex: 1 0 auto;
+    max-width: 1200px;
+    width: 100%;
+    margin: 24px auto;
+    padding: 0 20px;
+  }
+  
+  // Адаптивность компонента
+  @media (max-width: 768px) {
+    .app-header {
+      .header-content {
+        flex-direction: column;
+        padding: 16px 0;
+        
+        .auth-section {
+          margin-top: 16px;
+          gap: 12px;
+  
+          .login-button {
+            padding: 6px 16px;
+            
+            .button-text {
+              display: none;
+            }
+          }
+        }
+      }
+    }
+  }
