@@ -64,7 +64,7 @@ namespace Adis.Bll.Services
         {
             try
             {
-                var existingProject = await _projectRepository.GetByIdAsync(project.IdProduct);
+                var existingProject = await _projectRepository.GetByIdAsync(project.IdProject);
 
                 if (project.StartDate > project.EndDate)
                     throw new ArgumentException("Дата оканчания не может быть меньше чем дата начала");

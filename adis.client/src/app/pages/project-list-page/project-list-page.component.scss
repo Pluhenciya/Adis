@@ -14,8 +14,8 @@
 
   .filter-group {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: auto repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
     align-items: center;
   }
 
@@ -195,6 +195,61 @@
   .filters-section {
     .filter-group {
       grid-template-columns: 1fr;
+    }
+  }
+}
+
+.create-btn {
+  background: linear-gradient(135deg, #4F46E5 0%, #9333EA 100%);
+  color: white !important;
+  padding: 0 24px;
+  height: 48px;
+  border-radius: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  order: -1; /* Перемещаем кнопку в начало */
+  
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+  }
+  
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* Стили для кнопки редактирования */
+.edit-btn {
+  color: #64748B;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    color: #4F46E5;
+    background: rgba(79, 70, 229, 0.05);
+  }
+  
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* Адаптивность для текста кнопки */
+@media (max-width: 480px) {
+  .btn-text {
+    display: none;
+  }
+  
+  .create-btn {
+    padding: 0 16px;
+    mat-icon {
+      margin-right: 0;
     }
   }
 }

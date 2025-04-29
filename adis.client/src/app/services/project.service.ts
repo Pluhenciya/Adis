@@ -58,4 +58,15 @@ export class ProjectService {
       params: httpParams
     });
   }
+
+  createProject(project: Partial<Project>): Observable<Project> {
+    project.idUser = 1; // Временно до авторизации
+    return this.http.post<Project>(`${this.apiUrl}/projects`, project);
+  }
+  
+  updateProject(project: Partial<Project>): Observable<Project> {
+    project.idUser = 1; // Временно до авторизации
+    return this.http.put<Project>(`${this.apiUrl}/projects`, project);
+  }
 }
+

@@ -18,10 +18,29 @@ namespace Adis.Dal.Interfaces
         /// </summary>
         List<Expression<Func<T, object>>> Includes { get; }
 
+        /// <summary>
+        /// Лямбда-выражение для сортировки по возрастанию
+        /// </summary>
         Expression<Func<T, object>>? OrderBy { get; }
+
+        /// <summary>
+        /// Лямбда-выражение для сортировки по убыванию
+        /// </summary>
         Expression<Func<T, object>>? OrderByDescending { get; }
+
+        /// <summary>
+        /// Размер списка
+        /// </summary>
         int Take { get; }
+
+        /// <summary>
+        /// Количество пропускаемых элементов в списке
+        /// </summary>
         int Skip { get; }
+
+        /// <summary>
+        /// Активна ли пагинация
+        /// </summary>
         bool IsPagingEnabled { get; }
     }
 }

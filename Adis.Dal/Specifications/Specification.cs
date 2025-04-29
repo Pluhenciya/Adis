@@ -49,32 +49,48 @@ namespace Adis.Dal.Specifications
                 : PredicateBuilder.And(Criteria, newCriteria);
         }
 
+        /// <summary>
+        /// Добавляет сортировку по возрастанию
+        /// </summary>
+        /// <param name="orderByExpression">Лямбда-выражения сортировки</param>
         protected void ApplyOrderBy(Expression<Func<T, object>> orderByExpression)
         {
             OrderBy = orderByExpression;
             OrderByDescending = null;
         }
 
+        /// <summary>
+        /// Добавляет сортировку по убываннию
+        /// </summary>
+        /// <param name="orderByDescendingExpression">Лямбда-выражения сортировки</param>
         protected void ApplyOrderByDescending(Expression<Func<T, object>> orderByDescendingExpression)
         {
             OrderByDescending = orderByDescendingExpression;
             OrderBy = null;
         }
 
-        // Методы для пагинации
+        /// <summary>
+        /// Добавляет пагинацию
+        /// </summary>
+        /// <param name="skip">Количество пропускаемых элементов</param>
+        /// <param name="take">Количество возвращаемых элементов</param>
+        /// <exception cref="ArgumentException">Выбрасывается, если один или оба параметра меньше нуля, также если количество возвращаемых элементов равно 0</exception>
         protected void ApplyPaging(int skip, int take)
         {
             if (take <= 0)
-                throw new ArgumentException("Take must be greater than 0", nameof(take));
+                throw new ArgumentException("Количество возвращаемых элементов должно быть больше 0", nameof(take));
 
             if (skip < 0)
-                throw new ArgumentException("Skip must be greater than or equal to 0", nameof(skip));
+                throw new ArgumentException("Количество пропускаемых элементов должно быть больше или равно 0", nameof(skip));
 
             Skip = skip;
             Take = take;
             IsPagingEnabled = true;
         }
 
+        /// <summary>
+        /// Выключает пагинацию
+        /// </summary>
         protected void DisablePaging()
         {
             IsPagingEnabled = false;
