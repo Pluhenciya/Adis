@@ -21,7 +21,4 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.apiUrl}/refresh-token`, tokens);
   }
 
-  logout(): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/logout`, {});
-  }
 }

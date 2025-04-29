@@ -13,8 +13,9 @@ export class RoleGuard implements CanActivate {
     const expectedRole = route.data['expectedRole'];
     const isAuthorized = this.authService.currentRole === expectedRole;
 
+    console.log(this.authService.currentRole)
     if (!isAuthorized) {
-      this.router.navigate(['/forbidden']);
+      //this.router.navigate(['/forbidden']);
       return false;
     }
     return true;

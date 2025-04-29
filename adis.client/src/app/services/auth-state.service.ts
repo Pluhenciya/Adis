@@ -4,8 +4,10 @@ import { jwtDecode } from 'jwt-decode';
 import { BehaviorSubject } from 'rxjs';
 
 interface DecodedToken {
-  role: string;
+  roles: string;  
   exp: number;
+  sub: string;
+  email: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -22,7 +24,7 @@ export class AuthStateService {
     if (token) {
       try {
         const decoded = jwtDecode<DecodedToken>(token);
-        this.roleSubject.next(decoded.role);
+        this.roleSubject.next(decoded.roles.toString());
       } catch {
         this.clearAuthData();
       }
@@ -64,7 +66,8 @@ export class AuthStateService {
     localStorage.setItem('accessToken', accessToken);
     localStorage.setItem('refreshToken', refreshToken);
     const decoded = jwtDecode<DecodedToken>(accessToken);
-    this.roleSubject.next(decoded.role);
+    console.log(decoded.roles)
+    this.roleSubject.next(decoded.roles.toString());
   }
 
   logout(): void {
