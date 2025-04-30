@@ -1,6 +1,7 @@
 ﻿using Adis.Bll.Dtos;
 using Adis.Bll.Interfaces;
 using Adis.Dm;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -12,6 +13,7 @@ namespace Adis.Api.Controllers
     /// <param name="projectService"></param>
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ProjectsController(IProjectService projectService) : ControllerBase
     {
         private readonly IProjectService _projectService = projectService;

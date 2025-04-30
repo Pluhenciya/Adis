@@ -8,7 +8,11 @@ import { AuthGuard } from './core/guards/user.guard';
 import { ForbiddenPageComponent } from './pages/forbidden-page/forbidden-page.component';
 
 const routes: Routes = [
-  { path: 'login', component: LoginPageComponent },
+  { 
+    path: 'login', 
+    component: LoginPageComponent, 
+    title: 'Вход в систему' 
+  },
   {
     path: 'admin',
     children: [
@@ -16,15 +20,21 @@ const routes: Routes = [
         path: 'users',
         component: UserListPageComponent,
         canActivate: [AuthGuard, RoleGuard],
-        data: { expectedRole: 'Admin' }
+        data: { expectedRole: 'Admin' },
+        title: 'Пользователи'
       }
     ]
   },
-  { path: 'forbidden', component: ForbiddenPageComponent },
+  { 
+    path: 'forbidden', 
+    component: ForbiddenPageComponent,
+    title: 'Ошибка 403'
+  },
   {
     path: '',
     component: ProjectListPageComponent,
     title: 'Главная',
+    canActivate: [AuthGuard]
   },
 ];
 
