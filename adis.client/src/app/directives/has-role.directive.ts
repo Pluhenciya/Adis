@@ -1,28 +1,39 @@
 import { Directive, Input, TemplateRef, ViewContainerRef } from '@angular/core';
 import { AuthStateService } from '../services/auth-state.service';
+import { Subscription } from 'rxjs';
 
 @Directive({
     standalone: false,
     selector: '[appHasRole]'
 })
 export class HasRoleDirective {
-  private hasView = false;
+  private sub!: Subscription;
+  private requiredRole!: string;
 
   @Input() set appHasRole(role: string) {
-    const hasAccess = this.authService.currentRole === role;
-    
-    if (hasAccess && !this.hasView) {
-      this.viewContainer.createEmbeddedView(this.templateRef);
-      this.hasView = true;
-    } else if (!hasAccess && this.hasView) {
-      this.viewContainer.clear();
-      this.hasView = false;
-    }
+    this.requiredRole = role;
+    this.updateView();
+    // Подписываемся на изменения роли
+    this.sub = this.authService.role$.subscribe(() => this.updateView());
   }
 
   constructor(
     private templateRef: TemplateRef<any>,
     private viewContainer: ViewContainerRef,
     private authService: AuthStateService
-  ) { }
+  ) {}
+
+  private updateView(): void {
+    const hasAccess = this.authService.currentRole === this.requiredRole;
+    this.viewContainer.clear();
+    if (hasAccess) {
+      this.viewContainer.createEmbeddedView(this.templateRef);
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.sub) {
+      this.sub.unsubscribe();
+    }
+  }
 }

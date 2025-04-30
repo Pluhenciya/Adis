@@ -1,0 +1,28 @@
+.full-width {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  
+  mat-icon {
+    vertical-align: middle;
+    margin-right: 8px;
+  }
+  
+  mat-hint {
+    font-size: 0.8rem;
+    color: #666;
+  }
+  
+  mat-error {
+    font-size: 0.8rem;
+  }
+  
+  mat-dialog-actions button {
+    margin-left: 8px;
+    padding: 0 24px;
+  }
+  
+  mat-option mat-icon {
+    margin-right: 12px;
+    color: #666;
+  }

@@ -5,6 +5,7 @@ import { LoginPageComponent } from './pages/login-page/login-page.component';
 import { UserListPageComponent } from './pages/user-list-page/user-list-page.component';
 import { RoleGuard } from './core/guards/role.guard';
 import { AuthGuard } from './core/guards/user.guard';
+import { ForbiddenPageComponent } from './pages/forbidden-page/forbidden-page.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginPageComponent },
@@ -19,7 +20,7 @@ const routes: Routes = [
       }
     ]
   },
-  // { path: 'forbidden', component: ForbiddenComponent },
+  { path: 'forbidden', component: ForbiddenPageComponent },
   {
     path: '',
     component: ProjectListPageComponent,

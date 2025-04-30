@@ -12,6 +12,13 @@
             <mat-icon>list_alt</mat-icon>
             Проекты
           </button>
+
+          <button mat-button 
+                  routerLink="/admin/users"
+                  *appHasRole="'Admin'">
+            <mat-icon>people</mat-icon>
+            Пользователи
+          </button>
         </nav>
 
         <!-- Кнопка Войти -->
