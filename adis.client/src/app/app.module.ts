@@ -6,13 +6,17 @@ import { AppComponent } from './app.component';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { AuthService } from './services/auth.service';
+import { AuthInterceptor } from './interceptors/auth.interceptor';
+import { HasRoleDirective } from './directives/has-role.directive';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    HasRoleDirective
   ],
   imports: [
     BrowserModule,
@@ -24,7 +28,16 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     MatNativeDateModule,
     MatFormFieldModule
   ],
-  providers: [],
-  bootstrap: [AppComponent]
+  providers: [
+    AuthService,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    }],
+  bootstrap: [AppComponent],
+  exports: [
+    HasRoleDirective
+  ]
 })
 export class AppModule { }

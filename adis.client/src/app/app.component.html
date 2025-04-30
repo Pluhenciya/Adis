@@ -1,20 +1,46 @@
-<header class="app-header">
+<header class="app-header" [class.hidden-header]="router.url === '/login'">
   <mat-toolbar color="primary">
     <div class="header-content">
       <div class="logo">
         <mat-icon>traffic</mat-icon>
         <span>АДИС</span>
       </div>
-      <nav>
-        <button mat-button routerLink="/projects">
-          <mat-icon>list_alt</mat-icon>
-          Проекты
+
+      <div class="auth-section">
+        <nav>
+          <button mat-button routerLink="/">
+            <mat-icon>list_alt</mat-icon>
+            Проекты
+          </button>
+
+          <button mat-button 
+                  routerLink="/admin/users"
+                  *appHasRole="'Admin'">
+            <mat-icon>people</mat-icon>
+            Пользователи
+          </button>
+        </nav>
+
+        <!-- Кнопка Войти -->
+        <a mat-flat-button 
+           color="accent" 
+           routerLink="/login" 
+           class="login-button"
+           *ngIf="!authService.isAuthenticated()">
+          <mat-icon>login</mat-icon>
+          <span class="button-text">Войти</span>
+        </a>
+
+        <!-- Кнопка Выйти -->
+        <button mat-flat-button 
+                color="warn" 
+                class="logout-button"
+                *ngIf="authService.isAuthenticated()"
+                (click)="authService.logout()">
+          <mat-icon>logout</mat-icon>
+          <span class="button-text">Выйти</span>
         </button>
-        <button mat-button>
-          <mat-icon>person</mat-icon>
-          Профиль
-        </button>
-      </nav>
+      </div>
     </div>
   </mat-toolbar>  
 </header>
