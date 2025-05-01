@@ -8,6 +8,9 @@ using System.Net.Http.Json;
 
 namespace Adis.Tests
 {
+    /// <summary>
+    /// Позволяет тестировать аутентификацию в API
+    /// </summary>
     public class AuthControllerIntegrationTests
         : IClassFixture<CustomWebApplicationFactory>, IDisposable
     {
@@ -33,6 +36,10 @@ namespace Adis.Tests
             InitializeTestUserAsync().Wait();
         }
 
+        /// <summary>
+        /// Создает пользователей для тестов
+        /// </summary>
+        /// <exception cref="Exception">Выбрасывается если пользователь не создался</exception>
         private async Task InitializeTestUserAsync()
         {
             var user = new User
@@ -57,6 +64,9 @@ namespace Adis.Tests
             _client.Dispose();
         }
 
+        /// <summary>
+        /// Тестирует эндпоинт авторизации с помощью данных пользователя
+        /// </summary> 
         [Fact]
         public async Task Login_ValidCredentials_ReturnsTokens()
         {
@@ -77,6 +87,9 @@ namespace Adis.Tests
             Assert.NotNull(authResponse?.RefreshToken);
         }
 
+        /// <summary>
+        /// Тестирует эндпоинт обновления токена доступа
+        /// </summary> 
         [Fact]
         public async Task RefreshToken_ValidTokens_ReturnsNewTokens()
         {

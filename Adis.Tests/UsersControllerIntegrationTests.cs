@@ -12,6 +12,9 @@ using System.Net.Http.Json;
 
 namespace Adis.Tests
 {
+    /// <summary>
+    /// Позволяет тестировать работу с пользователями в API
+    /// </summary>
     public class UsersControllerIntegrationTests : IClassFixture<CustomWebApplicationFactory>, IDisposable
     {
         private readonly CustomWebApplicationFactory _factory;
@@ -33,6 +36,9 @@ namespace Adis.Tests
             InitializeAsync().Wait();
         }
 
+        /// <summary>
+        /// Создает пользователей и роли для тестов
+        /// </summary>
         private async Task InitializeAsync()
         {
             // Создаем роли
@@ -58,6 +64,10 @@ namespace Adis.Tests
             await CreateUserIfNotExists(regularUser, "UserPassword123!", "User");
         }
 
+        /// <summary>
+        /// Создает роль если её не существует
+        /// </summary>
+        /// <param name="roleName">Имя роли</param>
         private async Task CreateRoleIfNotExists(string roleName)
         {
             if (!await _roleManager.RoleExistsAsync(roleName))
@@ -66,9 +76,15 @@ namespace Adis.Tests
             }
         }
 
+        /// <summary>
+        /// Создает пользователя если его не существует
+        /// </summary>
+        /// <param name="user">Данные пользователя</param>
+        /// <param name="password">Пароль пользователя</param>
+        /// <param name="role">Роль пользователя</param>
         private async Task CreateUserIfNotExists(User user, string password, string role)
         {
-            if (await _userManager.FindByEmailAsync(user.Email) == null)
+            if (await _userManager.FindByEmailAsync(user.Email!) == null)
             {
                 var result = await _userManager.CreateAsync(user, password);
                 if (result.Succeeded)
@@ -84,6 +100,10 @@ namespace Adis.Tests
             _client.Dispose();
         }
 
+        /// <summary>
+        /// Возвращает токен администратора
+        /// </summary>
+        /// <returns>Токен администратора</returns>
         private async Task<string> GetAdminTokenAsync()
         {
             var loginRequest = new LoginRequest
@@ -96,6 +116,10 @@ namespace Adis.Tests
             return (await response.Content.ReadFromJsonAsync<AuthResponse>())!.AccessToken;
         }
 
+        /// <summary>
+        /// Возвращает токен не администратора
+        /// </summary>
+        /// <returns>Токен не администратора</returns>
         private async Task<string> GetUserTokenAsync()
         {
             var loginRequest = new LoginRequest
@@ -108,6 +132,9 @@ namespace Adis.Tests
             return (await response.Content.ReadFromJsonAsync<AuthResponse>())!.AccessToken;
         }
 
+        /// <summary>
+        /// Тестирует создание пользователя под администратором
+        /// </summary>
         [Fact]
         public async Task AddUser_AsAdmin_ReturnsCreatedUser()
         {
@@ -129,10 +156,13 @@ namespace Adis.Tests
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var result = await response.Content.ReadFromJsonAsync<UserDto>();
-            Assert.Equal(newUser.Email, result.Email);
+            Assert.Equal(newUser.Email, result!.Email);
             Assert.Equal(newUser.Role, result.Role);
         }
 
+        /// <summary>
+        /// Тестирует невозможность создания пользователя под не администратором
+        /// </summary>
         [Fact]
         public async Task AddUser_AsNonAdmin_ReturnsForbidden()
         {

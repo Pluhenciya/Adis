@@ -6,11 +6,15 @@ using Adis.Dal.Data;
 using Adis.Dm;
 using Adis.Tests.Helpers;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace Adis.Tests
 {
+    /// <summary>
+    /// Позволяет тестировать работу с проектами в API
+    /// </summary>
     public class ProjectsControllerIntegrationTests
         : IClassFixture<CustomWebApplicationFactory>, IDisposable
     {
@@ -36,6 +40,10 @@ namespace Adis.Tests
             InitializeTestUserAsync().Wait();
         }
 
+        /// <summary>
+        /// Создает пользователей для тестов
+        /// </summary>
+        /// <exception cref="Exception">Выбрасывается если пользователь не создался</exception>
         private async Task InitializeTestUserAsync()
         {
             // Создаем тестового пользователя с подтвержденным email
@@ -54,6 +62,9 @@ namespace Adis.Tests
             }
         }
 
+        /// <summary>
+        /// Возвращает токен доступа для авторизации
+        /// </summary>
         private async Task<string> GetAuthTokenAsync()
         {
             // Логинимся с созданными учетными данными
@@ -75,6 +86,9 @@ namespace Adis.Tests
             _client.Dispose();
         }
 
+        /// <summary>
+        /// Тестирует создания проекта с валидными данными
+        /// </summary>
         [Fact]
         public async Task AddProject_ValidData_ReturnsCreatedProject()
         {
@@ -101,6 +115,9 @@ namespace Adis.Tests
             Assert.Equal(project.Name, result!.Name);
         }
 
+        /// <summary>
+        /// Тестирует авторизацию при создании проекта
+        /// </summary>
         [Fact]
         public async Task AddProject_Unauthorized_ReturnsUnauthorized()
         {
@@ -122,6 +139,9 @@ namespace Adis.Tests
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
         }
 
+        /// <summary>
+        /// Тестирует фильтрацию при возвращения списка проектов
+        /// </summary>
         [Fact]
         public async Task GetProjects_WithFilters_ReturnsFilteredResults()
         {
@@ -164,8 +184,38 @@ namespace Adis.Tests
             // Assert
             response.EnsureSuccessStatusCode();
             var result = await response.Content.ReadFromJsonAsync<ProjectsResponseDto>();
-            Assert.Single(result.Projects);
+            Assert.Single(result!.Projects);
             Assert.Equal("Filtered Project", result.Projects.First().Name);
+        }
+
+        /// <summary>
+        /// Тестирует создания проекта с невалидным бюджетом
+        /// </summary>
+        [Fact]
+        public async Task AddProject_InvalidBudget_ReturnsValidationError()
+        {
+            // Arrange
+            var token = await GetAuthTokenAsync();
+            _client.DefaultRequestHeaders.Authorization = new("Bearer", token);
+
+            var project = new ProjectDto
+            {
+                Name = "Test Project",
+                Budget = -100, // Невалидный бюджет
+                StartDate = new DateOnly(2024, 1, 1),
+                EndDate = new DateOnly(2024, 12, 31),
+                Status = Status.Draft,
+                IdUser = 1
+            };
+
+            // Act
+            var response = await _client.PostAsJsonAsync("/api/projects", project);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            var problemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+            Assert.NotNull(problemDetails);
+            Assert.Contains("Budget", problemDetails.Errors.Keys);
         }
     }
 }

@@ -131,4 +131,7 @@ app.UseSwaggerUI();
 
 app.Run();
 
+// Требуется для создания тестов
+#pragma warning disable CS1591 // Отсутствует комментарий XML для открытого видимого типа или члена
 public partial class Program { }
+#pragma warning restore CS1591 // Отсутствует комментарий XML для открытого видимого типа или члена

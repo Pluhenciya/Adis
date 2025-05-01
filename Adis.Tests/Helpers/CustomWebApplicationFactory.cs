@@ -8,6 +8,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Adis.Tests.Helpers
 {
+    /// <summary>
+    /// Кастомная фабрика для создания интеграционных тестов
+    /// </summary>
     public class CustomWebApplicationFactory
     : WebApplicationFactory<Program>
     {
