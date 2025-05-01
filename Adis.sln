@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Adis.Dal", "Adis.Dal\Adis.D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Adis.Dm", "Adis.Dm\Adis.Dm.csproj", "{8DA852B1-7E97-4F3A-9809-1138CE653D24}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Adis.Tests", "Adis.Tests\Adis.Tests.csproj", "{BDA0C76C-853C-48E0-8BAB-7A52FD385236}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,10 @@ Global
 		{8DA852B1-7E97-4F3A-9809-1138CE653D24}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8DA852B1-7E97-4F3A-9809-1138CE653D24}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8DA852B1-7E97-4F3A-9809-1138CE653D24}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BDA0C76C-853C-48E0-8BAB-7A52FD385236}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BDA0C76C-853C-48E0-8BAB-7A52FD385236}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BDA0C76C-853C-48E0-8BAB-7A52FD385236}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BDA0C76C-853C-48E0-8BAB-7A52FD385236}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
