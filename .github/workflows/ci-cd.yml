@@ -102,6 +102,9 @@ jobs:
         secrets: |
           "JWT__Key=${{ secrets.PROD_JWT_KEY }}"
 
+    - name: List files
+      run: ls -laR
+
     - name: Build and push frontend
       uses: docker/build-push-action@v5
       with:
