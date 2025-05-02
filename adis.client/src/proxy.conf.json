@@ -5,11 +5,9 @@
     "changeOrigin": true
   },
   "/docker": {
-    "target": "http://backend:8080",
+    "target": "http://backend:8080/api",
     "secure": false,
     "changeOrigin": true,
-    "pathRewrite": {
-      "^/docker": "/api"
-    }
+    "pathRewrite": {"^/docker": ""}
   }
 }
