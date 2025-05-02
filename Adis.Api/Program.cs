@@ -62,15 +62,8 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowFrontend", policy =>
-    {
-        policy.WithOrigins("http://localhost")
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
-});
+builder.Services.AddCors();
+
 builder.Services.AddAutoMapper(typeof(ProjectProfile), typeof(UserProfile));
 
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
@@ -137,7 +130,10 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.UseCors("AllowFrontend");
+app.UseCors(builder =>
+    builder.AllowAnyOrigin()
+           .AllowAnyMethod()
+           .AllowAnyHeader());
 
 app.UseSwagger();
 app.UseSwaggerUI();

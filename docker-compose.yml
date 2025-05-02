@@ -19,8 +19,6 @@ services:
     build:
       context: ./adis.client
       dockerfile: Dockerfile
-    environment:
-      - API_PROXY_PREFIX=/docker
     ports:
       - "80:80"
     depends_on:
