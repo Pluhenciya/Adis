@@ -9,7 +9,9 @@ services:
     env_file:
       - "./environment/default.env"
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
+        restart: true
     networks:
       - app-network
 
@@ -27,7 +29,7 @@ services:
       - app-network
 
   mysql:
-    image: mysql:8.0
+    image: mysql:8.4
     env_file:
       - "./environment/mysql.env"
     volumes:
@@ -42,6 +44,7 @@ services:
 
 networks:
   app-network:
+    external: false
     driver: bridge
 
 volumes:
