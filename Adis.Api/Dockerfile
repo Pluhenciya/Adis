@@ -13,9 +13,9 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Adis.Api/Adis.Api.csproj", "Adis.Api/"]
-COPY ["Adis.Api.Tests/Adis.Api.Tests.csproj", "Adis.Api.Tests/"]
+COPY ["Adis.Tests/Adis.Tests.csproj", "Adis.Tests/"]
 RUN dotnet restore "./Adis.Api/Adis.Api.csproj"
-RUN dotnet restore "Adis.Api.Tests/Adis.Api.Tests.csproj"
+RUN dotnet restore "Adis.Tests/Adis.Tests.csproj"
 COPY . .
 WORKDIR "/src/Adis.Api"
 RUN dotnet build "./Adis.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
@@ -24,7 +24,7 @@ RUN dotnet build "./Adis.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./Adis.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
-RUN dotnet test "Adis.Api.Tests/Adis.Api.Tests.csproj" -c $BUILD_CONFIGURATION --no-build
+RUN dotnet test "Adis.Tests/Adis.Tests.csproj" -c $BUILD_CONFIGURATION --no-build
 
 # Этот этап используется в рабочей среде или при запуске из VS в обычном режиме (по умолчанию, когда конфигурация отладки не используется)
 FROM base AS final
