@@ -64,12 +64,12 @@ jobs:
 
     - name: Start containers
       run: |
-        docker-compose -f docker-compose.ci.yml up -d
+        docker compose -f docker-compose.ci.yml up -d
         ./scripts/wait-for-it.sh mysql:3306 --timeout=30
 
     - name: Run backend tests
       run: |
-        docker-compose -f docker-compose.ci.yml exec backend dotnet test
+        docker compose -f docker-compose.ci.yml exec backend dotnet test
 
   deploy-production:
     if: github.ref == 'refs/heads/master'
@@ -122,7 +122,7 @@ jobs:
           cd /opt/adis
           echo "PROD_MYSQL_PASSWORD=${{ secrets.PROD_MYSQL_PASSWORD }}" >> .env.prod
           echo "JWT__Key=${{ secrets.PROD_JWT_KEY }}" >> .env.prod
-          docker-compose pull
-          docker-compose -f docker-compose.prod.yml up -d --force-recreate
+          docker compose pull
+          docker compose -f docker-compose.prod.yml up -d --force-recreate
           docker exec backend dotnet ef database update
           docker system prune -af
