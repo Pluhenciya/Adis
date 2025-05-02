@@ -10,7 +10,6 @@ env:
   REGISTRY: ghcr.io
   BACKEND_IMAGE: ${{ github.repository }}_backend
   FRONTEND_IMAGE: ${{ github.repository }}_frontend
-  MYSQL_IMAGE: "mysql:8.4"
 
 jobs:
   build-and-test:
@@ -19,7 +18,7 @@ jobs:
 
     services:
       mysql:
-        image: ${{ env.MYSQL_IMAGE }}
+        image: mysql:8.4
         env:
           MYSQL_ROOT_PASSWORD: ${{ secrets.DEV_MYSQL_ROOT_PASSWORD }}
           MYSQL_DATABASE: ${{ secrets.DEV_MYSQL_DATABASE }}
@@ -120,7 +119,7 @@ jobs:
         username: ${{ secrets.PROD_SERVER_USERNAME }}
         key: ${{ secrets.PROD_SERVER_SSH_KEY }}
         script: |
-          cd /opt/your-app
+          cd /opt/adis
           echo "PROD_MYSQL_PASSWORD=${{ secrets.PROD_MYSQL_PASSWORD }}" >> .env.prod
           echo "JWT__Key=${{ secrets.PROD_JWT_KEY }}" >> .env.prod
           docker-compose pull
