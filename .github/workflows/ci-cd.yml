@@ -57,7 +57,7 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         context: ./adis.client
-        file: Dockerfile
+        file: ./adis.client/Dockerfile
         tags: ${{ env.FRONTEND_IMAGE }}:dev-${{ github.sha }}
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache
@@ -101,9 +101,6 @@ jobs:
         push: true
         secrets: |
           "JWT__Key=${{ secrets.PROD_JWT_KEY }}"
-
-    - name: List files
-      run: ls -laR
 
     - name: Build and push frontend
       uses: docker/build-push-action@v5
