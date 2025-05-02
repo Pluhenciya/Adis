@@ -1,4 +1,4 @@
 export const environment = {
     production: false,
-  apiUrl: process.env['API_PROXY_PREFIX'] || '/api'
+    apiUrl: window.location.hostname === 'localhost' ? '/api' : '/docker'
   };
