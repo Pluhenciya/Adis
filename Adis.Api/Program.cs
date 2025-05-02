@@ -1,4 +1,5 @@
 using Adis.Bll.Configurations;
+using Adis.Bll.Initializers;
 using Adis.Bll.Interfaces;
 using Adis.Bll.Profiles;
 using Adis.Bll.Services;
@@ -82,6 +83,9 @@ builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JWT"))
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
+builder.Services.Configure<AdminSettings>(builder.Configuration.GetSection("AdminSettings"));
+builder.Services.AddScoped<IAdminInitializer, AdminInitializer>();
+
 builder.Services.AddSwaggerGen(options =>
 {
     var basePath = AppContext.BaseDirectory;
@@ -121,6 +125,9 @@ using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     dbContext.Database.Migrate();
+
+    var adminInitializer = scope.ServiceProvider.GetRequiredService<IAdminInitializer>();
+    await adminInitializer.InitializeAsync();
 }
 
 app.UseHttpsRedirection();
