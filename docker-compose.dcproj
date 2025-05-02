@@ -9,5 +9,7 @@
   <ItemGroup>
     <None Include="docker-compose.yml" />
     <None Include=".dockerignore" />
+    <None Include="environment\default.env_example" />
+    <None Include="environment\mysql.env_example" />
   </ItemGroup>
 </Project>

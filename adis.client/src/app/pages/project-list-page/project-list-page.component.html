@@ -1,0 +1,121 @@
+<div class="project-list-container">
+  <div class="filters-section">
+    <div class="filter-group">
+      <button mat-raised-button class="create-btn" (click)="openProjectForm()">
+        <mat-icon>add_circle</mat-icon>
+        <span class="btn-text">Новый проект</span>
+      </button>
+
+      <mat-form-field appearance="outline" class="status-filter">
+        <mat-label>Статус проекта</mat-label>
+        <mat-select [(value)]="statusFilter" (selectionChange)="applyFilter()">
+          <mat-option value="">Все статусы</mat-option>
+          <mat-option value="draft">
+            <div class="status-option draft">Черновик</div>
+          </mat-option>
+          <mat-option value="inProgress">
+            <div class="status-option in-progress">В работе</div>
+          </mat-option>
+          <mat-option value="completed">
+            <div class="status-option completed">Завершён</div>
+          </mat-option>
+          <mat-option value="overdue">
+            <div class="status-option overdue">Просрочен</div>
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="date-filter">
+        <mat-label>Период выполнения</mat-label>
+        <input matInput [matDatepicker]="picker" (dateChange)="applyFilter()" [(ngModel)]="dateFilter"
+          placeholder="Выберите дату">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+
+      <button mat-raised-button class="reset-btn" (click)="resetFilters()">
+        <mat-icon>autorenew</mat-icon>
+        Сбросить фильтры
+      </button>
+    </div>
+  </div>
+
+  <div class="projects-table-wrapper">
+    <div *ngIf="isLoading" class="loading-indicator">
+      <mat-spinner diameter="40" color="accent"></mat-spinner>
+      <p>Загрузка данных...</p>
+    </div>
+
+    <table mat-table [dataSource]="dataSource" matSort class="projects-table" (matSortChange)="loadProjectsData()">
+      <!-- Название проекта -->
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Проект</th>
+        <td mat-cell *matCellDef="let project" class="project-name">
+          {{ project.name }}
+        </td>
+      </ng-container>
+
+      <!-- Статус -->
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Текущий статус</th>
+        <td mat-cell *matCellDef="let project">
+          <div class="status-badge" [ngClass]="project.status">
+            {{ getStatusLabel(project.status) }}
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- Даты -->
+      <ng-container matColumnDef="dates">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Сроки выполнения</th>
+        <td mat-cell *matCellDef="let project" class="dates-cell">
+          <div class="date-range">
+            <div class="date-item">
+              <mat-icon>play_arrow</mat-icon>
+              {{ project.startDate | date: 'dd.MM.yyyy' }}
+            </div>
+            <div class="date-item">
+              <mat-icon>flag</mat-icon>
+              {{ project.endDate | date: 'dd.MM.yyyy' }}
+            </div>
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="createdAt">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Дата создания</th>
+        <td mat-cell *matCellDef="let project" class="created-at-cell">
+          <div class="date-item">
+            {{ project.createdAt | date: 'dd.MM.yyyy HH:mm' }}
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- Бюджет -->
+      <ng-container matColumnDef="budget">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Бюджет</th>
+        <td mat-cell *matCellDef="let project" class="budget-cell">
+          <div class="budget-value">
+            {{ project.budget }} руб.
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let project">
+          <button mat-icon-button class="edit-btn" (click)="openProjectForm(project)">
+            <mat-icon>edit_square</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="project-row"></tr>
+    </table>
+
+    <mat-paginator [length]="length" [pageSize]="pageSize" [pageIndex]="pageIndex" [pageSizeOptions]="[10, 20, 50]"
+      showFirstLastButtons class="custom-paginator" (page)="handlePageEvent($event)" #paginator>
+    </mat-paginator>
+  </div>
+</div>

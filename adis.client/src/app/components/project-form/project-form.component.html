@@ -1,0 +1,70 @@
+<div class="project-form-container">
+    <h2 mat-dialog-title>
+      {{ data?.project ? 'Редактирование проекта' : 'Новый проект' }}
+    </h2>
+  
+    <mat-dialog-content>
+      <form [formGroup]="projectForm" (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="outline">
+          <mat-label>Название проекта</mat-label>
+          <input matInput formControlName="name">
+          <mat-error *ngIf="name?.hasError('required')">
+            Обязательное поле
+          </mat-error>
+          <mat-error *ngIf="name?.hasError('maxlength')">
+            Максимальная длина 255 символов
+          </mat-error>
+        </mat-form-field>
+  
+        <mat-form-field appearance="outline">
+          <mat-label>Бюджет</mat-label>
+          <input matInput type="number" formControlName="budget">
+          <mat-error *ngIf="budget?.hasError('required')">
+            Обязательное поле
+          </mat-error>
+          <mat-error *ngIf="budget?.hasError('min')">
+            Бюджет не может быть отрицательным
+          </mat-error>
+        </mat-form-field>
+  
+        <div class="date-fields">
+            <mat-form-field appearance="outline">
+                <mat-label>Дата начала</mat-label>
+                <input matInput [matDatepicker]="startPicker" formControlName="startDate">
+                <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+                <mat-datepicker #startPicker></mat-datepicker>
+                <mat-error *ngIf="projectForm.get('startDate')?.hasError('required')">
+                  Обязательное поле
+                </mat-error>
+              </mat-form-field>
+          
+          <mat-form-field appearance="outline">
+            <mat-label>Дата окончания</mat-label>
+            <input matInput [matDatepicker]="endPicker" formControlName="endDate">
+            <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+            <mat-datepicker #endPicker></mat-datepicker>
+            <mat-error *ngIf="projectForm.get('endDate')?.hasError('required')">
+              Обязательное поле
+            </mat-error>
+          </mat-form-field>
+        </div>
+  
+        <div *ngIf="projectForm.hasError('dateRange')" class="error-message">
+          Дата окончания должна быть после даты начала
+        </div>
+  
+        <div *ngIf="errorMessage" class="error-message">
+          {{ errorMessage }}
+        </div>
+      </form>
+    </mat-dialog-content>
+  
+    <mat-dialog-actions align="end">
+      <button mat-button mat-dialog-close>Отмена</button>
+      <button mat-raised-button color="primary" 
+              [disabled]="isSubmitting || projectForm.invalid"
+              (click)="onSubmit()">
+        {{ isSubmitting ? 'Сохранение...' : 'Сохранить' }}
+      </button>
+    </mat-dialog-actions>
+  </div>
