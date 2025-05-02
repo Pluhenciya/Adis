@@ -29,7 +29,6 @@ namespace Adis.Bll.Initializers
 
         public async Task InitializeAsync()
         {
-
             var admins = await _userManager.GetUsersInRoleAsync("Admin");
 
             if (admins.Count() > 0)
@@ -41,9 +40,14 @@ namespace Adis.Bll.Initializers
                 UserName = _adminSettings.Email
             };
 
-            await _userManager.CreateAsync(admin, _adminSettings.Password);
+            var result = await _userManager.CreateAsync(admin, _adminSettings.Password);
+            if (!result.Succeeded)
+                throw new ArgumentException(string.Join(", ", result.Errors.Select(e => e.Description)));
 
-            await _userManager.AddToRoleAsync(admin, "Admin");
+            // Назначение роли
+            var roleResult = await _userManager.AddToRoleAsync(admin, "Admin");
+            if (!roleResult.Succeeded)
+                throw new ArgumentException("Ошибка назначения роли");
         }
     }
 }

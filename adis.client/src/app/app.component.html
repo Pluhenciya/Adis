@@ -1,4 +1,4 @@
-<header class="app-header" [class.hidden-header]="router.url === '/login'">
+<header class="app-header" [class.hidden-header]="router.url.split('?')[0] === '/login'">
   <mat-toolbar color="primary">
     <div class="header-content">
       <div class="logo">
