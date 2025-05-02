@@ -13,7 +13,9 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Adis.Api/Adis.Api.csproj", "Adis.Api/"]
+COPY ["Adis.Tests/Adis.Tests.csproj", "Adis.Tests/"]
 RUN dotnet restore "./Adis.Api/Adis.Api.csproj"
+RUN dotnet restore "Adis.Tests/Adis.Tests.csproj"
 COPY . .
 WORKDIR "/src/Adis.Api"
 RUN dotnet build "./Adis.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
@@ -21,7 +23,7 @@ RUN dotnet build "./Adis.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 # Этот этап используется для публикации проекта службы, который будет скопирован на последний этап
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Adis.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./Adis.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false --no-restore
 
 # Этот этап используется в рабочей среде или при запуске из VS в обычном режиме (по умолчанию, когда конфигурация отладки не используется)
 FROM base AS final
