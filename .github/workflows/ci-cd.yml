@@ -10,7 +10,7 @@ env:
   REGISTRY: ghcr.io
   BACKEND_IMAGE: ${{ github.repository }}_backend
   FRONTEND_IMAGE: ${{ github.repository }}_frontend
-  MYSQL_IMAGE: mysql:8.4
+  MYSQL_IMAGE: "mysql:8.4"
 
 jobs:
   build-and-test:
