@@ -7,7 +7,7 @@ import { UserDto } from '../models/user.model';
   providedIn: 'root'
 })
 export class UserService {
-  private readonly apiUrl = '/api/users';
+  private readonly apiUrl = '/users';
 
   constructor(private http: HttpClient) { }
 
