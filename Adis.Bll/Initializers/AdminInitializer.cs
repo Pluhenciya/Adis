@@ -1,4 +1,5 @@
 ﻿using Adis.Bll.Configurations;
+using Adis.Bll.Dtos;
 using Adis.Bll.Interfaces;
 using Adis.Dal.Interfaces;
 using Adis.Dm;
@@ -41,6 +42,8 @@ namespace Adis.Bll.Initializers
             };
 
             await _userManager.CreateAsync(admin, _adminSettings.Password);
+
+            await _userManager.AddToRoleAsync(admin, "Admin");
         }
     }
 }
