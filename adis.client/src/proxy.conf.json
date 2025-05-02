@@ -1,7 +1,15 @@
 {
-    "/api": {
-      "target": "https://localhost:7210",
-      "secure": false,
-      "changeOrigin": true
+  "/api": {
+    "target": "https://localhost:7210",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/docker": {
+    "target": "http://backend:8080",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/docker": "/api"
     }
   }
+}

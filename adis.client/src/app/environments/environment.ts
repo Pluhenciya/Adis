@@ -1,4 +1,4 @@
 export const environment = {
     production: false,
-    apiUrl: '/api'
+  apiUrl: process.env['API_PROXY_PREFIX'] || '/api'
   };
