@@ -106,7 +106,7 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         context: ./adis.client
-        file: Dockerfile
+        file: ./adis.client/Dockerfile
         tags: |
           ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:latest
           ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:${{ github.sha }}
