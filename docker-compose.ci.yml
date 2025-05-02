@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  backend:
+    image: ${{ env.BACKEND_IMAGE }}:dev-${{ github.sha }}
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=server=mysql;port=3306;user=${{ secrets.DEV_MYSQL_USER }};password=${{ secrets.DEV_MYSQL_PASSWORD }};database=${{ secrets.DEV_MYSQL_DATABASE }}
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  frontend:
+    image: ${{ env.FRONTEND_IMAGE }}:dev-${{ github.sha }}
+    environment:
+      - NODE_ENV=test
+    depends_on:
+      - backend
+
+  mysql:
+    image: ${{ env.MYSQL_IMAGE }}
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
