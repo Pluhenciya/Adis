@@ -114,13 +114,43 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
+// »нициализаци€ базы данных с повторными попытками
 using (var scope = app.Services.CreateScope())
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    dbContext.Database.Migrate();
+    var services = scope.ServiceProvider;
+    var logger = services.GetRequiredService<ILogger<Program>>();
+    var dbContext = services.GetRequiredService<AppDbContext>();
 
-    var adminInitializer = scope.ServiceProvider.GetRequiredService<IAdminInitializer>();
-    await adminInitializer.InitializeAsync();
+    int retries = 0;
+    const int maxRetries = 5;
+
+    while (retries < maxRetries)
+    {
+        try
+        {
+            logger.LogInformation("Attempting database migration (Attempt {Retry})", retries + 1);
+
+            if (!dbContext.Database.CanConnect())
+                throw new Exception("Database connection failed");
+
+            dbContext.Database.Migrate();
+
+            var adminInitializer = services.GetRequiredService<IAdminInitializer>();
+            await adminInitializer.InitializeAsync();
+
+            break;
+        }
+        catch (Exception ex)
+        {
+            retries++;
+            logger.LogError(ex, "Database migration failed on attempt {Retry}", retries);
+
+            if (retries >= maxRetries)
+                throw;
+
+            await Task.Delay(5000 * retries);
+        }
+    }
 }
 
 app.UseHttpsRedirection();
