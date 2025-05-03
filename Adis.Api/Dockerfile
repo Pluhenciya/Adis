@@ -13,6 +13,9 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Adis.Api/Adis.Api.csproj", "Adis.Api/"]
+COPY ["Adis.Bll/Adis.Bll.csproj", "Adis.Bll/"]
+COPY ["Adis.Dal/Adis.Dal.csproj", "Adis.Dal/"]
+COPY ["Adis.Dm/Adis.Dm.csproj", "Adis.Dm/"] 
 COPY ["Adis.Tests/Adis.Tests.csproj", "Adis.Tests/"]
 RUN dotnet restore "./Adis.Api/Adis.Api.csproj"
 RUN dotnet restore "Adis.Tests/Adis.Tests.csproj"
