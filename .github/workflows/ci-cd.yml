@@ -88,10 +88,20 @@ jobs:
 
     - name: Run backend tests
       run: |
-        # Ожидание готовности backend
-        timeout 60s bash -c '
-          while ! docker compose -f docker-compose.ci.yml ps -q adis-backend-1 | xargs docker inspect -f "{{.State.Status}}" | grep -q "running";
-          do sleep 3;
+        # Ожидание готовности backend с проверкой существования контейнера
+        timeout 300s bash -c '
+          while ! docker compose -f docker-compose.ci.yml ps backend | grep -q "running";
+          do
+            sleep 5;
+            echo "Waiting for backend to start...";
+          done'
+        
+        # Дополнительная проверка healthcheck status
+        timeout 120s bash -c '
+          while [ "$(docker inspect -f {{.State.Health.Status}} $(docker compose -f docker-compose.ci.yml ps -q backend)" != "healthy" ];
+          do
+            sleep 5;
+            echo "Backend health status: $(docker inspect -f {{.State.Health.Status}} $(docker compose -f docker-compose.ci.yml ps -q backend)";
           done'
         
         docker compose -f docker-compose.ci.yml exec backend dotnet test
