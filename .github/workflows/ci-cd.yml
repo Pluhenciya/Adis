@@ -8,8 +8,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  BACKEND_IMAGE: adis_backend
-  FRONTEND_IMAGE: adis_frontend
+  BACKEND_IMAGE: adis-backend
+  FRONTEND_IMAGE: adis-frontend
 
 jobs:
   build-and-test:
@@ -18,7 +18,7 @@ jobs:
 
     services:
       mysql:
-        image: mysql:8.4
+        image: mysql:8.0  # Используем стабильную версию 8.0
         env:
           MYSQL_ROOT_PASSWORD: ${{ secrets.DEV_MYSQL_ROOT_PASSWORD }}
           MYSQL_DATABASE: ${{ secrets.DEV_MYSQL_DATABASE }}
@@ -26,7 +26,11 @@ jobs:
           MYSQL_PASSWORD: ${{ secrets.DEV_MYSQL_PASSWORD }}
         ports:
           - "3306:3306"
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+        options: 
+          --health-cmd="mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD" 
+          --health-interval=10s 
+          --health-timeout=5s 
+          --health-retries=5
 
     steps:
     - name: Checkout code
@@ -34,13 +38,6 @@ jobs:
 
     - name: Setup Docker Buildx
       uses: docker/setup-buildx-action@v3
-
-    - name: Cache Docker layers
-      uses: actions/cache@v3
-      with:
-        path: /tmp/.buildx-cache
-        key: ${{ runner.os }}-buildx-${{ github.sha }}
-        restore-keys: ${{ runner.os }}-buildx-
 
     - name: Build backend
       uses: docker/build-push-action@v5
@@ -66,20 +63,30 @@ jobs:
 
     - name: Start containers
       run: |
-        export BACKEND_IMAGE=${{ env.BACKEND_IMAGE }}
-        export FRONTEND_IMAGE=${{ env.FRONTEND_IMAGE }}
-        export IMAGE_TAG=dev-${{ github.sha }}
-        export MYSQL_USER=${{ secrets.DEV_MYSQL_USER }}
-        export MYSQL_PASSWORD=${{ secrets.DEV_MYSQL_PASSWORD }}
-        export MYSQL_DATABASE=${{ secrets.DEV_MYSQL_DATABASE }}
-        export MYSQL_ROOT_PASSWORD=${{ secrets.DEV_MYSQL_ROOT_PASSWORD }}
+        # Генерируем .env файл
+        echo "MYSQL_HOST=mysql" >> .env
+        echo "MYSQL_PORT=3306" >> .env
+        echo "MYSQL_USER=${{ secrets.DEV_MYSQL_USER }}" >> .env
+        echo "MYSQL_PASSWORD=${{ secrets.DEV_MYSQL_PASSWORD }}" >> .env
+        echo "MYSQL_DATABASE=${{ secrets.DEV_MYSQL_DATABASE }}" >> .env
         
-        docker compose -f docker-compose.ci.yml up -d
-        timeout 30s bash -c 'until docker exec adis-mysql-1 mysqladmin ping; do sleep 1; done'
+        docker compose -f docker-compose.ci.yml up -d --build
+        
+        # Ожидание готовности MySQL
+        timeout 120s bash -c '
+          while ! docker exec mysql mysqladmin ping -u root -p${{ secrets.DEV_MYSQL_ROOT_PASSWORD }} --silent;
+          do sleep 5;
+          done'
 
     - name: Run backend tests
       run: |
-        docker compose -f docker-compose.ci.yml exec adis-backend-1 dotnet test
+        # Ожидание готовности backend
+        timeout 60s bash -c '
+          while ! docker compose -f docker-compose.ci.yml ps -q backend | xargs docker inspect -f "{{.State.Status}}" | grep -q "running";
+          do sleep 3;
+          done'
+        
+        docker compose -f docker-compose.ci.yml exec backend dotnet test
 
   deploy-production:
     if: github.ref == 'refs/heads/master'
@@ -130,8 +137,9 @@ jobs:
         key: ${{ secrets.PROD_SERVER_SSH_KEY }}
         script: |
           cd /opt/adis
-          echo "PROD_MYSQL_PASSWORD=${{ secrets.PROD_MYSQL_PASSWORD }}" >> .env.prod
+          echo "PROD_MYSQL_PASSWORD=${{ secrets.PROD_MYSQL_PASSWORD }}" > .env.prod
           echo "JWT__Key=${{ secrets.PROD_JWT_KEY }}" >> .env.prod
-          docker compose pull
-          docker compose -f docker-compose.prod.yml up -d --force-recreate
-          docker system prune -af
+          docker compose -f docker-compose.yml down
+          docker compose -f docker-compose.yml pull
+          docker compose -f docker-compose.yml up -d --force-recreate
+          docker system prune -af --volumes
