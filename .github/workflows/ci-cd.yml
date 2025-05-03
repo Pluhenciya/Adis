@@ -82,7 +82,7 @@ jobs:
         
         # Ожидание готовности MySQL
         timeout 120s bash -c '
-          while ! docker exec adis-mysql-1 mysqladmin ping -u root -p${{ secrets.DEV_MYSQL_ROOT_PASSWORD }} --silent;
+          while ! docker exec mysql mysqladmin ping -u root -p${{ secrets.DEV_MYSQL_ROOT_PASSWORD }} --silent;
           do sleep 5;
           done'
 
