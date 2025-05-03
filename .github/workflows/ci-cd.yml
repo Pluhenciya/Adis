@@ -74,7 +74,7 @@ jobs:
         export MYSQL_DATABASE=${{ secrets.DEV_MYSQL_DATABASE }}
         export MYSQL_ROOT_PASSWORD=${{ secrets.DEV_MYSQL_ROOT_PASSWORD }}
         
-        docker-compose -f docker-compose.ci.yml up -d
+        docker compose -f docker-compose.ci.yml up -d
         timeout 30s bash -c 'until docker exec mysql mysqladmin ping; do sleep 1; done'
 
     - name: Run backend tests
