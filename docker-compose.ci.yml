@@ -7,6 +7,10 @@ services:
       - ConnectionStrings__DefaultConnection=server=mysql;port=3306;user=${MYSQL_USER};password=${MYSQL_PASSWORD};database=${MYSQL_DATABASE}
     networks:
       - app-network
+    depends_on:
+      mysql:
+        condition: service_healthy
+        restart: true
 
   frontend:
     container_name: frontend
