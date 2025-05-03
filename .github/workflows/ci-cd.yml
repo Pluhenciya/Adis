@@ -63,14 +63,22 @@ jobs:
 
     - name: Start containers
       run: |
-        # Генерируем .env файл
-        echo "MYSQL_HOST=mysql" >> .env
-        echo "MYSQL_PORT=3306" >> .env
-        echo "MYSQL_USER=${{ secrets.DEV_MYSQL_USER }}" >> .env
-        echo "MYSQL_PASSWORD=${{ secrets.DEV_MYSQL_PASSWORD }}" >> .env
-        echo "MYSQL_DATABASE=${{ secrets.DEV_MYSQL_DATABASE }}" >> .env
+        # Создаем .env файл с необходимыми переменными
+        cat <<EOF > .env
+        MYSQL_ROOT_PASSWORD=${{ secrets.DEV_MYSQL_ROOT_PASSWORD }}
+        MYSQL_DATABASE=${{ secrets.DEV_MYSQL_DATABASE }}
+        MYSQL_USER=${{ secrets.DEV_MYSQL_USER }}
+        MYSQL_PASSWORD=${{ secrets.DEV_MYSQL_PASSWORD }}
+        IMAGE_TAG=dev-${{ github.sha }}
+        BACKEND_IMAGE=${{ env.BACKEND_IMAGE }}
+        FRONTEND_IMAGE=${{ env.FRONTEND_IMAGE }}
+        EOF
         
-        docker compose -f docker-compose.ci.yml up -d --build
+        # Проверяем созданный файл
+        cat .env
+        
+        # Запускаем контейнеры с явным указанием файла .env
+        docker compose --env-file .env -f docker-compose.ci.yml up -d --build
         
         # Ожидание готовности MySQL
         timeout 120s bash -c '
