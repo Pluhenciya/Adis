@@ -65,6 +65,14 @@ jobs:
 
     - name: Start containers
       run: |
+        export BACKEND_IMAGE=${{ env.BACKEND_IMAGE }}
+        export FRONTEND_IMAGE=${{ env.FRONTEND_IMAGE }}
+        export IMAGE_TAG=dev-${{ github.sha }}
+        export MYSQL_USER=${{ secrets.DEV_MYSQL_USER }}
+        export MYSQL_PASSWORD=${{ secrets.DEV_MYSQL_PASSWORD }}
+        export MYSQL_DATABASE=${{ secrets.DEV_MYSQL_DATABASE }}
+        export MYSQL_ROOT_PASSWORD=${{ secrets.DEV_MYSQL_ROOT_PASSWORD }}
+        
         docker-compose -f docker-compose.ci.yml up -d
         ./scripts/wait-for-it.sh mysql:3306 --timeout=30
 
