@@ -79,7 +79,7 @@ jobs:
 
     - name: Run backend tests
       run: |
-        docker compose -f docker-compose.ci.yml exec backend dotnet test
+        docker compose -f docker-compose.ci.yml exec adis-backend-1 dotnet test
 
   deploy-production:
     if: github.ref == 'refs/heads/master'
@@ -134,5 +134,4 @@ jobs:
           echo "JWT__Key=${{ secrets.PROD_JWT_KEY }}" >> .env.prod
           docker compose pull
           docker compose -f docker-compose.prod.yml up -d --force-recreate
-          docker exec backend dotnet ef database update
           docker system prune -af
