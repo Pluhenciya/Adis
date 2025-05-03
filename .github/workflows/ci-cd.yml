@@ -90,7 +90,7 @@ jobs:
       run: |
         # Ожидание готовности backend
         timeout 60s bash -c '
-          while ! docker compose -f docker-compose.ci.yml ps -q backend | xargs docker inspect -f "{{.State.Status}}" | grep -q "running";
+          while ! docker compose -f docker-compose.ci.yml ps -q adis-backend-1 | xargs docker inspect -f "{{.State.Status}}" | grep -q "running";
           do sleep 3;
           done'
         
