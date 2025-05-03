@@ -72,15 +72,6 @@ jobs:
             sleep 10;
             echo "MySQL status: $(docker compose -f docker-compose.ci.yml ps mysql)";
           done'
-    
-        # Ожидание миграций
-        timeout 1200s bash -c '
-          until docker compose -f docker-compose.ci.yml logs backend | grep "Database initialization completed";
-          do
-            sleep 20;
-            echo "Migration status:";
-            docker compose -f docker-compose.ci.yml logs backend --tail=50 | grep "Database";
-          done'
 
     - name: Run backend tests
       run: |
