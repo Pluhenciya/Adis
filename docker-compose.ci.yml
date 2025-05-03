@@ -4,7 +4,7 @@ services:
     image: ${BACKEND_IMAGE}:${IMAGE_TAG}
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=server=mysql;port=3306;user=${MYSQL_USER};password=${MYSQL_PASSWORD};database=${MYSQL_DATABASE}
+      - ConnectionStrings__DefaultConnection=server=mysql;port=3306;user=root;password=${MYSQL_ROOT_PASSWORD};database=${MYSQL_DATABASE}
     networks:
       - app-network
     depends_on:
@@ -31,7 +31,7 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin", "ping", "-uroot", "-p$$MYSQL_ROOT_PASSWORD"]
       interval: 5s
       timeout: 10s
       retries: 5

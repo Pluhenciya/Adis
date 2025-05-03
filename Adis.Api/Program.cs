@@ -27,6 +27,20 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+
+    options.UseMySql(
+        connectionString,
+        ServerVersion.AutoDetect(connectionString),
+        mysqlOptions =>
+        {
+            mysqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 10,
+                maxRetryDelay: TimeSpan.FromSeconds(30),
+                errorNumbersToAdd: null);
+        })
+    .LogTo(Console.WriteLine, LogLevel.Information)
+    .EnableSensitiveDataLogging()
+    .EnableDetailedErrors();
 });
 
 builder.Services.AddIdentity<User, Role>()
@@ -122,19 +136,21 @@ using (var scope = app.Services.CreateScope())
     var dbContext = services.GetRequiredService<AppDbContext>();
 
     int retries = 0;
-    const int maxRetries = 5;
+    const int maxRetries = 10;
 
     while (retries < maxRetries)
     {
         try
         {
-            logger.LogInformation("Attempting database migration (Attempt {Retry})", retries + 1);
+            logger.LogInformation("Database connection attempt #{Retry}", retries + 1);
 
             if (!dbContext.Database.CanConnect())
                 throw new Exception("Database connection failed");
 
+            logger.LogInformation("Applying migrations...");
             dbContext.Database.Migrate();
 
+            logger.LogInformation("Initializing admin user...");
             var adminInitializer = services.GetRequiredService<IAdminInitializer>();
             await adminInitializer.InitializeAsync();
 
@@ -143,12 +159,15 @@ using (var scope = app.Services.CreateScope())
         catch (Exception ex)
         {
             retries++;
-            logger.LogError(ex, "Database migration failed on attempt {Retry}", retries);
+            logger.LogError(ex, "Database initialization failed");
 
             if (retries >= maxRetries)
+            {
+                logger.LogCritical("Database initialization failed after {MaxRetries} attempts", maxRetries);
                 throw;
+            }
 
-            await Task.Delay(5000 * retries);
+            await Task.Delay(10000 * retries);
         }
     }
 }

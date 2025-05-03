@@ -77,13 +77,25 @@ jobs:
         # Проверяем созданный файл
         cat .env
         
-        # Запускаем контейнеры с явным указанием файла .env
+        docker compose -f docker-compose.ci.yml down -v
         docker compose --env-file .env -f docker-compose.ci.yml up -d --build
-        
+    
         # Ожидание готовности MySQL
-        timeout 120s bash -c '
-          while ! docker exec mysql mysqladmin ping -u root -p${{ secrets.DEV_MYSQL_ROOT_PASSWORD }} --silent;
-          do sleep 5;
+        timeout 600s bash -c '
+          while ! docker compose -f docker-compose.ci.yml exec mysql \
+            mysqladmin ping -uroot -p${{ secrets.DEV_MYSQL_ROOT_PASSWORD }};
+          do
+            sleep 10;
+            echo "MySQL status: $(docker compose -f docker-compose.ci.yml ps mysql)";
+          done'
+    
+        # Ожидание миграций
+        timeout 1200s bash -c '
+          until docker compose -f docker-compose.ci.yml logs backend | grep "Database initialization completed";
+          do
+            sleep 20;
+            echo "Migration status:";
+            docker compose -f docker-compose.ci.yml logs backend --tail=50 | grep "Database";
           done'
 
     - name: Run backend tests
