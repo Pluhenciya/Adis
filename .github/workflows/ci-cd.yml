@@ -47,18 +47,15 @@ jobs:
 
     - name: Start containers
       run: |
-        # Создаем .env файл с необходимыми переменными
-        cat <<EOF > .env
-        MYSQL_ROOT_PASSWORD=${{ secrets.DEV_MYSQL_ROOT_PASSWORD }}
-        MYSQL_DATABASE=${{ secrets.DEV_MYSQL_DATABASE }}
-        MYSQL_USER=${{ secrets.DEV_MYSQL_USER }}
-        MYSQL_PASSWORD=${{ secrets.DEV_MYSQL_PASSWORD }}
-        IMAGE_TAG=dev-${{ github.sha }}
-        BACKEND_IMAGE=${{ env.BACKEND_IMAGE }}
-        FRONTEND_IMAGE=${{ env.FRONTEND_IMAGE }}
-        EOF
-        
-        # Проверяем созданный файл
+        echo "MYSQL_ROOT_PASSWORD=${{ secrets.DEV_MYSQL_ROOT_PASSWORD }}" > .env
+        echo "MYSQL_DATABASE=${{ secrets.DEV_MYSQL_DATABASE }}" >> .env
+        echo "MYSQL_USER=${{ secrets.DEV_MYSQL_USER }}" >> .env
+        echo "MYSQL_PASSWORD=${{ secrets.DEV_MYSQL_PASSWORD }}" >> .env
+        echo "IMAGE_TAG=dev-${{ github.sha }}" >> .env
+        echo "BACKEND_IMAGE=${{ env.BACKEND_IMAGE }}" >> .env
+        echo "FRONTEND_IMAGE=${{ env.FRONTEND_IMAGE }}" >> .env
+
+        # Проверяем содержимое .env
         cat .env
         
         docker compose -f docker-compose.ci.yml down -v
