@@ -52,6 +52,7 @@ jobs:
         cache-to: type=local,dest=/tmp/.buildx-cache
         secrets: |
           "JWT__Key=${{ secrets.DEV_JWT_KEY }}"
+        load: true
 
     - name: Build frontend
       uses: docker/build-push-action@v5
@@ -61,6 +62,7 @@ jobs:
         tags: ${{ env.FRONTEND_IMAGE }}:dev-${{ github.sha }}
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache
+        load: true
 
     - name: Start containers
       run: |
