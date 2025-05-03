@@ -66,11 +66,11 @@ jobs:
     
         # Ожидание готовности MySQL
         timeout 300s bash -c '
-          until docker compose -f docker-compose.ci.yml exec mysql \
-            mysqladmin ping -h mysql -uroot -p${{ secrets.MYSQL_ROOT_PASSWORD }} --silent;
+          until docker compose -f docker-compose.ci.yml exec -T mysql \
+            mysqladmin ping -h mysql -uroot -p${{ secrets.DEV_MYSQL_ROOT_PASSWORD }} --silent;
           do
             sleep 5;
-            echo "MySQL status: $(docker compose ps mysql)";
+            echo "MySQL status: $(docker compose -f docker-compose.ci.yml ps mysql)";
           done'
 
     - name: Run backend tests

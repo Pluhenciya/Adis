@@ -133,6 +133,10 @@ using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var logger = services.GetRequiredService<ILogger<Program>>();
+
+    logger.LogInformation("Connection string: {ConnectionString}",
+    builder.Configuration.GetConnectionString("DefaultConnection"));
+
     var dbContext = services.GetRequiredService<AppDbContext>();
 
     int retries = 0;
