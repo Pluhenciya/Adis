@@ -8,9 +8,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  BACKEND_IMAGE: ${{ github.repository }}_backend
-  FRONTEND_IMAGE: ${{ github.repository }}_frontend
-  MYSQL_IMAGE: mysql:8.4
+  BACKEND_IMAGE: adis_backend
+  FRONTEND_IMAGE: adis_frontend
 
 jobs:
   build-and-test:
@@ -19,7 +18,7 @@ jobs:
 
     services:
       mysql:
-        image: ${{ env.MYSQL_IMAGE }}
+        image: mysql:8.4
         env:
           MYSQL_ROOT_PASSWORD: ${{ secrets.DEV_MYSQL_ROOT_PASSWORD }}
           MYSQL_DATABASE: ${{ secrets.DEV_MYSQL_DATABASE }}
@@ -58,7 +57,7 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         context: ./adis.client
-        file: Dockerfile
+        file: ./adis.client/Dockerfile
         tags: ${{ env.FRONTEND_IMAGE }}:dev-${{ github.sha }}
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache
@@ -78,7 +77,7 @@ jobs:
 
     - name: Run backend tests
       run: |
-        docker-compose -f docker-compose.ci.yml exec backend dotnet test
+        docker compose -f docker-compose.ci.yml exec backend dotnet test
 
   deploy-production:
     if: github.ref == 'refs/heads/master'
@@ -115,7 +114,7 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         context: ./adis.client
-        file: Dockerfile
+        file: ./adis.client/Dockerfile
         tags: |
           ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:latest
           ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:${{ github.sha }}
@@ -128,10 +127,10 @@ jobs:
         username: ${{ secrets.PROD_SERVER_USERNAME }}
         key: ${{ secrets.PROD_SERVER_SSH_KEY }}
         script: |
-          cd /opt/your-app
+          cd /opt/adis
           echo "PROD_MYSQL_PASSWORD=${{ secrets.PROD_MYSQL_PASSWORD }}" >> .env.prod
           echo "JWT__Key=${{ secrets.PROD_JWT_KEY }}" >> .env.prod
-          docker-compose pull
-          docker-compose -f docker-compose.prod.yml up -d --force-recreate
+          docker compose pull
+          docker compose -f docker-compose.prod.yml up -d --force-recreate
           docker exec backend dotnet ef database update
           docker system prune -af
