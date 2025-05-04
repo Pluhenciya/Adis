@@ -108,6 +108,15 @@ jobs:
           ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:${{ github.sha }}
         push: true
 
+    - name: Copy files to server
+      uses: appleboy/scp-action@v1
+      with:
+        host: ${{ secrets.PROD_SERVER_HOST }}
+        username: ${{ secrets.PROD_SERVER_USERNAME }}
+        key: ${{ secrets.PROD_SERVER_SSH_KEY }}
+        source: "./"
+        target: "/opt/adis"
+
     - name: Deploy to production
       uses: appleboy/ssh-action@v1
       with:
