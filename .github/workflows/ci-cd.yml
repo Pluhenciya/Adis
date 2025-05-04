@@ -60,29 +60,9 @@ jobs:
         
         docker compose -f docker-compose.ci.yml down -v
         docker compose --env-file .env -f docker-compose.ci.yml up -d --build
-    
-        # Ожидание готовности MySQL
-        timeout 300s bash -c '
-          until docker compose -f docker-compose.ci.yml exec -T mysql \
-            mysqladmin ping -h mysql -uroot -p${{ secrets.DEV_MYSQL_ROOT_PASSWORD }} --silent;
-          do
-            sleep 5;
-            echo "MySQL status: $(docker compose -f docker-compose.ci.yml ps mysql)";
-          done'
 
     - name: Run backend tests
-      run: |
-        docker compose -f docker-compose.ci.yml logs mysql
-        # Ожидание готовности backend с выводом логов
-        timeout 600s bash -c '
-          while ! docker compose -f docker-compose.ci.yml logs backend | grep -q "Application started";
-          do
-            sleep 10;
-            echo "Backend status: $(docker compose -f docker-compose.ci.yml ps backend)";
-            echo "Last logs:";
-            docker compose -f docker-compose.ci.yml logs backend --tail=20;
-          done'
-        
+      run: |   
         # Запуск тестов
         docker compose -f docker-compose.ci.yml exec backend dotnet test
 
