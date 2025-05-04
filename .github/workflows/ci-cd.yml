@@ -61,11 +61,6 @@ jobs:
         docker compose -f docker-compose.ci.yml down -v
         docker compose --env-file .env -f docker-compose.ci.yml up -d --build
 
-    - name: Run backend tests
-      run: |   
-        # Запуск тестов
-        docker compose -f docker-compose.ci.yml exec backend dotnet test
-
   deploy-production:
     if: github.ref == 'refs/heads/master'
     needs: build-and-test

@@ -20,6 +20,10 @@ COPY ["Adis.Tests/Adis.Tests.csproj", "Adis.Tests/"]
 RUN dotnet restore "./Adis.Api/Adis.Api.csproj"
 RUN dotnet restore "Adis.Tests/Adis.Tests.csproj"
 COPY . .
+
+# Запуск тестов
+RUN dotnet test "Adis.Tests/Adis.Tests.csproj"
+
 WORKDIR "/src/Adis.Api"
 RUN dotnet build "./Adis.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
