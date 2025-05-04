@@ -16,6 +16,9 @@ services:
       mysql:
         condition: service_healthy
         restart: true
+    command: |
+      apt-get update && apt-get install -y dotnet-sdk-9.0
+      dotnet test
 
   frontend:
     container_name: frontend
