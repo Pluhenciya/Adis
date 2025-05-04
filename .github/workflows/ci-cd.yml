@@ -127,11 +127,11 @@ jobs:
           cd /opt/adis
           
           echo "ConnectionStrings__DefaultConnection=server=mysql;port=3306;user=root;password=${{ secrets.PROD_MYSQL_ROOT_PASSWORD }};database=${{ secrets.PROD_MYSQL_DATABASE }}" > environment/default.prod.env
-          echo "JWT__Issuer=localhost:5221" >> environment/default.prod.env
-          echo "JWT__Audience=your-localhost:5221" >> environment/default.prod.env
-          echo "JWT__Key=${{ secrets.PROD_JWT_KEY }}" >> environment/default.prod.env
-          echo "ASPNETCORE_ENVIRONMENT=Development" >> environment/default.prod.env
-          echo "ASPNETCORE_URLS=http://+:8080" >> environment/default.prod.env
+          echo "JWT__Issuer=localhost:5221" >> environment/default.env
+          echo "JWT__Audience=your-localhost:5221" >> environment/default.env
+          echo "JWT__Key=${{ secrets.PROD_JWT_KEY }}" >> environment/default.env
+          echo "ASPNETCORE_ENVIRONMENT=Development" >> environment/default.env
+          echo "ASPNETCORE_URLS=http://+:8080" >> environment/default.env
 
           echo "MYSQL_ROOT_PASSWORD=${{ secrets.DEV_MYSQL_ROOT_PASSWORD }}" > environment/mysql.env
           echo "MYSQL_DATABASE=${{ secrets.DEV_MYSQL_DATABASE }}" >> environment/mysql.env
