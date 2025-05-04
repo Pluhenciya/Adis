@@ -68,6 +68,9 @@ jobs:
     if: github.event_name == 'pull_request' && github.base_ref == 'master'
     needs: build-and-test
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     environment: 
       name: production
       url: http://92.255.104.183/
