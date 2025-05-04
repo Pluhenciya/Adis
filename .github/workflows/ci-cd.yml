@@ -8,13 +8,13 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  BACKEND_IMAGE: adis-backend
-  FRONTEND_IMAGE: adis-frontend
+  BACKEND_IMAGE: pluhenciya/adis-backend
+  FRONTEND_IMAGE: pluhenciya/adis-frontend
 
 jobs:
   build-and-test:
     if: |
-      github.event_name == 'pull_request' || 
+      github.event_name == 'pull_request' && 
       github.ref == 'refs/heads/dev' || 
       github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
