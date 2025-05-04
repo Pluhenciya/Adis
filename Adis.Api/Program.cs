@@ -27,20 +27,6 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
-
-    options.UseMySql(
-        connectionString,
-        ServerVersion.AutoDetect(connectionString),
-        mysqlOptions =>
-        {
-            mysqlOptions.EnableRetryOnFailure(
-                maxRetryCount: 10,
-                maxRetryDelay: TimeSpan.FromSeconds(30),
-                errorNumbersToAdd: null);
-        })
-    .LogTo(Console.WriteLine, LogLevel.Information)
-    .EnableSensitiveDataLogging()
-    .EnableDetailedErrors();
 });
 
 builder.Services.AddIdentity<User, Role>()
@@ -132,47 +118,14 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    var logger = services.GetRequiredService<ILogger<Program>>();
-
-    logger.LogInformation("Connection string: {ConnectionString}",
-    builder.Configuration.GetConnectionString("DefaultConnection"));
-
     var dbContext = services.GetRequiredService<AppDbContext>();
 
-    int retries = 0;
-    const int maxRetries = 10;
-
-    while (retries < maxRetries)
+    if (!dbContext.Database.IsInMemory()) // Чтобы в тестах это не срабатывало
     {
-        try
-        {
-            logger.LogInformation("Database connection attempt #{Retry}", retries + 1);
+        dbContext.Database.Migrate();
 
-            if (!dbContext.Database.CanConnect())
-                throw new Exception("Database connection failed");
-
-            logger.LogInformation("Applying migrations...");
-            dbContext.Database.Migrate();
-
-            logger.LogInformation("Initializing admin user...");
-            var adminInitializer = services.GetRequiredService<IAdminInitializer>();
-            await adminInitializer.InitializeAsync();
-
-            break;
-        }
-        catch (Exception ex)
-        {
-            retries++;
-            logger.LogError(ex, "Database initialization failed");
-
-            if (retries >= maxRetries)
-            {
-                logger.LogCritical("Database initialization failed after {MaxRetries} attempts", maxRetries);
-                throw;
-            }
-
-            await Task.Delay(10000 * retries);
-        }
+        var adminInitializer = services.GetRequiredService<IAdminInitializer>();
+        await adminInitializer.InitializeAsync();
     }
 }
 
