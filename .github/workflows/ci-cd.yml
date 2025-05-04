@@ -8,12 +8,15 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  BACKEND_IMAGE: adis-backend
-  FRONTEND_IMAGE: adis-frontend
+  BACKEND_IMAGE: pluhenciya/adis-backend
+  FRONTEND_IMAGE: pluhenciya/adis-frontend
 
 jobs:
   build-and-test:
-    if: github.ref == 'refs/heads/dev'
+    if: |
+      github.event_name == 'pull_request' || 
+      github.ref == 'refs/heads/dev' || 
+      github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
 
     steps:
@@ -62,9 +65,12 @@ jobs:
         docker compose --env-file .env -f docker-compose.ci.yml up -d --build
 
   deploy-production:
-    if: github.ref == 'refs/heads/master'
+    if: github.event_name == 'pull_request' && github.base_ref == 'master'
     needs: build-and-test
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     environment: 
       name: production
       url: http://92.255.104.183/
@@ -102,6 +108,15 @@ jobs:
           ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:${{ github.sha }}
         push: true
 
+    - name: Copy files to server
+      uses: appleboy/scp-action@v1
+      with:
+        host: ${{ secrets.PROD_SERVER_HOST }}
+        username: ${{ secrets.PROD_SERVER_USERNAME }}
+        key: ${{ secrets.PROD_SERVER_SSH_KEY }}
+        source: "./"
+        target: "/opt/adis"
+
     - name: Deploy to production
       uses: appleboy/ssh-action@v1
       with:
@@ -110,8 +125,19 @@ jobs:
         key: ${{ secrets.PROD_SERVER_SSH_KEY }}
         script: |
           cd /opt/adis
-          echo "PROD_MYSQL_PASSWORD=${{ secrets.PROD_MYSQL_PASSWORD }}" > .env.prod
-          echo "JWT__Key=${{ secrets.PROD_JWT_KEY }}" >> .env.prod
+          
+          echo "ConnectionStrings__DefaultConnection=server=mysql;port=3306;user=root;password=${{ secrets.PROD_MYSQL_ROOT_PASSWORD }};database=${{ secrets.PROD_MYSQL_DATABASE }}" > environment/default.prod.env
+          echo "JWT__Issuer=localhost:5221" >> environment/default.env
+          echo "JWT__Audience=your-localhost:5221" >> environment/default.env
+          echo "JWT__Key=${{ secrets.PROD_JWT_KEY }}" >> environment/default.env
+          echo "ASPNETCORE_ENVIRONMENT=Development" >> environment/default.env
+          echo "ASPNETCORE_URLS=http://+:8080" >> environment/default.env
+
+          echo "MYSQL_ROOT_PASSWORD=${{ secrets.DEV_MYSQL_ROOT_PASSWORD }}" > environment/mysql.env
+          echo "MYSQL_DATABASE=${{ secrets.DEV_MYSQL_DATABASE }}" >> environment/mysql.env
+          echo "MYSQL_USER=${{ secrets.DEV_MYSQL_USER }}" >> environment/mysql.env
+          echo "MYSQL_PASSWORD=${{ secrets.DEV_MYSQL_PASSWORD }}" >> environment/mysql.env
+          
           docker compose -f docker-compose.yml down
           docker compose -f docker-compose.yml pull
           docker compose -f docker-compose.yml up -d --force-recreate
