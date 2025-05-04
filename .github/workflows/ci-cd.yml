@@ -13,7 +13,10 @@ env:
 
 jobs:
   build-and-test:
-    if: github.ref == 'refs/heads/dev'
+    if: |
+      github.event_name == 'pull_request' || 
+      github.ref == 'refs/heads/dev' || 
+      github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
 
     steps:
@@ -62,7 +65,7 @@ jobs:
         docker compose --env-file .env -f docker-compose.ci.yml up -d --build
 
   deploy-production:
-    if: github.ref == 'refs/heads/master'
+    if: github.event_name == 'pull_request' && github.base_ref == 'master'
     needs: build-and-test
     runs-on: ubuntu-latest
     environment: 
