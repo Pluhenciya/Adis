@@ -114,13 +114,19 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
+// »нициализаци€ базы данных с повторными попытками
 using (var scope = app.Services.CreateScope())
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    dbContext.Database.Migrate();
+    var services = scope.ServiceProvider;
+    var dbContext = services.GetRequiredService<AppDbContext>();
 
-    var adminInitializer = scope.ServiceProvider.GetRequiredService<IAdminInitializer>();
-    await adminInitializer.InitializeAsync();
+    if (!dbContext.Database.IsInMemory()) // „тобы в тестах это не срабатывало
+    {
+        dbContext.Database.Migrate();
+
+        var adminInitializer = services.GetRequiredService<IAdminInitializer>();
+        await adminInitializer.InitializeAsync();
+    }
 }
 
 app.UseHttpsRedirection();

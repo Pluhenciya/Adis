@@ -1,0 +1,52 @@
+services:
+  backend:
+    container_name: backend
+    image: ${BACKEND_IMAGE}:${IMAGE_TAG}
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=server=mysql;port=3306;user=root;password=${MYSQL_ROOT_PASSWORD};database=${MYSQL_DATABASE}
+      - JWT__Issuer=localhost:5221
+      - JWT__Audience=localhost:5221
+      - JWT__Key=SuperSecretKey_JSM_The_Best_837412904361249126341789268041263489127346784263490
+      - AdminSettings__Email=admin@example.com
+      - AdminSettings__Password=Admin1234!
+    networks:
+      - app-network
+    depends_on:
+      mysql:
+        condition: service_healthy
+        restart: true
+
+  frontend:
+    container_name: frontend
+    image: ${FRONTEND_IMAGE}:${IMAGE_TAG}
+    environment:
+      - NODE_ENV=test
+
+  mysql:
+    container_name: mysql
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - app-network
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+
+networks:
+  app-network:
+    external: false
+    driver: bridge
+
+volumes:
+  mysql-data:
