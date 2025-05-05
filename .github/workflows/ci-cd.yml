@@ -132,6 +132,8 @@ jobs:
           echo "JWT__Key=${{ secrets.PROD_JWT_KEY }}" >> environment/default.env
           echo "ASPNETCORE_ENVIRONMENT=Development" >> environment/default.env
           echo "ASPNETCORE_URLS=http://+:8080" >> environment/default.env
+          echo "AdminSettings__Email=${{ secrets.PROD_ADMIN_EMAIL }}" >> environment/default.env
+          echo "AdminSettings__Password=${{ secrets.PROD_ADMIN_PASSWORD }}" >> environment/default.env
 
           echo "MYSQL_ROOT_PASSWORD=${{ secrets.DEV_MYSQL_ROOT_PASSWORD }}" > environment/mysql.env
           echo "MYSQL_DATABASE=${{ secrets.DEV_MYSQL_DATABASE }}" >> environment/mysql.env
