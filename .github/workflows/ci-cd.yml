@@ -126,7 +126,7 @@ jobs:
         script: |
           cd /opt/adis
           
-          echo "ConnectionStrings__DefaultConnection=server=mysql;port=3306;user=root;password=${{ secrets.PROD_MYSQL_ROOT_PASSWORD }};database=${{ secrets.PROD_MYSQL_DATABASE }}" > environment/default.prod.env
+          echo "ConnectionStrings__DefaultConnection=server=mysql;port=3306;user=root;password=${{ secrets.PROD_MYSQL_ROOT_PASSWORD }};database=${{ secrets.PROD_MYSQL_DATABASE }}" > environment/default.env
           echo "JWT__Issuer=localhost:5221" >> environment/default.env
           echo "JWT__Audience=your-localhost:5221" >> environment/default.env
           echo "JWT__Key=${{ secrets.PROD_JWT_KEY }}" >> environment/default.env
