@@ -1,6 +1,6 @@
 services:
   backend:
-    image: pluhenciya/adis-backend:latest
+    image: ghcr.io/pluhenciya/adis-backend:latest
     build:
       context: .
       dockerfile: Adis.Api/Dockerfile
@@ -17,7 +17,7 @@ services:
       - app-network
 
   frontend:
-    image: pluhenciya/adis-frontend:latest
+    image: ghcr.io/pluhenciya/adis-frontend:latest
     build:
       context: ./adis.client
       dockerfile: Dockerfile
