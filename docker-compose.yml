@@ -1,5 +1,6 @@
 services:
   backend:
+    image: adis-backend:latest
     build:
       context: .
       dockerfile: Adis.Api/Dockerfile
@@ -16,6 +17,7 @@ services:
       - app-network
 
   frontend:
+    image: adis-backend:latest
     build:
       context: ./adis.client
       dockerfile: Dockerfile
