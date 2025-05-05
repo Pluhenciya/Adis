@@ -135,10 +135,10 @@ jobs:
           echo "AdminSettings__Email=${{ secrets.PROD_ADMIN_EMAIL }}" >> environment/default.env
           echo "AdminSettings__Password=${{ secrets.PROD_ADMIN_PASSWORD }}" >> environment/default.env
 
-          echo "MYSQL_ROOT_PASSWORD=${{ secrets.DEV_MYSQL_ROOT_PASSWORD }}" > environment/mysql.env
-          echo "MYSQL_DATABASE=${{ secrets.DEV_MYSQL_DATABASE }}" >> environment/mysql.env
-          echo "MYSQL_USER=${{ secrets.DEV_MYSQL_USER }}" >> environment/mysql.env
-          echo "MYSQL_PASSWORD=${{ secrets.DEV_MYSQL_PASSWORD }}" >> environment/mysql.env
+          echo "MYSQL_ROOT_PASSWORD=${{ secrets.PROD_MYSQL_ROOT_PASSWORD }}" > environment/mysql.env
+          echo "MYSQL_DATABASE=${{ secrets.PROD_MYSQL_DATABASE }}" >> environment/mysql.env
+          echo "MYSQL_USER=${{ secrets.PROD_MYSQL_USER }}" >> environment/mysql.env
+          echo "MYSQL_PASSWORD=${{ secrets.PROD_MYSQL_PASSWORD }}" >> environment/mysql.env
           
           docker compose -f docker-compose.yml down
           docker compose -f docker-compose.yml pull
