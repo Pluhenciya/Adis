@@ -4,17 +4,19 @@ using Adis.Dal.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using NetTopologySuite.Geometries;
 
 #nullable disable
 
 namespace Adis.Dal.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250506170445_AddTask")]
+    partial class AddTask
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,30 +24,6 @@ namespace Adis.Dal.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
-
-            modelBuilder.Entity("Adis.Dm.Location", b =>
-                {
-                    b.Property<int>("IdLocation")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id_location");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("IdLocation"));
-
-                    b.Property<Geometry>("Geometry")
-                        .IsRequired()
-                        .HasColumnType("GEOMETRY")
-                        .HasColumnName("geometry");
-
-                    b.HasKey("IdLocation")
-                        .HasName("PRIMARY");
-
-                    b.HasIndex("Geometry")
-                        .HasDatabaseName("ix_locations_geometry")
-                        .HasAnnotation("MySql:SpatialIndex", true);
-
-                    b.ToTable("locations", (string)null);
-                });
 
             modelBuilder.Entity("Adis.Dm.Project", b =>
                 {
@@ -60,10 +38,6 @@ namespace Adis.Dal.Migrations
                         .HasColumnType("date")
                         .HasColumnName("end_date");
 
-                    b.Property<int>("IdLocation")
-                        .HasColumnType("int")
-                        .HasColumnName("id_location");
-
                     b.Property<int>("IdUser")
                         .HasColumnType("int")
                         .HasColumnName("id_user");
@@ -73,11 +47,6 @@ namespace Adis.Dal.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)")
                         .HasColumnName("name");
-
-                    b.Property<string>("NameWorkObject")
-                        .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasColumnName("name_work_object");
 
                     b.Property<DateOnly>("StartDate")
                         .HasColumnType("date")
@@ -90,8 +59,6 @@ namespace Adis.Dal.Migrations
 
                     b.HasKey("IdProject")
                         .HasName("PRIMARY");
-
-                    b.HasIndex("IdLocation");
 
                     b.HasIndex("IdUser");
 
@@ -469,20 +436,12 @@ namespace Adis.Dal.Migrations
 
             modelBuilder.Entity("Adis.Dm.Project", b =>
                 {
-                    b.HasOne("Adis.Dm.Location", "Location")
-                        .WithMany("Projects")
-                        .HasForeignKey("IdLocation")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .HasConstraintName("fk_location_project");
-
                     b.HasOne("Adis.Dm.User", "User")
                         .WithMany("Projects")
                         .HasForeignKey("IdUser")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired()
                         .HasConstraintName("fk_projects_user");
-
-                    b.Navigation("Location");
 
                     b.Navigation("User");
                 });
@@ -494,7 +453,7 @@ namespace Adis.Dal.Migrations
                         .HasForeignKey("IdProject")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired()
-                        .HasConstraintName("fk_project_tasks");
+                        .HasConstraintName("FK_project_tasks");
 
                     b.Navigation("Project");
                 });
@@ -560,11 +519,6 @@ namespace Adis.Dal.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Adis.Dm.Location", b =>
-                {
-                    b.Navigation("Projects");
                 });
 
             modelBuilder.Entity("Adis.Dm.Project", b =>

@@ -39,9 +39,9 @@ namespace Adis.Api.Controllers
         /// <response code="200">Успешное выполнение</response>
         /// <response code="400">Ошибка валидации данных</response>
         [HttpPost]
-        [ProducesResponseType(typeof(ProjectDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(PostProjectDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> AddProject(ProjectDto project)
+        public async Task<IActionResult> AddProject(PostProjectDto project)
         {
             try
             {
@@ -75,9 +75,9 @@ namespace Adis.Api.Controllers
         /// <param name="sortOrder">Сортировать по возрастанию или по убыванию</param>
         /// <response code="200">Успешное выполнение</response>
         [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<ProjectDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<PostProjectDto>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetProjects(
-            [FromQuery] Status? status,
+            [FromQuery] ProjectStatus? status,
             [FromQuery] string? targetDate,
             [FromQuery] string? startDateFrom,
             [FromQuery] string? startDateTo,
@@ -130,9 +130,9 @@ namespace Adis.Api.Controllers
         /// <response code="200">Успешное выполнение</response>
         /// <response code="400">Ошибка валидации данных</response>
         [HttpPut]
-        [ProducesResponseType(typeof(ProjectDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(PostProjectDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> UpdateProject(ProjectDto project)
+        public async Task<IActionResult> UpdateProject(PostProjectDto project)
         {
             try
             {

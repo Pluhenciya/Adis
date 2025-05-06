@@ -1,53 +1,72 @@
-<!-- login-page.component.html -->
+<!-- HTML -->
 <div class="login-container">
-    <mat-card class="login-card">
-      <mat-card-header>
-        <mat-card-title class="login-title">Вход в систему</mat-card-title>
-      </mat-card-header>
-  
-      <mat-card-content>
-        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-          <!-- Email Field -->
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Email</mat-label>
-            <input matInput formControlName="email" type="email">
-            <mat-icon matSuffix>mail</mat-icon>
-            
-            <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
-              Email обязателен
-            </mat-error>
-            <mat-error *ngIf="loginForm.get('email')?.hasError('email')">
-              Введите корректный email
-            </mat-error>
-          </mat-form-field>
-  
-          <!-- Password Field -->
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Пароль</mat-label>
-            <input matInput formControlName="password" type="password">
-            <mat-icon matSuffix>lock</mat-icon>
-            
-            <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
-              Пароль обязателен
-            </mat-error>
-          </mat-form-field>
-  
-          <!-- Error Message -->
-          <div *ngIf="errorMessage" class="error-message">
-            <mat-icon>error</mat-icon>
-            {{ errorMessage }}
-          </div>
-  
-          <!-- Submit Button -->
-          <button 
-            mat-raised-button 
-            color="primary" 
-            class="full-width" 
-            type="submit"
-            [disabled]="loginForm.invalid">
-            Войти
-          </button>
-        </form>
-      </mat-card-content>
-    </mat-card>
+  <div class="login-form">
+    <div class="auth-header">
+      <div class="logo">
+        <svg width="50" height="43" viewBox="0 0 70 63" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#FF6F00"/>
+              <stop offset="100%" stop-color="#FF8F00"/>
+            </linearGradient>
+          </defs>
+          <path fill="url(#logo-gradient)" d="M59.2869 3.15C58.892 1.18125 57.3123 0 55.3378 0H39.1465L39.9364 11.8125H30.4585L31.2484 0H14.6622C12.6877 0 11.108 1.575 10.7131 3.15L0.0505703 58.275C-0.344339 60.6375 1.63021 63 3.99966 63H27.2993L28.484 43.3125H41.9109L43.0956 63H66.0003C68.3698 63 70.3443 60.6375 69.9494 58.275L59.2869 3.15ZM28.8789 35.4375L29.6687 19.6875H39.9364L40.7262 35.4375H28.8789Z"/>
+        </svg>
+        <span class="logo-highlight">АДИС</span>
+      </div>
+      <h2 class="subtitle">Добро пожаловать в систему</h2>
+    </div>
+    
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <!-- Email Field -->
+      <mat-form-field appearance="outline" class="input-field">
+        <mat-label>Email</mat-label>
+        <input matInput formControlName="email" type="email">
+        <mat-icon matPrefix class="form-icon">mail</mat-icon>
+        <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
+          Обязательное поле
+        </mat-error>
+        <mat-error *ngIf="loginForm.get('email')?.hasError('email')">
+          Некорректный email
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Password Field -->
+      <mat-form-field appearance="outline" class="input-field">
+        <mat-label>Пароль</mat-label>
+        <input matInput formControlName="password" [type]="hidePassword ? 'password' : 'text'">
+        <mat-icon matPrefix class="form-icon">key</mat-icon>
+        <button 
+          type="button" 
+          mat-icon-button 
+          matSuffix
+          (click)="hidePassword = !hidePassword"
+          [attr.aria-label]="'Hide password'"
+          [attr.aria-pressed]="hidePassword"
+          class="toggle-password"
+        >
+          <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
+          Введите пароль
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Submit Button -->
+      <button mat-raised-button class="submit-btn" type="submit" [disabled]="loginForm.invalid">
+        Войти
+        <mat-icon class="btn-icon">login</mat-icon>
+      </button>
+
+      <div class="additional-actions">
+        <a class="link" routerLink="/forgot-password">Забыли пароль?</a>
+        <a class="link" routerLink="/register">Создать аккаунт</a>
+      </div>
+
+      <div *ngIf="errorMessage" class="error-message">
+        <mat-icon>error_outline</mat-icon>
+        {{ errorMessage }}
+      </div>
+    </form>
   </div>
+</div>

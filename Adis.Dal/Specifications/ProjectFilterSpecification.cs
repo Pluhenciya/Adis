@@ -17,7 +17,7 @@ namespace Adis.Dal.Specifications
     public class ProjectFilterSpecification : Specification<Project>
     {
         public ProjectFilterSpecification(
-            Status? status,
+            ProjectStatus? status,
             DateOnly? targetDate,
             DateOnly? startDateFrom,
             DateOnly? startDateTo,
@@ -82,9 +82,7 @@ namespace Adis.Dal.Specifications
             {
                 "name" => p => p.Name,
                 "startdate" => p => p.StartDate,
-                "budget" => p => p.Budget,
                 "idproject" => p => p.IdProject,
-                "createdat" => p => p.CreatedAt,
                 _ => null
             };
         }

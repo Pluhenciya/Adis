@@ -11,7 +11,7 @@ namespace Adis.Bll.Dtos
     /// <summary>
     /// DTO для проектов
     /// </summary>
-    public class ProjectDto
+    public class PostProjectDto
     {
         /// <summary>
         /// Идентификатор проекта
@@ -25,25 +25,12 @@ namespace Adis.Bll.Dtos
         public string Name { get; set; } = null!;
 
         /// <summary>
-        /// Описание проекта
+        /// Начало проектирования
         /// </summary>
-        public string? Description { get; set; }
-
-        /// <summary>
-        /// Бюджет проекта
-        /// </summary>
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Бюджет обязателен")]
-        [Range(0.01, 1000000000000, ErrorMessage = "Допустимый бюджет от 0.01 до 1 000 000 000 000")]
-        public double Budget { get; set; }
-
-        /// <summary>
-        /// Начало выполнения проекта
-        /// </summary>
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Дата начала обязательна")]
         public DateOnly StartDate { get; set; }
 
         /// <summary>
-        /// Конец выполнения проекта
+        /// Конец проектирования
         /// </summary>
         [Required(AllowEmptyStrings = false, ErrorMessage = "Дата конца обязательна")]
         public DateOnly EndDate { get; set; }
@@ -51,18 +38,19 @@ namespace Adis.Bll.Dtos
         /// <summary>
         /// Статус проекта
         /// </summary>
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Статус проекта обязателен")]
-        public Status Status { get; set; }
-
-        /// <summary>
-        /// Время создания
-        /// </summary>
-        public DateTime? CreatedAt { get; set; }
+        public ProjectStatus Status { get; set; } = ProjectStatus.Designing;
 
         /// <summary>
         /// Идентификатор пользователя, который создал проект
         /// </summary>
-        [Required(ErrorMessage = "Идентификатор пользователя обязателен")]
         public int IdUser { get; set; }
+
+        public int IdLocation { get; set; }
+
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Место работ обязательно")]
+        public string NameWorkObject { get; set; } = null!;
+
+        [Required(ErrorMessage = "Локация обязательно")]
+        public LocationDto Location { get; set; } = null!;
     }
 }

@@ -16,7 +16,7 @@ namespace Adis.Bll.Profiles
     {
         public ProjectProfile() 
         {
-            CreateMap<ProjectDto, Project>().ReverseMap();
+            CreateMap<PostProjectDto, Project>().ReverseMap();
         }
     }
 }

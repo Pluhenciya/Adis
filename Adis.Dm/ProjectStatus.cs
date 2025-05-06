@@ -10,24 +10,27 @@ namespace Adis.Dm
     /// <summary>
     /// Статус
     /// </summary>
-    [JsonConverter(typeof(JsonStringEnumConverter<Status>))]
-    public enum Status
+    [JsonConverter(typeof(JsonStringEnumConverter<ProjectStatus>))]
+    public enum ProjectStatus
     {
         /// <summary>
-        /// Черновик
+        /// Проектируется
         /// </summary>
-        Draft,
+        Designing,
+
         /// <summary>
-        /// Выполняется
+        /// Поиск подрядчика
         /// </summary>
-        InProgress,
+        ContractorSearch,
+
+        /// <summary>
+        /// Исполняется
+        /// </summary>
+        InExecution,
+
         /// <summary>
         /// Завершен
         /// </summary>
-        Completed,
-        /// <summary>
-        /// Просрочен
-        /// </summary>
-        Overdue
+        Completed
     }
 }

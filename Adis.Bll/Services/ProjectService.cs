@@ -3,6 +3,8 @@ using Adis.Bll.Interfaces;
 using Adis.Dal.Interfaces;
 using Adis.Dm;
 using AutoMapper;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 
 namespace Adis.Bll.Services
 {
@@ -11,24 +13,40 @@ namespace Adis.Bll.Services
     {
         private readonly IMapper _mapper;
         private readonly IProjectRepository _projectRepository;
+        private readonly IHttpContextAccessor _contextAccessor;
 
-        public ProjectService(IMapper mapper, IProjectRepository projectRepository)
+        public ProjectService(IMapper mapper, IProjectRepository projectRepository, IHttpContextAccessor httpContextAccessor)
         {
             _mapper = mapper;
             _projectRepository = projectRepository;
+            _contextAccessor = httpContextAccessor;
         }
 
         /// <inheritdoc/>
         /// <exception cref="ArgumentException">Возникает когда данные проекта не прошли валидацию</exception>
-        public async Task<ProjectDto> AddProjectAsync(ProjectDto project)
+        public async Task<PostProjectDto> AddProjectAsync(PostProjectDto projectDto)
         {
-            if (project.StartDate > project.EndDate)
-                throw new ArgumentException("Дата оканчания не может быть меньше чем дата начала");
-            return _mapper.Map<ProjectDto>(await _projectRepository.AddAsync(_mapper.Map<Project>(project)));
+            if (DateOnly.FromDateTime(DateTime.Now) > projectDto.EndDate)
+                throw new ArgumentException("Дата оканчания не может быть в прошлом");
+
+            var project = _mapper.Map<Project>(projectDto);
+            var user = _contextAccessor.HttpContext.User;
+
+            if (project.IdLocation != 0)
+                project.Location = null!;
+
+            if (!user.IsInRole("Admin"))
+            {
+                project.IdUser = Int32.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+                project.StartDate = DateOnly.FromDateTime(DateTime.Now);
+                project.Status = ProjectStatus.Designing;
+            }
+
+            return _mapper.Map<PostProjectDto>(await _projectRepository.AddAsync(project));
         }
 
-        public async Task<PaginatedResult<ProjectDto>> GetProjectsAsync(
-            Status? status,
+        public async Task<PaginatedResult<PostProjectDto>> GetProjectsAsync(
+            ProjectStatus? status,
             string? targetDate,
             string? startDateFrom,
             string? startDateTo,
@@ -51,29 +69,29 @@ namespace Adis.Bll.Services
                 page,
                 pageSize);
 
-            return new PaginatedResult<ProjectDto>
+            return new PaginatedResult<PostProjectDto>
             {
-                Items = _mapper.Map<IEnumerable<ProjectDto>>(projects),
+                Items = _mapper.Map<IEnumerable<PostProjectDto>>(projects),
                 TotalCount = totalCount
             };
         }
 
         /// <inheritdoc/>
         /// <exception cref="ArgumentException">Возникает когда данные проекта не прошли валидацию</exception>
-        public async Task<ProjectDto> UpdateProjectAsync(ProjectDto project)
+        public async Task<PostProjectDto> UpdateProjectAsync(PostProjectDto project)
         {
             try
             {
                 var existingProject = await _projectRepository.GetByIdAsync(project.IdProject);
 
-                if (project.StartDate > project.EndDate)
-                    throw new ArgumentException("Дата оканчания не может быть меньше чем дата начала");
+                if (DateOnly.FromDateTime(DateTime.Now) > project.EndDate)
+                    throw new ArgumentException("Дата оканчания не может быть в прошлом");
 
                 _mapper.Map(project, existingProject);
 
                 var updatedProject = await _projectRepository.UpdateAsync(existingProject);
 
-                return _mapper.Map<ProjectDto>(updatedProject);
+                return _mapper.Map<PostProjectDto>(updatedProject);
             }
             catch (KeyNotFoundException)
             {

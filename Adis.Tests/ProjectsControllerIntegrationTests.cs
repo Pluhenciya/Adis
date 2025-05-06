@@ -96,13 +96,10 @@ namespace Adis.Tests
             var token = await GetAuthTokenAsync();
             _client.DefaultRequestHeaders.Authorization = new("Bearer", token);
 
-            var project = new ProjectDto
+            var project = new PostProjectDto
             {
                 Name = "Test Project",
-                Budget = 100000,
-                StartDate = new DateOnly(2024, 1, 1),
                 EndDate = new DateOnly(2024, 12, 31),
-                Status = Status.Draft,
                 IdUser = 1 // Должен соответствовать ID созданного пользователя
             };
 
@@ -111,7 +108,7 @@ namespace Adis.Tests
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            var result = await response.Content.ReadFromJsonAsync<ProjectDto>();
+            var result = await response.Content.ReadFromJsonAsync<PostProjectDto>();
             Assert.Equal(project.Name, result!.Name);
         }
 
@@ -122,13 +119,10 @@ namespace Adis.Tests
         public async Task AddProject_Unauthorized_ReturnsUnauthorized()
         {
             // Arrange
-            var project = new ProjectDto
+            var project = new PostProjectDto
             {
                 Name = "Test Project",
-                Budget = 100000,
-                StartDate = new DateOnly(2024, 1, 1),
                 EndDate = new DateOnly(2024, 12, 31),
-                Status = Status.Draft,
                 IdUser = 1
             };
 
@@ -150,24 +144,18 @@ namespace Adis.Tests
             _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
             // Add test projects
-            var projects = new List<ProjectDto>
+            var projects = new List<PostProjectDto>
             {
                 new()
                 {
                     Name = "Filtered Project",
-                    Budget = 500000,
-                    StartDate = new DateOnly(2024, 1, 1),
                     EndDate = new DateOnly(2024, 3, 31),
-                    Status = Status.Draft,
                     IdUser = 1
                 },
                 new()
                 {
                     Name = "Other Project",
-                    Budget = 1500000,
-                    StartDate = new DateOnly(2024, 6, 1),
                     EndDate = new DateOnly(2024, 12, 31),
-                    Status = Status.InProgress,
                     IdUser = 1
                 }
             };
@@ -198,13 +186,10 @@ namespace Adis.Tests
             var token = await GetAuthTokenAsync();
             _client.DefaultRequestHeaders.Authorization = new("Bearer", token);
 
-            var project = new ProjectDto
+            var project = new PostProjectDto
             {
                 Name = "Test Project",
-                Budget = -100, // Невалидный бюджет
-                StartDate = new DateOnly(2024, 1, 1),
                 EndDate = new DateOnly(2024, 12, 31),
-                Status = Status.Draft,
                 IdUser = 1
             };
 

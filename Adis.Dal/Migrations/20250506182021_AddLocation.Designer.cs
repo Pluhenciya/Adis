@@ -4,6 +4,7 @@ using Adis.Dal.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 
@@ -12,9 +13,11 @@ using NetTopologySuite.Geometries;
 namespace Adis.Dal.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250506182021_AddLocation")]
+    partial class AddLocation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -36,6 +39,11 @@ namespace Adis.Dal.Migrations
                         .IsRequired()
                         .HasColumnType("GEOMETRY")
                         .HasColumnName("geometry");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("enum('point', 'lineString', 'polygon')")
+                        .HasColumnName("location_type");
 
                     b.HasKey("IdLocation")
                         .HasName("PRIMARY");

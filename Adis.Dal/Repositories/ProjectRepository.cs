@@ -18,7 +18,7 @@ namespace Adis.Dal.Repositories
         }
 
         public async Task<(IEnumerable<Project>, int)> GetFilteredProjectsAsync(
-            Status? status = null,
+            ProjectStatus? status = null,
             DateOnly? targetDate = null,
             DateOnly? startDateFrom = null,
             DateOnly? startDateTo = null,

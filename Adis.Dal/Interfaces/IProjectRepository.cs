@@ -25,7 +25,7 @@ namespace Adis.Dal.Interfaces
         /// <param name="sortOrder">Сортировать по возрастанию или по убыванию</param>
         /// <returns>Отфильтрованный список проетов и их общее количество</returns>
         Task<(IEnumerable<Project>, int)> GetFilteredProjectsAsync(
-        Status? status = null,
+        ProjectStatus? status = null,
         DateOnly? targetDate = null,
         DateOnly? startDateFrom = null,
         DateOnly? startDateTo = null,

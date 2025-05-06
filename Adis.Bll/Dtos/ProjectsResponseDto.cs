@@ -14,7 +14,7 @@ namespace Adis.Bll.Dtos
         /// <summary>
         /// Список проектов
         /// </summary>
-        public IEnumerable<ProjectDto> Projects { get; set; } = null!;
+        public IEnumerable<PostProjectDto> Projects { get; set; } = null!;
 
         /// <summary>
         /// Общее количество проектов 
