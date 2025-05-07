@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
 import { BehaviorSubject } from 'rxjs';
+import { AuthService } from './auth.service';
+import { RefreshTokenRequest } from '../models/auth.model';
 
 interface DecodedToken {
   roles: string;  
@@ -15,7 +17,7 @@ export class AuthStateService {
   private roleSubject = new BehaviorSubject<string | null>(null);
   public role$ = this.roleSubject.asObservable();
 
-  constructor(private router: Router) {
+  constructor(private router: Router, private authService: AuthService) {
     this.initializeAuthState();
   }
 
@@ -44,7 +46,27 @@ export class AuthStateService {
   }
 
   isAuthenticated(): boolean {
-    return !!this.accessToken && !this.isTokenExpired();
+    
+    if(!!this.accessToken && !this.isTokenExpired())
+      return true;
+
+    if(!!this.refreshToken){
+      var tokens : RefreshTokenRequest = {
+        accessToken : this.accessToken!,
+        refreshToken : this.refreshToken!
+      }
+      this.authService.refreshToken(tokens).
+      subscribe({
+        next: (response) => {
+          this.login(response.accessToken, response.refreshToken);
+          return true;
+        },
+        error: () => {
+          return false;
+        }
+      });
+    }
+      return false;
   }
 
   isAdmin(): boolean {

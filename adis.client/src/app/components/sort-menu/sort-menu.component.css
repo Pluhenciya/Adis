@@ -1,0 +1,23 @@
+.sort-menu {
+    display: flex;
+    flex-direction: column;
+    padding: 8px;
+    min-width: 160px;
+  }
+  
+  button {
+    justify-content: flex-start;
+    text-align: left;
+    padding: 8px 16px;
+  }
+  
+  button.active {
+    background: rgba(0, 0, 0, 0.04);
+  }
+  
+  .sort-icon {
+    margin-right: 8px;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }

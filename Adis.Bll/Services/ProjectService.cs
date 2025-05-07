@@ -15,12 +15,14 @@ namespace Adis.Bll.Services
         private readonly IMapper _mapper;
         private readonly IProjectRepository _projectRepository;
         private readonly IHttpContextAccessor _contextAccessor;
+        private readonly IUserService _userService;
 
-        public ProjectService(IMapper mapper, IProjectRepository projectRepository, IHttpContextAccessor httpContextAccessor)
+        public ProjectService(IMapper mapper, IProjectRepository projectRepository, IHttpContextAccessor httpContextAccessor, IUserService userService)
         {
             _mapper = mapper;
             _projectRepository = projectRepository;
             _contextAccessor = httpContextAccessor;
+            _userService = userService;
         }
 
         /// <inheritdoc/>
@@ -33,15 +35,23 @@ namespace Adis.Bll.Services
             var project = _mapper.Map<Project>(projectDto);
             var user = _contextAccessor.HttpContext.User;
 
+            int idUser = project.IdUser == 0 ? Int32.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value!) : project.IdUser;
+
+            var responsiblePerson = await _userService.GetUserByIdAsync(idUser);
+
+            if (responsiblePerson.Role != Role.ProjectManager)
+                throw new ArgumentException("Этот пользователь не может управлять проектом");
+
             if (project.StartDate == DateOnly.MinValue)
                 project.StartDate = DateOnly.FromDateTime(DateTime.Now);
+
 
             if (project.IdLocation != 0)
                 project.Location = null!;
 
-            if (!user.IsInRole("Admin"))
+            if (!user.IsInRole(Role.Admin.ToString()))
             {
-                project.IdUser = Int32.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+                project.IdUser = idUser;
                 project.StartDate = DateOnly.FromDateTime(DateTime.Now);
                 project.Status = ProjectStatus.Designing;
             }
@@ -54,6 +64,7 @@ namespace Adis.Bll.Services
             string? targetDate,
             string? startDateFrom,
             string? startDateTo,
+            string? search,
             string sortField = "StartDate",
             string sortOrder = "desc",
             int page = 1,
@@ -68,6 +79,7 @@ namespace Adis.Bll.Services
                 parsedTargetDate,
                 parsedStartDateFrom,
                 parsedStartDateTo,
+                search,
                 sortField,
                 sortOrder,
                 page,

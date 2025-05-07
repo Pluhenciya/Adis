@@ -71,6 +71,7 @@ namespace Adis.Api.Controllers
         /// <param name="targetDate">Дата, в которую проект будет выполняться (yyyy-MM-dd)</param>
         /// <param name="startDateFrom">Начальная дата диапазона (yyyy-MM-dd)</param>
         /// <param name="startDateTo">Конечная дата диапазона (yyyy-MM-dd)</param>
+        /// <param name="search">Часть имени наименования проекта для поиска</param>
         /// <param name="page">Номер страницы для пагинации</param>
         /// <param name="pageSize">Количество записей на страницы</param>
         /// <param name="sortField">Свойство, по которому сортировать</param>
@@ -83,6 +84,7 @@ namespace Adis.Api.Controllers
             [FromQuery] string? targetDate,
             [FromQuery] string? startDateFrom,
             [FromQuery] string? startDateTo,
+            [FromQuery] string? search,
             [FromQuery] string sortField = "StartDate",
             [FromQuery] string sortOrder = "desc",
             [FromQuery] int page = 1,
@@ -96,6 +98,7 @@ namespace Adis.Api.Controllers
                 targetDate,
                 startDateFrom,
                 startDateTo,
+                search,
                 sortField,
                 sortOrder,
                 page,

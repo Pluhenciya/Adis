@@ -22,12 +22,13 @@ namespace Adis.Dal.Repositories
             DateOnly? targetDate = null,
             DateOnly? startDateFrom = null,
             DateOnly? startDateTo = null,
+            string? search = null,
             string sortField = "StartDate",
             string sortOrder = "desc",
             int page = 1,
             int pageSize = 10)
         {
-            var spec = new ProjectFilterSpecification(status, targetDate, startDateFrom, startDateTo, sortField, sortOrder, page, pageSize);
+            var spec = new ProjectFilterSpecification(status, targetDate, startDateFrom, startDateTo, search, sortField, sortOrder, page, pageSize);
 
             return (await GetAsync(spec), (await GetAsync()).Count());
         }

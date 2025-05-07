@@ -1,0 +1,19 @@
+<div class="sort-menu" (click)="$event.stopPropagation()">
+    <button mat-button 
+            (click)="toggleSort('startDate')"
+            [class.active]="selectedField === 'startDate'">
+      <mat-icon class="sort-icon">
+        {{ getSortIcon('startDate') }}
+      </mat-icon>
+      Дата начала
+    </button>
+  
+    <button mat-button 
+            (click)="toggleSort('name')"
+            [class.active]="selectedField === 'name'">
+      <mat-icon class="sort-icon">
+        {{ getSortIcon('name') }}
+      </mat-icon>
+      Название
+    </button>
+  </div>

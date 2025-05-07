@@ -3,7 +3,10 @@
     <div class="search-bar">
       <mat-form-field appearance="outline" class="search-field">
         <mat-label>Поиск проектов</mat-label>
-        <input matInput placeholder="Введите название проекта...">
+        <input matInput 
+               placeholder="Введите название проекта..."
+               [(ngModel)]="searchQuery"
+               (input)="onSearchInput($event)">
         <mat-icon matPrefix>search</mat-icon>
       </mat-form-field>
       <button mat-raised-button class="add-btn" (click)="openProjectForm()">
@@ -14,39 +17,66 @@
 
     <div class="projects-list">
       <div class="list-controls">
-        <h2 class="title">Текущие проекты</h2>
+        <h2 class="title">Текущие проекты ({{totalCount}})</h2>
         <div class="control-buttons">
-          <button mat-icon-button class="filter-btn" matTooltip="Фильтры">
+          <!-- Фильтры -->
+          <button mat-icon-button 
+                  [matMenuTriggerFor]="filterMenu" 
+                  #filterTrigger="matMenuTrigger"
+                  matTooltip="Фильтры"
+                  [class.active]="hasActiveFilters">
             <mat-icon>filter_alt</mat-icon>
           </button>
-          <button mat-icon-button class="sort-btn" matTooltip="Сортировка">
+          <mat-menu #filterMenu="matMenu">
+            <app-filter-menu 
+              (applied)="applyFilters($event)"
+              (cleared)="clearFilters()">
+            </app-filter-menu>
+          </mat-menu>
+
+          <!-- Сортировка -->
+          <button mat-icon-button 
+                  [matMenuTriggerFor]="sortMenu" 
+                  #sortTrigger="matMenuTrigger"
+                  matTooltip="Сортировка"
+                  [class.active]="sortField !== 'startDate' || sortOrder !== 'desc'">
             <mat-icon>sort</mat-icon>
           </button>
-          <div class="view-switcher">
-            <button mat-flat-button class="list-view active">Список</button>
-            <button mat-flat-button class="map-view">Карта</button>
-          </div>
+          <mat-menu #sortMenu="matMenu">
+            <app-sort-menu 
+            [selectedField]="sortField"
+            [sortOrder]="sortOrder"
+            (applied)="applySort($event)">
+            </app-sort-menu>
+          </mat-menu>
+
+          <mat-button-toggle-group class="view-switcher" 
+            [hideSingleSelectionIndicator]="hideSingleSelectionIndicator()" 
+            [(ngModel)]="viewMode"
+            (change)="toggleView($event.value)">
+            <mat-button-toggle value="list">Список</mat-button-toggle>
+            <mat-button-toggle value="map">Карта</mat-button-toggle>
+          </mat-button-toggle-group>
         </div>
       </div>
 
-      <div class="project-cards">
-        <div class="project-card" 
-             *ngFor="let project of projects" 
-             [class]="project.status"
-             [style.--progress]="project.progress">
-             <div class="actions">
-              <button mat-mini-fab class="edit-btn">
-                <mat-icon>edit</mat-icon>
-              </button>
-              <button mat-mini-fab class="delete-btn">
-                <mat-icon>delete</mat-icon>
-              </button>
-            </div>
+      <div *ngIf="viewMode === 'list'" class="project-cards">
+        <div class="project-card" *ngFor="let project of projects" [class]="project.status"
+          [style.--progress]="project.progress">
+          <div class="actions">
+            <button mat-mini-fab class="edit-btn">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-mini-fab class="delete-btn">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
           <h3 class="project-title">{{ project.name }}</h3>
           <div class="status-chip" [class]="project.status">
             {{ getStatusLabel(project.status) }}
           </div>
-          <div class="progress-circle">
+          <div class="progress-circle" *ngIf="project.status !== ProjectStatus.ContractorSearch && 
+                      project.status !== ProjectStatus.Completed">
             <span class="percent">{{ project.progress }}%</span>
             <span class="label">Готово</span>
           </div>
@@ -68,6 +98,16 @@
               <span>{{ project.nameWorkObject }}</span>
             </div>
           </div>
+        </div>
+        <div class="scroll-trigger" style="height: 1px; visibility: hidden;"></div>
+      </div>
+      <div *ngIf="viewMode === 'map'" class="map-container">
+        <div id="map-container" style="height: 100%"></div>
+        <div *ngIf="selectedProject" class="selected-project-info">
+          <h3>{{ selectedProject.name }}</h3>
+          <p>Статус: {{ getStatusLabel(selectedProject.status) }}</p>
+          <p>Объект: {{ selectedProject.nameWorkObject }}</p>
+          <p>Прогресс: {{ selectedProject.progress }}%</p>
         </div>
       </div>
     </div>

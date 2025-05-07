@@ -1,4 +1,3 @@
-// Переменные
 $primary: #FF6D00;
 $primary-hover: #FF9100;
 $surface: #FFFFFF;
@@ -39,12 +38,23 @@ $status-colors: (
 .search-bar {
   display: flex;
   gap: 1.5rem;
-  padding: 2rem;
+  padding: 1.5rem;
+  padding-bottom: 0.5rem;
   border-bottom: 1px solid #eee;
 
   .search-field {
     flex: 1;
+    --mat-form-field-container-height: 40px;
+  --mat-form-field-container-vertical-padding: 8px;
+    
+    .mat-form-field-outline {
+      border-radius: 12px !important;
+    }
 
+    .mat-input-element {
+      padding-top: 4px !important;
+      font-size: 0.95rem;
+    }
   }
 
   .add-btn {
@@ -90,28 +100,49 @@ $status-colors: (
 
       button {
         transition: color 0.2s;
+        color: $text-secondary;
+
+        &.active {
+          background: rgba($primary, 0.1);
+          color: $primary;
+        }
 
         &:hover {
           color: $primary;
         }
       }
+    }
+  }
+}
 
-      .view-switcher {
-        display: flex;
-        gap: 0.5rem;
-        margin-left: 1rem;
+// Переключатели вида
+.mat-button-toggle-group {
+  border-radius: 12px !important;
+  overflow: hidden;
+  border: 1px solid rgba($primary, 0.2) !important;
 
-        button {
-          border: 2px solid $primary;
-          border-radius: 8px;
-          padding: 0.5rem 1.5rem;
+  .mat-button-toggle {
+    background: rgba($primary, 0.05);
+    color: $text-secondary;
+    border-right: 1px solid rgba($primary, 0.1) !important;
+    min-width: 100px;
 
-          &.active {
-            background: $primary;
-            color: white;
-          }
-        }
-      }
+    &:hover{
+      --mat-sys-on-surface: transparent !important;
+    }
+
+    &:last-child {
+      border-right: none !important;
+    }
+
+    &.mat-button-toggle-checked {
+      background: rgba($primary, 0.15);
+      color: $primary;
+      font-weight: 500;
+    }
+
+    .mat-button-toggle-label-content {
+      padding: 0 1.2rem;
     }
   }
 }
@@ -120,18 +151,18 @@ $status-colors: (
 .project-cards {
   display: grid;
   gap: 1.5rem;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
 }
 
 .project-card {
   @include card-shadow;
   background: $surface;
   border-radius: 16px;
-  padding: 2rem;
+  padding: 1.5rem;
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: 1fr auto;
   grid-template-rows: auto auto auto;
-  gap: 1rem;
+  gap: 0.5rem 1rem;
   position: relative;
 
   @each $status, $color in $status-colors {
@@ -148,8 +179,7 @@ $status-colors: (
     margin: 0;
     transition: color 0.2s;
     cursor: pointer;
-    position: relative;
-    padding-right: 40px;
+    padding-right: 60px;
 
     &:hover {
       color: $primary;
@@ -157,8 +187,8 @@ $status-colors: (
   }
 
   .status-chip {
-    grid-area: 1 / 2 / 2 / 3;
-    align-self: start;
+    grid-area: 2 / 1 / 3 / 2;
+    justify-self: start;
     display: inline-flex;
     align-items: center;
     padding: 0.5rem 1rem;
@@ -176,10 +206,9 @@ $status-colors: (
   }
 
   .progress-circle {
-    grid-area: 2 / 3 / 4 / 4;
+    grid-area: 1 / 2 / 3 / 3;
     width: 100px;
     height: 100px;
-    margin-left: auto;
     background: conic-gradient(
       $primary calc(3.6deg * var(--progress)),
       #f0f0f0 0
@@ -189,6 +218,7 @@ $status-colors: (
     align-items: center;
     justify-content: center;
     position: relative;
+    margin-top: 2.5rem;
 
     &::before {
       content: '';
@@ -213,16 +243,15 @@ $status-colors: (
       bottom: 1rem;
       font-size: 0.75rem;
       color: $text-secondary;
-      margin-bottom: 10px;
     }
   }
 
   .details {
-    grid-area: 2 / 1 / 3 / 3;
+    grid-area: 3 / 1 / 4 / 3;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
-    margin-top: 1rem;
+    margin-top: 0.5rem;
 
     .date-item,
     .responsible,
@@ -239,38 +268,63 @@ $status-colors: (
     }
   }
 
+  // Кнопки действий
   .actions {
-  grid-area: 1 / 3 / 2 / 4;
-  align-self: start;
-  justify-self: end;
-  display: flex;
-  gap: 0.5rem;
-  top: 1.5rem;
-  right: 1.5rem;
-  z-index: 2;
-
-  button {
-    width: 32px;
-    height: 32px;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba($text-primary, 0.05);
-    border-radius: 8px;
-    transition: all 0.2s;
+    gap: 0.5rem;
+    z-index: 2;
     
-    .mat-icon {
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
-    }
+    button {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      backdrop-filter: blur(4px);
+      border: none;
+      border-radius: 8px;
+      
+      .mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        transition: inherit;
+      }
 
-    &:hover {
-      color: white !important;
+      &.edit-btn {
+        background: rgba(#2196F3, 0.1);
+        color: #2196F3;
+
+        &:hover {
+          --mat-sys-on-primary-container: transparent;
+          background: #2196F3 !important;
+          transform: scale(1.1);
+        }
+      }
+
+      &.delete-btn {
+        background: rgba(#f44336, 0.1);
+        color: #f44336;
+
+        &:hover {
+          --mat-sys-on-primary-container: transparent;
+          background: #f44336 !important;
+          transform: scale(1.1);
+        }
+      }
+
+      &:hover {
+        .mat-icon {
+          color: white !important;
+          transform: rotate(15deg);
+        }
+      }
     }
   }
-}
-
 }
 
 // Адаптивность
@@ -291,37 +345,140 @@ $status-colors: (
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
+    padding: 1rem 0 !important;
+
+    .control-buttons {
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+
+  .mat-button-toggle-group {
+    width: 100%;
+    
+    .mat-button-toggle {
+      width: 50%;
+      padding: 0 0.5rem;
+      
+      .mat-button-toggle-label-content {
+        padding: 0 0.5rem !important;
+      }
+    }
   }
 
   .project-card {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto auto;
+    padding: 1rem;
 
-    .project-title {
-      grid-area: 1 / 1 / 2 / 2;
-    }
-
-    .status-chip {
-      grid-area: 2 / 1 / 3 / 2;
+    .actions {
+      top: 0.5rem;
+      right: 0.5rem;
+      
+      button {
+        width: 32px;
+        height: 32px;
+      }
     }
 
     .progress-circle {
-      grid-area: 1 / 2 / 3 / 3;
-      width: 80px;
-      height: 80px;
+      width: 70px;
+      height: 70px;
 
       &::before {
-        width: 64px;
-        height: 64px;
+        width: 56px;
+        height: 56px;
+      }
+
+      .percent {
+        font-size: 1.2rem;
       }
     }
 
     .details {
-      grid-area: 3 / 1 / 4 / 3;
-    }
-
-    .actions {
-      grid-area: 4 / 1 / 5 / 3;
+      grid-template-columns: 1fr;
     }
   }
 }
+
+@media (max-width: 480px) {
+  .projects-list {
+    padding: 0 1rem 1rem;
+  }
+
+  .project-card {
+    grid-template-columns: 1fr;
+
+    .progress-circle {
+      grid-area: 2 / 1 / 3 / 2;
+      margin: 0.5rem auto;
+    }
+
+    .status-chip {
+      grid-area: 3 / 1 / 4 / 2;
+    }
+
+    .details {
+      grid-area: 4 / 1 / 5 / 2;
+    }
+  }
+}
+
+.map-container {
+  position: relative;
+  height: 600px;
+  border-radius: 16px;
+  overflow: hidden;
+  @include card-shadow;
+
+  #map-container {
+    height: 100%;
+    width: 100%;
+  }
+
+  .selected-project-info {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    max-width: 300px;
+
+    h3 {
+      margin: 0 0 0.5rem;
+      font-size: 1.1rem;
+      color: $text-primary;
+    }
+
+    p {
+      margin: 0.25rem 0;
+      font-size: 0.9rem;
+      color: $text-secondary;
+    }
+  }
+}
+
+// Кастомизация элементов Яндекса
+.ymaps-balloon {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  border-radius: 12px !important;
+  
+  &__content {
+    padding: 1rem !important;
+    margin-right: 0 !important;
+  }
+  
+  &__close-button {
+    width: 24px !important;
+    height: 24px !important;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23666" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>') no-repeat center;
+  }
+}
+
+.scroll-trigger {
+  height: 50px;
+  width: 100%;
+  visibility: hidden;
+}
+

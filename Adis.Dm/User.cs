@@ -9,7 +9,7 @@ namespace Adis.Dm
 {
     public class User : IdentityUser<int> 
     {
-        public virtual IEnumerable<Role> Roles { get; set; } = null!;
+        public virtual IEnumerable<AppRole> Roles { get; set; } = null!;
 
         /// <summary>
         /// ФИО пользователя

@@ -22,7 +22,7 @@ namespace Adis.Tests
         private readonly IServiceScope _scope;
         private readonly AppDbContext _dbContext;
         private readonly UserManager<User> _userManager;
-        private readonly RoleManager<Role> _roleManager;
+        private readonly RoleManager<AppRole> _roleManager;
 
         public UsersControllerIntegrationTests(CustomWebApplicationFactory factory)
         {
@@ -31,7 +31,7 @@ namespace Adis.Tests
             _scope = _factory.Services.CreateScope();
             _dbContext = _scope.ServiceProvider.GetRequiredService<AppDbContext>();
             _userManager = _scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-            _roleManager = _scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
+            _roleManager = _scope.ServiceProvider.GetRequiredService<RoleManager<AppRole>>();
 
             InitializeAsync().Wait();
         }
@@ -72,7 +72,7 @@ namespace Adis.Tests
         {
             if (!await _roleManager.RoleExistsAsync(roleName))
             {
-                await _roleManager.CreateAsync(new Role { Name = roleName});
+                await _roleManager.CreateAsync(new AppRole { Name = roleName});
             }
         }
 

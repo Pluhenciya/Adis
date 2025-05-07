@@ -10,7 +10,7 @@ namespace Adis.Dal.Data
     /// <summary>
     /// Позволяет использовать EFCore
     /// </summary>
-    public class AppDbContext : IdentityDbContext<User, Role, int>
+    public class AppDbContext : IdentityDbContext<User, AppRole, int>
     {
         /// <summary>
         /// Основной конструктор для контекста БД
@@ -254,7 +254,7 @@ namespace Adis.Dal.Data
                     "email LIKE '%@%'"));
             });
 
-            modelBuilder.Entity<Role>(entity =>
+            modelBuilder.Entity<AppRole>(entity =>
             {
                 entity.ToTable("roles");
 
@@ -428,6 +428,8 @@ namespace Adis.Dal.Data
                     "chk_refresh_tokens_revoked",
                     "revoked_at IS NULL OR revoked_at > created_at"));
             });
+
+            modelBuilder.Entity<AppRole>().HasData(InitialData.RolesList);
         }
     }
 }

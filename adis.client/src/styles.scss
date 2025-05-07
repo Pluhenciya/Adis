@@ -48,7 +48,6 @@ html, body {
   background: #f5f5f5;
 }
 
-
 .mat-card {
   border-radius: 12px !important;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05) !important;
@@ -61,6 +60,32 @@ html, body {
 }
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.mat-datepicker-content {
+  background-color: var(--mat-sys-surface-container) !important;
+  border-radius: var(--mat-sys-corner-large) !important;
+  box-shadow: var(--mat-sys-level3) !important;
+}
+.mat-form-field.mat-focused .mat-form-field-outline {
+  color: var(--mat-sys-primary) !important;
+}
+.mat-input-element {
+  color: var(--mat-sys-on-surface);
+}
+
+.mat-form-field-label {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.mat-datepicker-toggle {
+  color: var(--mat-sys-on-surface);
+}
+
+.mat-form-field-outline,
+.mat-form-field-label,
+.mat-input-element {
+  transition: var(--transition) !important;
+}
 
 :root {
   --primary-color: #FF6D00;

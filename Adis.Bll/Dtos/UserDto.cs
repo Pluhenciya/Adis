@@ -35,7 +35,7 @@ namespace Adis.Bll.Dtos
         /// Роль пользователя
         /// </summary>
         [Required(AllowEmptyStrings = false, ErrorMessage = "Роль обязательна")]
-        public string Role { get; set; } = null!;
+        public Role Role { get; set; }
 
         /// <summary>
         /// ФИО пользователя

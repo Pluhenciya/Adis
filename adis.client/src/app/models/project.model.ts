@@ -1,8 +1,8 @@
 export enum ProjectStatus {
-  Designing = 'designing',
-  ContractorSearch = 'contractorSearch',
-  InExecution = 'inExecution',
-  Completed = 'completed'
+  Designing = 'Designing',
+  ContractorSearch = 'ContractorSearch',
+  InExecution = 'InExecution',
+  Completed = 'Completed'
 }
 
 export interface Geometry {

@@ -38,6 +38,7 @@ namespace Adis.Bll.Interfaces
         string? targetDate,
         string? startDateFrom,
         string? startDateTo,
+        string? search,
         string sortField = "StartDate",
         string sortOrder = "desc",
         int page = 1,

@@ -21,6 +21,7 @@ namespace Adis.Dal.Specifications
             DateOnly? targetDate,
             DateOnly? startDateFrom,
             DateOnly? startDateTo,
+            string? search,
             string sortField = "StartDate",
             string sortOrder = "desc",
             int page = 1,
@@ -56,6 +57,9 @@ namespace Adis.Dal.Specifications
                     ApplyCriteria(p => p.StartDate <= startDateTo!.Value);
                 }
             }
+
+            if (!string.IsNullOrEmpty(search))
+                ApplyCriteria(p => p.Name.Contains(search));
 
             // Сортировка
             var orderExpression = GetOrderExpression(sortField);
