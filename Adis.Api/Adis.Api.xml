@@ -61,7 +61,7 @@
             </summary>
             <param name="projectService"></param>
         </member>
-        <member name="M:Adis.Api.Controllers.ProjectsController.AddProject(Adis.Bll.Dtos.PostProjectDto)">
+        <member name="M:Adis.Api.Controllers.ProjectsController.AddProject(Adis.Bll.Dtos.Project.PostProjectDto)">
              <summary>
              Добавляет новый проект
              </summary>
@@ -106,7 +106,7 @@
              <param name="sortOrder">Сортировать по возрастанию или по убыванию</param>
              <response code="200">Успешное выполнение</response>
         </member>
-        <member name="M:Adis.Api.Controllers.ProjectsController.UpdateProject(Adis.Bll.Dtos.PostProjectDto)">
+        <member name="M:Adis.Api.Controllers.ProjectsController.UpdateProject(Adis.Bll.Dtos.Project.PostProjectDto)">
              <summary>
              Обновляет данные проекта на новые
              </summary>

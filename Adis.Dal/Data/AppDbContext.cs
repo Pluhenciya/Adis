@@ -140,10 +140,16 @@ namespace Adis.Dal.Data
                 entity.Property(t => t.Description)
                     .HasColumnName("description")
                     .HasColumnType("text")
-                    .IsRequired();
+                    .IsRequired(false);
 
                 entity.Property(t => t.IdProject)
                     .HasColumnName("id_project")
+                    .IsRequired();
+
+                entity.Property(t => t.Status)
+                    .HasColumnName("status")
+                    .HasConversion(new EnumToStringConverter<Status>())
+                    .HasColumnType("enum('toDo', 'doing', 'checking', 'completed')")
                     .IsRequired();
 
                 // Indexes

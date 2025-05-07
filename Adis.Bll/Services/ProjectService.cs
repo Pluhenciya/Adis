@@ -1,4 +1,5 @@
 ﻿using Adis.Bll.Dtos;
+using Adis.Bll.Dtos.Project;
 using Adis.Bll.Interfaces;
 using Adis.Dal.Interfaces;
 using Adis.Dm;
@@ -32,6 +33,9 @@ namespace Adis.Bll.Services
             var project = _mapper.Map<Project>(projectDto);
             var user = _contextAccessor.HttpContext.User;
 
+            if (project.StartDate == DateOnly.MinValue)
+                project.StartDate = DateOnly.FromDateTime(DateTime.Now);
+
             if (project.IdLocation != 0)
                 project.Location = null!;
 
@@ -45,7 +49,7 @@ namespace Adis.Bll.Services
             return _mapper.Map<PostProjectDto>(await _projectRepository.AddAsync(project));
         }
 
-        public async Task<PaginatedResult<PostProjectDto>> GetProjectsAsync(
+        public async Task<PaginatedResult<GetProjectDto>> GetProjectsAsync(
             ProjectStatus? status,
             string? targetDate,
             string? startDateFrom,
@@ -69,9 +73,9 @@ namespace Adis.Bll.Services
                 page,
                 pageSize);
 
-            return new PaginatedResult<PostProjectDto>
+            return new PaginatedResult<GetProjectDto>
             {
-                Items = _mapper.Map<IEnumerable<PostProjectDto>>(projects),
+                Items = _mapper.Map<IEnumerable<GetProjectDto>>(projects),
                 TotalCount = totalCount
             };
         }

@@ -31,6 +31,8 @@ namespace Adis.Dm
         /// </summary>
         public int IdProject { get; set; }
 
+        public Status Status { get; set; }
+
         /// <summary>
         /// Проект с этой задачей
         /// </summary>

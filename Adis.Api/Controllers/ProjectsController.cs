@@ -1,4 +1,5 @@
 ﻿using Adis.Bll.Dtos;
+using Adis.Bll.Dtos.Project;
 using Adis.Bll.Interfaces;
 using Adis.Dm;
 using Microsoft.AspNetCore.Authorization;
@@ -13,7 +14,7 @@ namespace Adis.Api.Controllers
     /// <param name="projectService"></param>
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    
     public class ProjectsController(IProjectService projectService) : ControllerBase
     {
         private readonly IProjectService _projectService = projectService;
@@ -38,6 +39,7 @@ namespace Adis.Api.Controllers
         /// <param name="project">Данные нового проекта</param>
         /// <response code="200">Успешное выполнение</response>
         /// <response code="400">Ошибка валидации данных</response>
+        [Authorize]
         [HttpPost]
         [ProducesResponseType(typeof(PostProjectDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -129,6 +131,7 @@ namespace Adis.Api.Controllers
         /// <param name="project">Новые данные проекта</param>
         /// <response code="200">Успешное выполнение</response>
         /// <response code="400">Ошибка валидации данных</response>
+        [Authorize]
         [HttpPut]
         [ProducesResponseType(typeof(PostProjectDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]

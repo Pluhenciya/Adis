@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Project } from '../models/project.model';
+import { GetProjectDto } from '../models/project.model';
 import { environment } from '../environments/environment';
 
 interface ProjectsResponse {
-  projects: Project[];
+  projects: GetProjectDto[];
   totalCount: number;
   page: number;
   pageSize: number;
@@ -53,20 +53,19 @@ export class ProjectService {
     if (requestParams.startDateTo) {
       httpParams = httpParams.set('startDateTo', requestParams.startDateTo.toISOString());
     }
-
     return this.http.get<ProjectsResponse>(`${this.apiUrl}/projects`, {
       params: httpParams
     });
   }
 
-  createProject(project: Partial<Project>): Observable<Project> {
+  createProject(project: Partial<GetProjectDto>): Observable<GetProjectDto> {
     project.idUser = 1; // Временно до авторизации
-    return this.http.post<Project>(`${this.apiUrl}/projects`, project);
+    return this.http.post<GetProjectDto>(`${this.apiUrl}/projects`, project);
   }
   
-  updateProject(project: Partial<Project>): Observable<Project> {
+  updateProject(project: Partial<GetProjectDto>): Observable<GetProjectDto> {
     project.idUser = 1; // Временно до авторизации
-    return this.http.put<Project>(`${this.apiUrl}/projects`, project);
+    return this.http.put<GetProjectDto>(`${this.apiUrl}/projects`, project);
   }
 }
 

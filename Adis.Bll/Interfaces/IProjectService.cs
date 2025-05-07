@@ -1,4 +1,5 @@
 ﻿using Adis.Bll.Dtos;
+using Adis.Bll.Dtos.Project;
 using Adis.Dm;
 using System;
 using System.Collections.Generic;
@@ -32,7 +33,7 @@ namespace Adis.Bll.Interfaces
         /// <param name="sortField">Свойство, по которому сортировать</param>
         /// <param name="sortOrder">Сортировать по возрастанию или по убыванию</param>
         /// <returns>Список проектов</returns>
-        public Task<PaginatedResult<PostProjectDto>> GetProjectsAsync(
+        public Task<PaginatedResult<GetProjectDto>> GetProjectsAsync(
         ProjectStatus? status,
         string? targetDate,
         string? startDateFrom,

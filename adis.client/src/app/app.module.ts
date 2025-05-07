@@ -12,6 +12,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { AuthService } from './services/auth.service';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { HasRoleDirective } from './directives/has-role.directive';
+import {MatMenuModule} from '@angular/material/menu';
+import {MatDividerModule} from '@angular/material/divider';
 
 @NgModule({
   declarations: [
@@ -26,7 +28,9 @@ import { HasRoleDirective } from './directives/has-role.directive';
     MatButtonModule,
     HttpClientModule,
     MatNativeDateModule,
-    MatFormFieldModule
+    MatFormFieldModule,
+    MatMenuModule,
+    MatDividerModule
   ],
   providers: [
     AuthService,

@@ -1,255 +1,327 @@
-.project-list-container {
-  padding: 2rem;
-  background: #f8f9fc;
-  min-height: calc(100vh - 64px);
+// Переменные
+$primary: #FF6D00;
+$primary-hover: #FF9100;
+$surface: #FFFFFF;
+$text-primary: #2D3038;
+$text-secondary: #6C757D;
+$status-colors: (
+  'Designing': #3DAFC9,
+  'ContractorSearch': #AD3DC9,
+  'InExecution': #E3CE32,
+  'Completed': #52CD2C
+);
+
+// Миксины
+@mixin card-shadow {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  &:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    transform: translateY(-3px);
+  }
 }
 
-.filters-section {
-  background: white;
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-  margin-bottom: 2rem;
-  
+// Основные стили
+.app-container {
+  min-height: 100vh;
 
-  .filter-group {
-    display: grid;
-    grid-template-columns: auto repeat(auto-fit, minmax(240px, 1fr));
+  .content-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    background: $surface;
+    border-radius: 16px;
+    @include card-shadow;
+  }
+}
+
+// Поисковая строка
+.search-bar {
+  display: flex;
   gap: 1.5rem;
-    align-items: center;
+  padding: 2rem;
+  border-bottom: 1px solid #eee;
+
+  .search-field {
+    flex: 1;
+
   }
 
-  .reset-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  .add-btn {
+    background: linear-gradient(135deg, $primary, $primary-hover);
     color: white;
-    height: 48px;
-    border-radius: 8px;
-    transition: transform 0.2s;
+    border-radius: 12px;
+    padding: 0 2rem;
+    font-weight: 600;
+    transition: transform 0.2s, box-shadow 0.2s;
 
     &:hover {
       transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba($primary, 0.3);
     }
 
-    mat-icon {
-      margin-right: 8px;
-    }
-  }
-}
-
-.projects-table-wrapper {
-  background: white;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-  position: relative;
-
-  .loading-indicator {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(255, 255, 255, 0.9);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-
-    p {
-      margin-top: 1rem;
-      color: #4a5568;
-      font-weight: 500;
+    .mat-icon {
+      margin-right: 0.5rem;
     }
   }
 }
 
-.projects-table {
-  width: 100%;
+// Список проектов
+.projects-list {
+  padding: 0 2rem 2rem;
 
-  .mat-header-row,
-  .mat-row {
-    height: 64px; 
-    vertical-align: middle;
-  }
-
-  td{
-    display: table-cell !important;
-  }
-
-
-  .mat-cell,
-  .mat-header-cell {
-    padding: 0 16px;
-    vertical-align: middle;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.12); // Явное задание границы
-  }
-
-  // Для многострочного контента
-  .mat-cell {
-    word-break: break-word;
-    min-height: 64px;
-    display: flex !important;
-    align-items: center;
-  }
-
-  .mat-header-cell {
-    font-size: 14px;
-    font-weight: 600;
-    color: #4a5568;
-  }
-
-  .project-row {
-    transition: background 0.2s;
-    
-    &:hover {
-      background: #f8fafc;
-    }
-  }
-
-  .project-name {
+  .list-controls {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    font-weight: 500;
-    
-    .project-icon {
-      color: #667eea;
-      margin-right: 12px;
-    }
-  }
+    padding: 2rem 0;
 
-  .status-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-
-    &.draft {
-      background: #f0f4ff;
-      color: #4a6cfa;
+    .title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: $text-primary;
+      margin: 0;
     }
 
-    &.inProgress {
-      background: #e6fff3;
-      color: #00c853;
-    }
-
-    &.completed {
-      background: #f8f0ff;
-      color: #9c27b0;
-    }
-
-    &.overdue {
-      background: #ffeef0;
-      color: #ff1744;
-    }
-  }
-
-  .dates-cell {
-    .date-range {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .date-item {
+    .control-buttons {
       display: flex;
       align-items: center;
-      color: #718096;
-      font-size: 14px;
+      gap: 1rem;
 
-      mat-icon {
-        font-size: 18px;
-        margin-right: 8px;
-        color: #a0aec0;
+      button {
+        transition: color 0.2s;
+
+        &:hover {
+          color: $primary;
+        }
+      }
+
+      .view-switcher {
+        display: flex;
+        gap: 0.5rem;
+        margin-left: 1rem;
+
+        button {
+          border: 2px solid $primary;
+          border-radius: 8px;
+          padding: 0.5rem 1.5rem;
+
+          &.active {
+            background: $primary;
+            color: white;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Карточки проектов
+.project-cards {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 1fr;
+}
+
+.project-card {
+  @include card-shadow;
+  background: $surface;
+  border-radius: 16px;
+  padding: 2rem;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  grid-template-rows: auto auto auto;
+  gap: 1rem;
+  position: relative;
+
+  @each $status, $color in $status-colors {
+    &.#{$status} {
+      border-left: 4px solid $color;
+    }
+  }
+
+  .project-title {
+    grid-area: 1 / 1 / 2 / 2;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: $text-primary;
+    margin: 0;
+    transition: color 0.2s;
+    cursor: pointer;
+    position: relative;
+    padding-right: 40px;
+
+    &:hover {
+      color: $primary;
+    }
+  }
+
+  .status-chip {
+    grid-area: 1 / 2 / 2 / 3;
+    align-self: start;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+
+    @each $status, $color in $status-colors {
+      &.#{$status} {
+        background: rgba($color, 0.1);
+        color: $color;
       }
     }
   }
 
-  .budget-cell {
-    font-weight: 600;
-    color: #2d3748;
-  }
-}
+  .progress-circle {
+    grid-area: 2 / 3 / 4 / 4;
+    width: 100px;
+    height: 100px;
+    margin-left: auto;
+    background: conic-gradient(
+      $primary calc(3.6deg * var(--progress)),
+      #f0f0f0 0
+    );
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
 
-.custom-paginator {
-  .mat-paginator-range-label {
-    margin: 0 16px;
-    font-weight: 500;
-  }
-  
-  .mat-paginator-page-size-select {
-    width: 80px;
-  }
-}
+    &::before {
+      content: '';
+      position: absolute;
+      width: 84px;
+      height: 84px;
+      background: white;
+      border-radius: 50%;
+    }
 
-@media (max-width: 768px) {
-  .project-list-container {
-    padding: 1rem;
+    .percent {
+      position: relative;
+      font-size: 1.5rem;
+      font-weight: 700;
+      z-index: 1;
+      color: $text-primary;
+      margin-bottom: 10px;
+    }
+
+    .label {
+      position: absolute;
+      bottom: 1rem;
+      font-size: 0.75rem;
+      color: $text-secondary;
+      margin-bottom: 10px;
+    }
   }
 
-  .filters-section {
-    .filter-group {
-      grid-template-columns: 1fr;
+  .details {
+    grid-area: 2 / 1 / 3 / 3;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-top: 1rem;
+
+    .date-item,
+    .responsible,
+    .location {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: $text-secondary;
+
+      .mat-icon {
+        color: $primary;
+        flex-shrink: 0;
+      }
+    }
+  }
+
+  .actions {
+  grid-area: 1 / 3 / 2 / 4;
+  align-self: start;
+  justify-self: end;
+  display: flex;
+  gap: 0.5rem;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 2;
+
+  button {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba($text-primary, 0.05);
+    border-radius: 8px;
+    transition: all 0.2s;
+    
+    .mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    &:hover {
+      color: white !important;
     }
   }
 }
 
-.create-btn {
-  background: linear-gradient(135deg, #4F46E5 0%, #9333EA 100%);
-  color: white !important;
-  padding: 0 24px;
-  height: 48px;
-  border-radius: 8px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  order: -1; /* Перемещаем кнопку в начало */
-  
-  &:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
-  }
-  
-  mat-icon {
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
-  }
 }
 
-/* Стили для кнопки редактирования */
-.edit-btn {
-  color: #64748B;
-  transition: all 0.2s ease;
-  
-  &:hover {
-    color: #4F46E5;
-    background: rgba(79, 70, 229, 0.05);
+// Адаптивность
+@media (max-width: 768px) {
+  .app-container {
+    padding: 1rem;
   }
-  
-  mat-icon {
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
-  }
-}
 
-/* Адаптивность для текста кнопки */
-@media (max-width: 480px) {
-  .btn-text {
-    display: none;
+  .search-bar {
+    flex-direction: column;
+
+    .add-btn {
+      width: 100%;
+    }
   }
-  
-  .create-btn {
-    padding: 0 16px;
-    mat-icon {
-      margin-right: 0;
+
+  .list-controls {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .project-card {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto auto;
+
+    .project-title {
+      grid-area: 1 / 1 / 2 / 2;
+    }
+
+    .status-chip {
+      grid-area: 2 / 1 / 3 / 2;
+    }
+
+    .progress-circle {
+      grid-area: 1 / 2 / 3 / 3;
+      width: 80px;
+      height: 80px;
+
+      &::before {
+        width: 64px;
+        height: 64px;
+      }
+    }
+
+    .details {
+      grid-area: 3 / 1 / 4 / 3;
+    }
+
+    .actions {
+      grid-area: 4 / 1 / 5 / 3;
     }
   }
 }

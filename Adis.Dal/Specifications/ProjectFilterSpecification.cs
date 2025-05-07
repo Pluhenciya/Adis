@@ -69,6 +69,10 @@ namespace Adis.Dal.Specifications
 
             // Пагинация
             ApplyPaging((page - 1) * pageSize, pageSize);
+
+            AddInclude(p => p.Location);
+            AddInclude(p => p.User);
+            AddInclude(p => p.Tasks);
         }
 
         /// <summary>

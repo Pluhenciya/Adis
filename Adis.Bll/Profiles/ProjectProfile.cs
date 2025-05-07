@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Adis.Bll.Dtos;
+using Adis.Bll.Dtos.Project;
 using Adis.Dm;
 using AutoMapper;
 
@@ -17,6 +17,24 @@ namespace Adis.Bll.Profiles
         public ProjectProfile() 
         {
             CreateMap<PostProjectDto, Project>().ReverseMap();
+
+            CreateMap<GetProjectDto, Project>();
+            CreateMap<Project, GetProjectDto>()
+                .ForMember(dest => dest.ResponsiblePerson,
+                    opt => opt.MapFrom(src => src.User.FullName))
+                .ForMember(dest => dest.Progress,
+                    opt => opt.MapFrom(src => CalculateProgress(src)));
+        }
+
+        private static int CalculateProgress(Project project)
+        {
+            if (project.Tasks == null || !project.Tasks.Any())
+                return 0;
+
+            var totalTasks = project.Tasks.Count();
+            var completedTasks = project.Tasks.Count(t => t.Status == Status.Completed);
+
+            return (int)Math.Round((double)completedTasks / totalTasks * 100);
         }
     }
 }

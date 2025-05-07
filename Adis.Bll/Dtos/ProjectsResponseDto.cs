@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Adis.Bll.Dtos.Project;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,7 +15,7 @@ namespace Adis.Bll.Dtos
         /// <summary>
         /// Список проектов
         /// </summary>
-        public IEnumerable<PostProjectDto> Projects { get; set; } = null!;
+        public IEnumerable<GetProjectDto> Projects { get; set; } = null!;
 
         /// <summary>
         /// Общее количество проектов 

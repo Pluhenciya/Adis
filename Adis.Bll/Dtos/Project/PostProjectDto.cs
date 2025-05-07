@@ -1,12 +1,13 @@
 ﻿using Adis.Dm;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Adis.Bll.Dtos
+namespace Adis.Bll.Dtos.Project
 {
     /// <summary>
     /// DTO для проектов
@@ -27,7 +28,7 @@ namespace Adis.Bll.Dtos
         /// <summary>
         /// Начало проектирования
         /// </summary>
-        public DateOnly StartDate { get; set; }
+        public DateOnly StartDate { get; set; } = DateOnly.FromDateTime(DateTime.Now);
 
         /// <summary>
         /// Конец проектирования

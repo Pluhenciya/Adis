@@ -2,6 +2,7 @@
 using System.Net.Http.Json;
 using Adis.Bll.Dtos;
 using Adis.Bll.Dtos.Auth;
+using Adis.Bll.Dtos.Project;
 using Adis.Dal.Data;
 using Adis.Dm;
 using Adis.Tests.Helpers;

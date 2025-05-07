@@ -3,20 +3,21 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatPaginator, MatPaginatorIntl, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { ProjectService } from '../../services/project.service';
-import { Project } from '../../models/project.model';
+import { GetProjectDto } from '../../models/project.model';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { FormsModule } from '@angular/forms';
 import { MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { MatChipsModule } from '@angular/material/chips';
-import { DatePipe, NgClass, NgIf } from '@angular/common';
+import { DatePipe, NgClass, NgForOf } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { startWith, switchMap, tap } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { ProjectFormComponent } from '../../components/project-form/project-form.component';
+import {MatTooltipModule} from '@angular/material/tooltip';
 
 const rangeLabel: string = 'из';
 const itemsPerPageLabel: string = 'Элементов на странице:';
@@ -57,13 +58,14 @@ export function getPaginatorIntl(): MatPaginatorIntl {
     MatProgressSpinnerModule,
     MatTableModule,
     MatChipsModule,
-    NgIf,
-    NgClass,
+    NgForOf,
     DatePipe,
     MatPaginatorModule,
     MatButtonModule,
     MatIconModule,
-    MatSortModule
+    MatSortModule,
+    MatInputModule,
+    MatTooltipModule
   ],
   templateUrl: './project-list-page.component.html',
   styleUrls: ['./project-list-page.component.scss'],
@@ -73,13 +75,14 @@ export function getPaginatorIntl(): MatPaginatorIntl {
 })
 export class ProjectListPageComponent implements OnInit {
   displayedColumns: string[] = ['name', 'status', 'dates', 'createdAt', 'budget', 'actions'];
-  dataSource = new MatTableDataSource<Project>();
+  dataSource = new MatTableDataSource<GetProjectDto>();
   pageIndex:number = 0;
   pageSize:number = 10;
   length:number = 10;
   isLoading = true;
   statusFilter = '';
   dateFilter: Date | null = null;
+  showActions = true;
   
   @ViewChild('paginator') paginator!: MatPaginator; 
   @ViewChild(MatSort) sort!: MatSort;
@@ -89,8 +92,11 @@ export class ProjectListPageComponent implements OnInit {
     private projectService: ProjectService
   ) {}
 
-  ngOnInit() {
-  }
+    projects: GetProjectDto[] = [];
+
+    ngOnInit() {
+      this.loadProjectsData().subscribe();
+    }
 
   ngAfterViewInit() {
     setTimeout(() => {
@@ -200,7 +206,7 @@ export class ProjectListPageComponent implements OnInit {
             newLength: totalCount
           });
   
-          this.dataSource.data = projects;
+          this.projects = projects;
           this.length = totalCount;
   
           if (this.paginator) {
@@ -239,19 +245,14 @@ export class ProjectListPageComponent implements OnInit {
     this.applyFilter();
   }
 
-  getStatusLabel(status: string){
-    switch(status.toLowerCase()){
-      case 'draft':
-        return 'Черновик'
-      case 'inprogress':
-        return 'Выполняется'
-      case 'completed':
-        return 'Завершен'
-      case 'overdue':
-        return 'Просрочен'
-      default:
-        return ''
-    }
+  getStatusLabel(status: string) {
+    const statusMap: {[key: string]: string} = {
+      'Designing': 'Проектирование',
+      'ContractorSearch': 'Поиск подрядчика',
+      'InExecution': 'В работе',
+      'Completed': 'Завершен'
+    };
+    return statusMap[status] || 'Неизвестный статус';
   }
 
   handlePageEvent(event: PageEvent) {
@@ -260,7 +261,7 @@ export class ProjectListPageComponent implements OnInit {
     this.loadProjectsData();
   }
   
-  openProjectForm(project?: Project): void {
+  openProjectForm(project?: GetProjectDto): void {
     const dialogRef = this.dialog.open(ProjectFormComponent, {
       width: '600px',
       data: { project }
