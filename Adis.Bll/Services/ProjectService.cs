@@ -29,8 +29,17 @@ namespace Adis.Bll.Services
         /// <exception cref="ArgumentException">Возникает когда данные проекта не прошли валидацию</exception>
         public async Task<PostProjectDto> AddProjectAsync(PostProjectDto projectDto)
         {
-            if (DateOnly.FromDateTime(DateTime.Now) > projectDto.EndDate)
-                throw new ArgumentException("Дата оканчания не может быть в прошлом");
+            if (projectDto.StartExecutionDate != null && projectDto.EndExecutionDate != null && projectDto.StartExecutionDate > projectDto.EndExecutionDate)
+                throw new ArgumentException("Дата начала выполнения работ не может быть позже чем дата оканчания");
+
+            if (projectDto.StartExecutionDate != null && projectDto.EndDate > projectDto.StartExecutionDate)
+                throw new ArgumentException("Дата начала проектирования не может быть позже чем дата оканчания работ");
+
+            if (projectDto.StartDate != null && projectDto.StartDate > projectDto.EndDate)
+                throw new ArgumentException("Дата начала проектирования не может быть позже чем дата оканчания");
+
+            if (projectDto.IdLocation == 0 && projectDto.Location == null)
+                throw new ArgumentException("Локация объекта работ обязательна");
 
             var project = _mapper.Map<Project>(projectDto);
             var user = _contextAccessor.HttpContext.User;
@@ -51,6 +60,7 @@ namespace Adis.Bll.Services
 
             if (!user.IsInRole(Role.Admin.ToString()))
             {
+
                 project.IdUser = idUser;
                 project.StartDate = DateOnly.FromDateTime(DateTime.Now);
                 project.Status = ProjectStatus.Designing;

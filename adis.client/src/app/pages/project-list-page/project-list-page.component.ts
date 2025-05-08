@@ -222,7 +222,6 @@ export class ProjectListPageComponent implements OnInit, OnDestroy, AfterViewIni
 
   openProjectForm(project?: GetProjectDto): void {
     const dialogRef = this.dialog.open(ProjectFormComponent, {
-      width: '600px',
       data: { project }
     });
 

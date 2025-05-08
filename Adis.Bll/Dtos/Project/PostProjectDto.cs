@@ -23,12 +23,13 @@ namespace Adis.Bll.Dtos.Project
         /// Название проекта
         /// </summary>
         [Required(AllowEmptyStrings = false, ErrorMessage = "Наименование обязательно")]
+        [StringLength(255)]
         public string Name { get; set; } = null!;
 
         /// <summary>
         /// Начало проектирования
         /// </summary>
-        public DateOnly StartDate { get; set; } = DateOnly.FromDateTime(DateTime.Now);
+        public DateOnly? StartDate { get; set; } = DateOnly.FromDateTime(DateTime.Now);
 
         /// <summary>
         /// Конец проектирования
@@ -52,5 +53,13 @@ namespace Adis.Bll.Dtos.Project
         public string NameWorkObject { get; set; } = null!;
 
         public LocationDto Location { get; set; } = null!;
+
+        public string? ContractorName { get; set; } = null!;
+
+        public int? IdContractor { get; set; }
+
+        public DateOnly? StartExecutionDate { get; set; }
+
+        public DateOnly? EndExecutionDate { get; set; }
     }
 }

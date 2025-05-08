@@ -41,6 +41,10 @@ namespace Adis.Dm
         /// </summary>
         public string NameWorkObject { get; set; } = null!;
 
+        public DateOnly? StartExecutionDate { get; set; }
+
+        public DateOnly? EndExecutionDate { get; set; }
+
         /// <summary>
         /// Идентификатор пользователя создавшего проект
         /// </summary>
@@ -48,7 +52,11 @@ namespace Adis.Dm
 
         public int IdLocation { get; set; }
 
-        public Location Location { get; set; } = null!;
+        public int? IdConstractor { get; set; }
+
+        public virtual Constractor Constractor { get; set; } = null!;
+
+        public virtual Location Location { get; set; } = null!;
 
         /// <summary>
         /// Пользователь создавший проект

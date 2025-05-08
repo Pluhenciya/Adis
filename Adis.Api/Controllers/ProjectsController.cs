@@ -39,7 +39,7 @@ namespace Adis.Api.Controllers
         /// <param name="project">Данные нового проекта</param>
         /// <response code="200">Успешное выполнение</response>
         /// <response code="400">Ошибка валидации данных</response>
-        [Authorize]
+        [Authorize(Roles = "Admin, ProjectManager")]
         [HttpPost]
         [ProducesResponseType(typeof(PostProjectDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]

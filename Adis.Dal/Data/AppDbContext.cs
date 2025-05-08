@@ -72,12 +72,26 @@ namespace Adis.Dal.Data
                     .HasColumnName("name_work_object")
                     .IsRequired();
 
+                entity.Property(p => p.StartExecutionDate)
+                    .HasColumnName("start_execution_date")
+                    .HasColumnType("date")
+                    .IsRequired(false);
+
+                entity.Property(p => p.EndExecutionDate)
+                    .HasColumnName("end_execution_date")
+                    .HasColumnType("date")
+                    .IsRequired(false);
+
                 entity.Property(p => p.IdUser)
                     .HasColumnName("id_user")
                     .IsRequired();
 
                 entity.Property(p => p.IdLocation)
                     .HasColumnName("id_location");
+
+                entity.Property(p => p.IdConstractor)
+                     .HasColumnName("id_constractor")
+                     .IsRequired(false);
 
                 entity.HasIndex(p => p.Status)
                     .HasDatabaseName("ix_projects_status");
@@ -91,6 +105,27 @@ namespace Adis.Dal.Data
                     .WithMany(u => u.Projects)
                     .HasForeignKey(p => p.IdUser)
                     .HasConstraintName("fk_projects_user");
+
+                entity.HasOne(p => p.Constractor)
+                    .WithMany(c => c.Projects)
+                    .HasForeignKey(p =>p.IdConstractor)
+                    .HasConstraintName("fk_projects_constractor");
+            });
+
+            modelBuilder.Entity<Constractor>(entity =>
+            {
+                entity.ToTable("constractor");
+
+                entity.HasKey(p => p.IdConstractor)
+                    .HasName("PRIMARY");
+
+                entity.Property(p => p.IdConstractor)
+                    .HasColumnName("id_constractor");
+
+                entity.Property(p => p.Name)
+                    .HasColumnName("name")
+                    .HasMaxLength(255)
+                    .IsRequired();
             });
 
             modelBuilder.Entity<Location>(entity =>
