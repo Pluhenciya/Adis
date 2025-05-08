@@ -51,7 +51,6 @@ namespace Adis.Bll.Dtos.Project
         [Required(AllowEmptyStrings = false, ErrorMessage = "Место работ обязательно")]
         public string NameWorkObject { get; set; } = null!;
 
-        [Required(ErrorMessage = "Локация обязательно")]
         public LocationDto Location { get; set; } = null!;
     }
 }
