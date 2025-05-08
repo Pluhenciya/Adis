@@ -38,7 +38,7 @@ export class ProjectService {
     if (requestParams.sortOrder) params = params.set('sortOrder', requestParams.sortOrder);
     if (requestParams.status) params = params.set('status', requestParams.status);
     if (requestParams.targetDate) params = params.set('targetDate', requestParams.targetDate);
-    if (requestParams.search) params = params.set('search', requestParams.search);
+    if (requestParams.search?.trim()) params = params.set('search', requestParams.search.trim());
   
     return this.http.get<ProjectsResponse>(`${this.apiUrl}/projects`, { params });
   }

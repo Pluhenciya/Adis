@@ -36,6 +36,7 @@
 
           <!-- Сортировка -->
           <button mat-icon-button 
+                  *ngIf="viewMode === 'list'"
                   [matMenuTriggerFor]="sortMenu" 
                   #sortTrigger="matMenuTrigger"
                   matTooltip="Сортировка"
@@ -102,7 +103,7 @@
         <div class="scroll-trigger" style="height: 1px; visibility: hidden;"></div>
       </div>
       <div *ngIf="viewMode === 'map'" class="map-container">
-        <div id="map-container" style="height: 100%"></div>
+        <div #mapContainerRef id="map-container" style="height: 100%"></div>
         <div *ngIf="selectedProject" class="selected-project-info">
           <h3>{{ selectedProject.name }}</h3>
           <p>Статус: {{ getStatusLabel(selectedProject.status) }}</p>

@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit, signal, OnDestroy, AfterViewInit} from '@angular/core';
+import { Component, ViewChild, OnInit, signal, OnDestroy, AfterViewInit, ElementRef} from '@angular/core';
 import { MatTableModule } from '@angular/material/table';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
@@ -54,12 +54,11 @@ import { MapService } from '../../services/map.service';
   providers: []
 })
 export class ProjectListPageComponent implements OnInit, OnDestroy, AfterViewInit {
-
   ngOnDestroy() {
     this.observer?.disconnect();
     this.mapService.destroyMap();
   }
-
+  private mapScrollTimer?: any;
   private scrollTrigger: Element | null = null;
   private observer?: IntersectionObserver;
   projects: GetProjectDto[] = [];
@@ -80,7 +79,6 @@ export class ProjectListPageComponent implements OnInit, OnDestroy, AfterViewIni
   mapCenter: [number, number] = [55.751244, 37.618423];
   zoom = 5;
   selectedProject?: GetProjectDto;
-  private mapInitialized = false;
 
   private searchSubject = new Subject<string>();
 
@@ -90,6 +88,8 @@ export class ProjectListPageComponent implements OnInit, OnDestroy, AfterViewIni
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
+  @ViewChild('mapContainerRef', { static: false }) mapContainerRef!: ElementRef;
+
   constructor(
     private dialog: MatDialog,
     private projectService: ProjectService,
@@ -98,7 +98,9 @@ export class ProjectListPageComponent implements OnInit, OnDestroy, AfterViewIni
     this.searchSubject.pipe(
       debounceTime(300),
       distinctUntilChanged()
-    ).subscribe(() => this.loadProjectsData());
+    ).subscribe(() => {
+      this.resetAndLoad();
+    });
   }
 
   ngOnInit() {
@@ -139,7 +141,7 @@ export class ProjectListPageComponent implements OnInit, OnDestroy, AfterViewIni
       rootMargin: '0px',
       threshold: 0.1
     };
-  
+
     this.observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting && 
@@ -159,7 +161,11 @@ export class ProjectListPageComponent implements OnInit, OnDestroy, AfterViewIni
   }
   loadProjectsData(append = false) {
     this.isLoading = true;
-    
+  
+    if (!append) {
+      this.stopMapScrollLoading();
+    }
+
     const requestParams = {
       page: this.pageIndex + 1,
       pageSize: this.pageSize,
@@ -167,9 +173,9 @@ export class ProjectListPageComponent implements OnInit, OnDestroy, AfterViewIni
       sortOrder: this.sortOrder,
       status: this.statusFilter,
       targetDate: this.dateFilter?.toISOString().split('T')[0],
-      search: this.searchQuery
+      search: this.searchQuery.trim() // Добавляем trim()
     };
-
+  
     this.projectService.getProjects(requestParams).subscribe({
       next: ({ projects, totalCount }) => {
         this.projects = append ? [...this.projects, ...projects] : projects;
@@ -181,8 +187,11 @@ export class ProjectListPageComponent implements OnInit, OnDestroy, AfterViewIni
         }
 
         if (this.viewMode === 'map') {
-          const newProjects = append ? projects : this.projects;
-          this.addMarkers(newProjects);
+          if(append)
+            this.addMarkers(projects);
+          else
+            this.addMarkers(this.projects);
+            this.updateMapMarkers()
         }
       },
       error: () => this.isLoading = false
@@ -190,10 +199,9 @@ export class ProjectListPageComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
     // Поиск
-  onSearchInput(event: Event) {
-    this.searchQuery = (event.target as HTMLInputElement).value;
-    this.searchSubject.next(this.searchQuery);
-  }
+    onSearchInput(event: Event) {
+        this.searchSubject.next(this.searchQuery);
+    }
 
     // Сортировка
   getSortDirectionIcon(field: string): string {
@@ -229,6 +237,7 @@ export class ProjectListPageComponent implements OnInit, OnDestroy, AfterViewIni
     this.hasActiveFilters = !!filters.status || !!filters.date;
     this.resetAndLoad();
     this.filterTrigger.closeMenu();
+    this.setupMapScrollLoading();
   }
 
   clearFilters() {
@@ -237,6 +246,7 @@ export class ProjectListPageComponent implements OnInit, OnDestroy, AfterViewIni
     this.hasActiveFilters = false;
     this.resetAndLoad();
     this.filterTrigger.closeMenu();
+    this.setupMapScrollLoading();
   }
 
   applySort(sortParams: {field: string, order: 'asc' | 'desc'}) {
@@ -244,12 +254,20 @@ export class ProjectListPageComponent implements OnInit, OnDestroy, AfterViewIni
     this.sortOrder = sortParams.order;
     this.resetAndLoad();
   }
-
+  
   private resetAndLoad() {
     this.pageIndex = 0;
     this.projects = [];
+    this.totalCount = 0; // Сбрасываем общее количество
+    this.stopMapScrollLoading(); // Останавливаем предыдущую подгрузку
     this.loadProjectsData();
+    
+    // Если в режиме карты - перезапускаем подгрузку
+    if (this.viewMode === 'map') {
+      this.setupMapScrollLoading();
+    }
   }
+  
 
     updateMap() {
       if (this.viewMode === 'map') {
@@ -258,21 +276,25 @@ export class ProjectListPageComponent implements OnInit, OnDestroy, AfterViewIni
       }
     }
   
-    private initMap() {
-      if (!this.mapInitialized && this.viewMode === 'map') {
-        const container = document.getElementById('map-container');
-        if (container) {
-          this.mapService.initMap(container, this.mapCenter, this.zoom);
+    private async initMap(): Promise<void> {
+      if (this.viewMode === 'map') {
+        // Ждём обновления DOM
+        await new Promise(resolve => setTimeout(resolve, 0));
+        
+        if (this.mapContainerRef?.nativeElement) {
+          await this.mapService.initMap(
+            this.mapContainerRef.nativeElement, 
+            this.mapCenter, 
+            this.zoom
+          );
           this.addMarkers();
           this.addMapListeners();
-          this.mapInitialized = true;
         }
       }
     }
-  
     private addMarkers(projects: GetProjectDto[] = this.projects) {
       projects.forEach(project => {
-        if (!this.mapService.hasMarker(project.idProject)) {
+        if (project.location?.geometry?.coordinates) {
           this.mapService.addMarker(project);
         }
       });
@@ -290,23 +312,50 @@ export class ProjectListPageComponent implements OnInit, OnDestroy, AfterViewIni
       });
     }
 
-    toggleView(mode: 'list' | 'map'): void {
+    async toggleView(mode: 'list' | 'map'): Promise<void> {
       this.viewMode = mode;
+      
       if (mode === 'map') {
-        setTimeout(() => this.initMap(), 50);
+        await this.initMap();
+        this.setupMapScrollLoading();
       } else {
+        this.stopMapScrollLoading();
         setTimeout(() => {
           this.setupScrollLoading();
-          this.scrollToTop();
-        }, 100);
+        }, 50);
       }
-      this.selectedProject = undefined;
     }
 
-    private scrollToTop() {
-      if (this.viewMode === 'list') {
-        const container = document.querySelector('.project-cards');
-        container?.scrollTo({ top: 0 });
+    private updateMapMarkers() {
+      if (this.viewMode === 'map') {
+        this.mapService.clearMarkers();
+        this.addMarkers(this.projects);
+        this.mapService.updateMap();
+      }
+    }
+
+    private setupMapScrollLoading() {
+      this.stopMapScrollLoading();
+      console.log("Мяу")
+      this.mapScrollTimer = setInterval(() => {
+        // Добавляем проверку на наличие данных для загрузки
+        if (!this.mapService.mapExists() || 
+            this.isLoading || 
+            this.projects.length >= this.totalCount) {
+              console.log("Мяу1")
+          // Если данные закончились - останавливаем таймер
+          if (this.projects.length >= this.totalCount) {
+            console.log("Мяу2")
+            this.stopMapScrollLoading();
+          }
+          this.loadNextPage();
+        }});
+    }
+  
+    private stopMapScrollLoading() {
+      if (this.mapScrollTimer) {
+        clearInterval(this.mapScrollTimer);
+        this.mapScrollTimer = undefined;
       }
     }
 }

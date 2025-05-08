@@ -37,7 +37,6 @@ export class MapService {
   }
 
   addMarker(project: GetProjectDto): void {
-    if (this.markersMap.has(project.idProject)) return;
     ymaps.ready().then(() => {
       const geometry = project.location?.geometry;
       if (!geometry) return;
@@ -48,18 +47,10 @@ export class MapService {
         geometry: geometry
       });
   
-      const props = {
-        balloonContent: this.getBalloonContent(project),
-        hintContent: project.name
-      };
-  
       const marker = new ymaps.GeoObject(
         { geometry: ymapsGeometry.geometry },
         {
           preset: 'islands#geoObject',
-          balloonContentLayout: ymaps.templateLayoutFactory.createClass(
-            props.balloonContent
-          ),
           ...this.getStyleForType(geometry.type, project.status)
         }
       );
@@ -135,38 +126,6 @@ export class MapService {
     }
   }
 
-  private getBalloonContent(project: GetProjectDto): string {
-    return `
-      <div class="map-balloon">
-        <h3>${project.name}</h3>
-        <p>Статус: ${this.getStatusLabel(project.status)}</p>
-        <p>Объект: ${project.nameWorkObject}</p>
-        <p>Прогресс: ${project.progress}%</p>
-        ${this.getGeometryType(project.location?.geometry)}
-      </div>
-    `;
-  }
-
-  private getStatusLabel(status: string): string {
-    const statusMap: {[key: string]: string} = {
-      'Designing': 'Проектирование',
-      'ContractorSearch': 'Поиск подрядчика',
-      'InExecution': 'В работе',
-      'Completed': 'Завершен'
-    };
-    return statusMap[status] || 'Неизвестный статус';
-  }
-
-  private getGeometryType(geometry?: any): string {
-    if (!geometry) return '';
-    const typeMap: {[key: string]: string} = {
-      'Point': 'Точка',
-      'LineString': 'Линия',
-      'Polygon': 'Полигон'
-    };
-    return `<p>Тип объекта: ${typeMap[geometry.type] || geometry.type}</p>`;
-  }
-
   highlightMarker(projectId: number): void {
     this.markersMap.forEach((marker, id) => {
       if (id === projectId) {
@@ -191,5 +150,29 @@ export class MapService {
 
   mapExists(): boolean {
     return !!this.map;
+  }
+
+  clearMarkers(): void {
+    // Удаляем все объекты с карты
+    this.map.geoObjects.removeAll();
+    
+    // Очищаем внутренние хранилища
+    this.markersMap.clear();
+    this.markers.clear();
+    
+    // Сбрасываем состояние
+    if (this.map) {
+      this.map.setCenter(this.map.getCenter(), this.map.getZoom());
+    }
+  }
+
+  updateMap(): void {
+    if (this.map) {
+      this.map.container.fitToViewport();
+      const bounds = this.map.geoObjects.getBounds();
+      if (bounds) {
+        this.map.setBounds(bounds, { checkZoomRange: true });
+      }
+    }
   }
 }
