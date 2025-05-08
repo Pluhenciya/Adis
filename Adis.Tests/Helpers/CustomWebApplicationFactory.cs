@@ -17,16 +17,6 @@ namespace Adis.Tests.Helpers
     public class CustomWebApplicationFactory
     : WebApplicationFactory<Program>
     {
-        private IConfiguration _configuration;
-
-        public CustomWebApplicationFactory()
-        {
-            // Инициализация конфигурации
-            _configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
-                .Build();
-        }
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             builder.ConfigureServices(services =>
