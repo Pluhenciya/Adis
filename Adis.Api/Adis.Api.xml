@@ -61,7 +61,7 @@
             </summary>
             <param name="projectService"></param>
         </member>
-        <member name="M:Adis.Api.Controllers.ProjectsController.AddProject(Adis.Bll.Dtos.ProjectDto)">
+        <member name="M:Adis.Api.Controllers.ProjectsController.AddProject(Adis.Bll.Dtos.Project.PostProjectDto)">
              <summary>
              Добавляет новый проект
              </summary>
@@ -83,7 +83,7 @@
              <response code="200">Успешное выполнение</response>
              <response code="400">Ошибка валидации данных</response>
         </member>
-        <member name="M:Adis.Api.Controllers.ProjectsController.GetProjects(System.Nullable{Adis.Dm.Status},System.String,System.String,System.String,System.String,System.String,System.Int32,System.Int32)">
+        <member name="M:Adis.Api.Controllers.ProjectsController.GetProjects(System.Nullable{Adis.Dm.ProjectStatus},System.String,System.String,System.String,System.String,System.String,System.String,System.Int32,System.Int32)">
              <summary>
              Возвращает список проектов с общим количеством и информации о страницах
              </summary>
@@ -100,13 +100,14 @@
              <param name="targetDate">Дата, в которую проект будет выполняться (yyyy-MM-dd)</param>
              <param name="startDateFrom">Начальная дата диапазона (yyyy-MM-dd)</param>
              <param name="startDateTo">Конечная дата диапазона (yyyy-MM-dd)</param>
+             <param name="search">Часть имени наименования проекта для поиска</param>
              <param name="page">Номер страницы для пагинации</param>
              <param name="pageSize">Количество записей на страницы</param>
              <param name="sortField">Свойство, по которому сортировать</param>
              <param name="sortOrder">Сортировать по возрастанию или по убыванию</param>
              <response code="200">Успешное выполнение</response>
         </member>
-        <member name="M:Adis.Api.Controllers.ProjectsController.UpdateProject(Adis.Bll.Dtos.ProjectDto)">
+        <member name="M:Adis.Api.Controllers.ProjectsController.UpdateProject(Adis.Bll.Dtos.Project.PostProjectDto)">
              <summary>
              Обновляет данные проекта на новые
              </summary>

@@ -22,43 +22,42 @@ namespace Adis.Dm
         public string Name { get; set; } = null!;
 
         /// <summary>
-        /// Описание проекта
+        /// Начало проектирования
         /// </summary>
-        public string? Description { get; set; }
+        public DateOnly StartDate { get; set; } = DateOnly.FromDateTime(DateTime.Now);
 
         /// <summary>
-        /// Бюджет проекта
-        /// </summary>
-        public double Budget { get; set; }
-
-        /// <summary>
-        /// Начало выполнения проекта
-        /// </summary>
-        public DateOnly StartDate { get; set; }
-
-        /// <summary>
-        /// Конец выполнения проекта
+        /// Конец проектирования
         /// </summary>
         public DateOnly EndDate { get; set; }
 
         /// <summary>
         /// Статус проекта
         /// </summary>
-        public Status Status { get; set; }
+        public ProjectStatus Status { get; set; }
 
         /// <summary>
-        /// Время создания
+        /// Наименование объекта, на котором проводятся работы
         /// </summary>
-        public DateTime CreatedAt { get; set; }
+        public string NameWorkObject { get; set; } = null!;
 
         /// <summary>
         /// Идентификатор пользователя создавшего проект
         /// </summary>
         public int IdUser { get; set; }
 
+        public int IdLocation { get; set; }
+
+        public Location Location { get; set; } = null!;
+
         /// <summary>
         /// Пользователь создавший проект
         /// </summary>
         public virtual User User { get; set; } = null!;
+
+        /// <summary>
+        /// Задачи проекта
+        /// </summary>
+        public virtual IEnumerable<ProjectTask> Tasks { get; set; } = null!;
     }
 }

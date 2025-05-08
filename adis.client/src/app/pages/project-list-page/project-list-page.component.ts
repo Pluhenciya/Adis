@@ -1,50 +1,28 @@
-import { Component, ViewChild, OnInit } from '@angular/core';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { Component, ViewChild, OnInit, signal, OnDestroy, AfterViewInit, ElementRef} from '@angular/core';
+import { MatTableModule } from '@angular/material/table';
 import { MatSort, MatSortModule } from '@angular/material/sort';
-import { MatPaginator, MatPaginatorIntl, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { ProjectService } from '../../services/project.service';
-import { Project } from '../../models/project.model';
+import { GetProjectDto, ProjectStatus } from '../../models/project.model';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { FormsModule } from '@angular/forms';
 import { MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { MatChipsModule } from '@angular/material/chips';
-import { DatePipe, NgClass, NgIf } from '@angular/common';
+import { DatePipe, NgClass, NgForOf, NgIf } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { startWith, switchMap, tap } from 'rxjs';
+import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { ProjectFormComponent } from '../../components/project-form/project-form.component';
-
-const rangeLabel: string = 'из';
-const itemsPerPageLabel: string = 'Элементов на странице:';
-const firstPageLabel: string = 'Первая страница';
-const lastPageLabel: string = 'Последняя страница';
-const previousPageLabel: string = 'Предыдущая страница';
-const nextPageLabel: string = 'Следующая страница';
-
-const getRangeLabel: (page: number, pageSize: number, length: number) => string = (
-  page: number,
-  pageSize: number,
-  length: number
-): string => {
-  return new MatPaginatorIntl().getRangeLabel(page, pageSize, length).replace(/[a-z]+/i, rangeLabel);
-};
-
-export function getPaginatorIntl(): MatPaginatorIntl {
-  const paginatorIntl: MatPaginatorIntl = new MatPaginatorIntl();
-
-  paginatorIntl.itemsPerPageLabel = itemsPerPageLabel;
-  paginatorIntl.firstPageLabel = firstPageLabel;
-  paginatorIntl.lastPageLabel = lastPageLabel;
-  paginatorIntl.previousPageLabel = previousPageLabel;
-  paginatorIntl.nextPageLabel = nextPageLabel;
-  paginatorIntl.getRangeLabel = getRangeLabel;
-  
-  return paginatorIntl;
-}
+import {MatTooltipModule} from '@angular/material/tooltip';
+import {MatButtonToggleModule} from '@angular/material/button-toggle';
+import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
+import { FilterMenuComponent } from '../../components/filter-menu/filter-menu.component';
+import { SortMenuComponent } from '../../components/sort-menu/sort-menu.component';
+import { MapService } from '../../services/map.service';
 
 @Component({
   selector: 'app-project-list-page',
@@ -57,219 +35,327 @@ export function getPaginatorIntl(): MatPaginatorIntl {
     MatProgressSpinnerModule,
     MatTableModule,
     MatChipsModule,
-    NgIf,
-    NgClass,
+    NgForOf,
     DatePipe,
     MatPaginatorModule,
     MatButtonModule,
     MatIconModule,
-    MatSortModule
+    MatSortModule,
+    MatInputModule,
+    MatTooltipModule,
+    MatButtonToggleModule,
+    NgIf,
+    MatMenuModule,
+    FilterMenuComponent,
+    SortMenuComponent,
   ],
   templateUrl: './project-list-page.component.html',
   styleUrls: ['./project-list-page.component.scss'],
-  providers: [
-    { provide: MatPaginatorIntl, useValue: getPaginatorIntl() }
- ]
+  providers: []
 })
-export class ProjectListPageComponent implements OnInit {
-  displayedColumns: string[] = ['name', 'status', 'dates', 'createdAt', 'budget', 'actions'];
-  dataSource = new MatTableDataSource<Project>();
-  pageIndex:number = 0;
-  pageSize:number = 10;
-  length:number = 10;
-  isLoading = true;
-  statusFilter = '';
-  dateFilter: Date | null = null;
-  
-  @ViewChild('paginator') paginator!: MatPaginator; 
+export class ProjectListPageComponent implements OnInit, OnDestroy, AfterViewInit {
+  ngOnDestroy() {
+    this.observer?.disconnect();
+    this.mapService.destroyMap();
+  }
+  private mapScrollTimer?: any;
+  private scrollTrigger: Element | null = null;
+  private observer?: IntersectionObserver;
+  projects: GetProjectDto[] = [];
+  ProjectStatus = ProjectStatus;
+  hideSingleSelectionIndicator = signal(true);
+  totalCount = 0;
+  isLoading = false;
+ 
+  searchQuery = '';
+  statusFilter?: ProjectStatus;
+  dateFilter?: Date;
+  sortField = 'startDate';
+  sortOrder: 'asc' | 'desc' = 'desc';
+  pageSize = 10;
+  pageIndex = 0;
+  hasActiveFilters = false;
+  viewMode: 'list' | 'map' = 'list';
+  mapCenter: [number, number] = [55.751244, 37.618423];
+  zoom = 5;
+  selectedProject?: GetProjectDto;
+
+  private searchSubject = new Subject<string>();
+
+  @ViewChild('filterTrigger') filterTrigger!: MatMenuTrigger;
+  @ViewChild('sortTrigger') sortTrigger!: MatMenuTrigger;
+
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
+
+  @ViewChild('mapContainerRef', { static: false }) mapContainerRef!: ElementRef;
 
   constructor(
     private dialog: MatDialog,
-    private projectService: ProjectService
-  ) {}
+    private projectService: ProjectService,
+    private mapService: MapService
+  ) {
+    this.searchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged()
+    ).subscribe(() => {
+      this.resetAndLoad();
+    });
+  }
 
   ngOnInit() {
+    this.loadProjectsData();
   }
 
   ngAfterViewInit() {
-    setTimeout(() => {
-      if (!this.paginator || !this.sort) return;
-      
-      // Инициализация начальных значений
-      this.paginator.pageSize = 10;
-      this.paginator.pageIndex = 0;
-      
-      this.initializeComponents();
-    }, 0);
+    this.setupScrollLoading();
+    if (this.viewMode === 'map') {
+      this.initMap();
+    }
+    // Обработка сортировки
+    if (this.sort) {
+      this.sort.sortChange.subscribe(() => {
+        this.sortField = this.sort.active;
+        this.sortOrder = this.sort.direction as 'asc' | 'desc';
+        this.loadProjectsData();
+      });
+    }
   }
 
-  private initializeComponents() {
-    // Проверяем инициализацию компонентов
-    if (!this.paginator || !this.sort) {
-      console.error('Paginator or Sort not initialized!');
+  private setupScrollLoading() {
+    if (this.viewMode !== 'list') return;
+  
+    this.scrollTrigger = document.querySelector('.scroll-trigger');
+    
+    if (!this.scrollTrigger) {
+      console.error('Scroll trigger element not found!');
       return;
     }
-
-    this.dataSource.sort = this.sort;
-
-    // Первая загрузка данных
-    this.paginator.page
-      .pipe(
-        startWith({}),
-        switchMap(() => {
-          this.isLoading = true;
-          return this.loadProjectsData();
-        })
-      )
-      .subscribe();
-
-    // Обработка сортировки
-    this.sort.sortChange.subscribe(() => {
-      if (this.paginator) {
-        this.paginator.pageIndex = 0;
-      }
-      this.loadProjectsData().subscribe();
-    });
-  }
-
-  loadProjectsData(event?:PageEvent) {
-    console.log('--- START loadProjectsData ---');
-
-    if (event) {
-      console.log('Event from paginator:', event);
-      this.pageIndex = event.pageIndex;
-      this.pageSize = event.pageSize;
+  
+    if (this.observer) {
+      this.observer.disconnect();
     }
-
-    // Проверяем инициализацию перед использованием
-    const pageIndex = this.paginator?.pageIndex ?? 0;
-    const pageSize = this.paginator?.pageSize ?? 10;
-    const sortField = this.sort?.active || 'createdAt';
-    const sortOrder: 'asc' | 'desc' = this.sort?.direction === 'asc' ? 'asc' : 'desc';
-
-    console.log('Current paginator state:', {
-      pageIndex: this.paginator?.pageIndex,
-      pageSize: this.paginator?.pageSize,
-      length: this.paginator?.length
-    });
-
-    console.log('Component state:', {
-      pageIndex: this.pageIndex,
-      pageSize: this.pageSize,
-      length: this.length
-    });
-
-    const requestParams = {
-      page: pageIndex + 1,
-      pageSize: pageSize,
-      sortField: sortField,
-      sortOrder: sortOrder,
-      status: this.statusFilter,
-      targetDate: this.dateFilter ? 
-        this.dateFilter.toISOString().split('T')[0] : 
-        undefined,
-      startDateFrom: undefined,
-      startDateTo: undefined
+  
+    const options = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.1
     };
 
-    this.isLoading = true;
-
-    console.log('Sending request with params:', requestParams);
-
-    return this.projectService.getProjects(requestParams).pipe(
-      tap({
-        next: ({ projects, totalCount }) => {
-          console.log('Response received:', {
-            projectsCount: projects.length,
-            totalCount,
-            page: requestParams.page,
-            pageSize: requestParams.pageSize
-          });
-  
-          // Проверка на выход за границы
-          if (pageIndex * pageSize >= totalCount) {
-            const newPageIndex = Math.max(0, Math.floor(totalCount / pageSize) - 1);
-            console.warn(`Correcting pageIndex from ${pageIndex} to ${newPageIndex}`);
-            this.pageIndex = newPageIndex;
-          }
-  
-          console.log('Updating component state:', {
-            newPageIndex: this.pageIndex,
-            newPageSize: this.pageSize,
-            newLength: totalCount
-          });
-  
-          this.dataSource.data = projects;
-          this.length = totalCount;
-  
-          if (this.paginator) {
-            console.log('Updating paginator:', {
-              length: totalCount,
-              pageIndex: this.pageIndex,
-              pageSize: this.pageSize
-            });
-            
-            this.paginator.length = totalCount;
-            this.paginator.pageIndex = this.pageIndex;
-            this.paginator.pageSize = this.pageSize;
-          }
-  
-          this.isLoading = false;
-          console.log('--- END loadProjectsData SUCCESS ---');
-        },
-        error: (err) => {
-          console.error('Error in loadProjectsData:', err);
-          this.isLoading = false;
-          console.log('--- END loadProjectsData ERROR ---');
+    this.observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && 
+            !this.isLoading && 
+            this.projects.length < this.totalCount) {
+          this.loadNextPage();
         }
-      })
-    );
-  }
-
-
-  applyFilter() {
-    if (this.paginator) this.paginator.pageIndex = 0;
-    this.loadProjectsData().subscribe();
-  }
-
-  resetFilters() {
-    this.statusFilter = '';
-    this.dateFilter = null;
-    this.applyFilter();
-  }
-
-  getStatusLabel(status: string){
-    switch(status.toLowerCase()){
-      case 'draft':
-        return 'Черновик'
-      case 'inprogress':
-        return 'Выполняется'
-      case 'completed':
-        return 'Завершен'
-      case 'overdue':
-        return 'Просрочен'
-      default:
-        return ''
-    }
-  }
-
-  handlePageEvent(event: PageEvent) {
-    this.pageIndex = event.pageIndex;
-    this.pageSize = event.pageSize;
-    this.loadProjectsData();
-  }
+      });
+    }, options);
   
-  openProjectForm(project?: Project): void {
+    this.observer.observe(this.scrollTrigger);
+  }
+
+  private loadNextPage() {
+    this.pageIndex++;
+    this.loadProjectsData(true);
+  }
+  loadProjectsData(append = false) {
+    this.isLoading = true;
+  
+    if (!append) {
+      this.stopMapScrollLoading();
+    }
+
+    const requestParams = {
+      page: this.pageIndex + 1,
+      pageSize: this.pageSize,
+      sortField: this.sortField,
+      sortOrder: this.sortOrder,
+      status: this.statusFilter,
+      targetDate: this.dateFilter?.toISOString().split('T')[0],
+      search: this.searchQuery.trim() // Добавляем trim()
+    };
+  
+    this.projectService.getProjects(requestParams).subscribe({
+      next: ({ projects, totalCount }) => {
+        this.projects = append ? [...this.projects, ...projects] : projects;
+        this.totalCount = totalCount;
+        this.isLoading = false;
+
+        if (this.viewMode === 'list') {
+          setTimeout(() => this.setupScrollLoading(), 50);
+        }
+
+        if (this.viewMode === 'map') {
+          if(append)
+            this.addMarkers(projects);
+          else
+            this.addMarkers(this.projects);
+            this.updateMapMarkers()
+        }
+      },
+      error: () => this.isLoading = false
+    });
+  }
+
+    // Поиск
+    onSearchInput(event: Event) {
+        this.searchSubject.next(this.searchQuery);
+    }
+
+    // Сортировка
+  getSortDirectionIcon(field: string): string {
+    return this.sortField === field 
+      ? this.sortOrder === 'asc' ? 'arrow_upward' : 'arrow_downward' 
+      : '';
+  }
+
+  getStatusLabel(status: string) {
+    const statusMap: {[key: string]: string} = {
+      'Designing': 'Проектирование',
+      'ContractorSearch': 'Поиск подрядчика',
+      'InExecution': 'В работе',
+      'Completed': 'Завершен'
+    };
+    return statusMap[status] || 'Неизвестный статус';
+  }
+
+  openProjectForm(project?: GetProjectDto): void {
     const dialogRef = this.dialog.open(ProjectFormComponent, {
       width: '600px',
       data: { project }
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.loadProjectsData().subscribe();
-      }
+      if (result) this.loadProjectsData();
     });
   }
+
+  applyFilters(filters: {status?: ProjectStatus, date?: Date}) {
+    this.statusFilter = filters.status;
+    this.dateFilter = filters.date;
+    this.hasActiveFilters = !!filters.status || !!filters.date;
+    this.resetAndLoad();
+    this.filterTrigger.closeMenu();
+    this.setupMapScrollLoading();
+  }
+
+  clearFilters() {
+    this.statusFilter = undefined;
+    this.dateFilter = undefined;
+    this.hasActiveFilters = false;
+    this.resetAndLoad();
+    this.filterTrigger.closeMenu();
+    this.setupMapScrollLoading();
+  }
+
+  applySort(sortParams: {field: string, order: 'asc' | 'desc'}) {
+    this.sortField = sortParams.field;
+    this.sortOrder = sortParams.order;
+    this.resetAndLoad();
+  }
+  
+  private resetAndLoad() {
+    this.pageIndex = 0;
+    this.projects = [];
+    this.totalCount = 0; // Сбрасываем общее количество
+    this.stopMapScrollLoading(); // Останавливаем предыдущую подгрузку
+    this.loadProjectsData();
+    
+    // Если в режиме карты - перезапускаем подгрузку
+    if (this.viewMode === 'map') {
+      this.setupMapScrollLoading();
+    }
+  }
+  
+
+    updateMap() {
+      if (this.viewMode === 'map') {
+        this.initMap();
+        this.addMarkers();
+      }
+    }
+  
+    private async initMap(): Promise<void> {
+      if (this.viewMode === 'map') {
+        // Ждём обновления DOM
+        await new Promise(resolve => setTimeout(resolve, 0));
+        
+        if (this.mapContainerRef?.nativeElement) {
+          await this.mapService.initMap(
+            this.mapContainerRef.nativeElement, 
+            this.mapCenter, 
+            this.zoom
+          );
+          this.addMarkers();
+          this.addMapListeners();
+        }
+      }
+    }
+    private addMarkers(projects: GetProjectDto[] = this.projects) {
+      projects.forEach(project => {
+        if (project.location?.geometry?.coordinates) {
+          this.mapService.addMarker(project);
+        }
+      });
+    }
+  
+    get projectsWithLocation() {
+      return this.projects.filter(p => 
+        p.location?.geometry?.coordinates?.length === 2
+      );
+    }
+
+    private addMapListeners() {
+      this.mapService.onMarkerClick().subscribe(project => {
+        this.selectedProject = project;
+      });
+    }
+
+    async toggleView(mode: 'list' | 'map'): Promise<void> {
+      this.viewMode = mode;
+      
+      if (mode === 'map') {
+        await this.initMap();
+        this.setupMapScrollLoading();
+      } else {
+        this.stopMapScrollLoading();
+        setTimeout(() => {
+          this.setupScrollLoading();
+        }, 50);
+      }
+    }
+
+    private updateMapMarkers() {
+      if (this.viewMode === 'map') {
+        this.mapService.clearMarkers();
+        this.addMarkers(this.projects);
+        this.mapService.updateMap();
+      }
+    }
+
+    private setupMapScrollLoading() {
+      this.stopMapScrollLoading();
+      console.log("Мяу")
+      this.mapScrollTimer = setInterval(() => {
+        // Добавляем проверку на наличие данных для загрузки
+        if (!this.mapService.mapExists() || 
+            this.isLoading || 
+            this.projects.length >= this.totalCount) {
+              console.log("Мяу1")
+          // Если данные закончились - останавливаем таймер
+          if (this.projects.length >= this.totalCount) {
+            console.log("Мяу2")
+            this.stopMapScrollLoading();
+          }
+          this.loadNextPage();
+        }});
+    }
+  
+    private stopMapScrollLoading() {
+      if (this.mapScrollTimer) {
+        clearInterval(this.mapScrollTimer);
+        this.mapScrollTimer = undefined;
+      }
+    }
 }

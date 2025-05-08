@@ -17,10 +17,11 @@ namespace Adis.Dal.Specifications
     public class ProjectFilterSpecification : Specification<Project>
     {
         public ProjectFilterSpecification(
-            Status? status,
+            ProjectStatus? status,
             DateOnly? targetDate,
             DateOnly? startDateFrom,
             DateOnly? startDateTo,
+            string? search,
             string sortField = "StartDate",
             string sortOrder = "desc",
             int page = 1,
@@ -57,6 +58,9 @@ namespace Adis.Dal.Specifications
                 }
             }
 
+            if (!string.IsNullOrEmpty(search))
+                ApplyCriteria(p => p.Name.Contains(search));
+
             // Сортировка
             var orderExpression = GetOrderExpression(sortField);
             if (orderExpression != null)
@@ -69,6 +73,10 @@ namespace Adis.Dal.Specifications
 
             // Пагинация
             ApplyPaging((page - 1) * pageSize, pageSize);
+
+            AddInclude(p => p.Location);
+            AddInclude(p => p.User);
+            AddInclude(p => p.Tasks);
         }
 
         /// <summary>
@@ -82,9 +90,7 @@ namespace Adis.Dal.Specifications
             {
                 "name" => p => p.Name,
                 "startdate" => p => p.StartDate,
-                "budget" => p => p.Budget,
                 "idproject" => p => p.IdProject,
-                "createdat" => p => p.CreatedAt,
                 _ => null
             };
         }

@@ -22,6 +22,12 @@ namespace Adis.Dal.Repositories
             UserWithRoleSpecification specification = new UserWithRoleSpecification();
             return await GetAsync(specification);
         }
+
+        public async Task<User?> GetUserWithRoleByIdAsync(int id)
+        {
+            UserWithRoleSpecification specification = new UserWithRoleSpecification(id);
+            return (await GetAsync(specification)).FirstOrDefault();
+        }
     }
 }
         

@@ -2,7 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ProjectService } from '../../services/project.service';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
-import { Project } from '../../models/project.model';
+import { GetProjectDto } from '../../models/project.model';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -34,7 +34,7 @@ export class ProjectFormComponent implements OnInit {
     private fb: FormBuilder,
     private projectService: ProjectService,
     private dialogRef: MatDialogRef<ProjectFormComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { project?: Project }
+    @Inject(MAT_DIALOG_DATA) public data: { project?: GetProjectDto }
   ) {
     this.projectForm = this.fb.group({
       name: ['', [Validators.required, Validators.maxLength(255)]],
@@ -90,8 +90,7 @@ export class ProjectFormComponent implements OnInit {
     const request = this.data?.project 
       ? this.projectService.updateProject({
         ...projectData,
-        idProject : this.data.project.idProject,
-        createdAt : this.data.project.createdAt
+        idProject : this.data.project.idProject
       })
       : this.projectService.createProject(projectData);
 

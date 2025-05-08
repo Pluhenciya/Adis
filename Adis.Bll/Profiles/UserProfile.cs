@@ -16,7 +16,7 @@ namespace Adis.Bll.Profiles
     {
         public UserProfile() 
         {
-            CreateMap<User, UserDto>().ForMember("Role", opt => opt.MapFrom(u => u.Roles.FirstOrDefault()!.Name!.ToString()));
+            CreateMap<User, UserDto>().ForMember("Role", opt => opt.MapFrom(u => Enum.Parse(typeof(Role), u.Roles.FirstOrDefault()!.Name!)));
             CreateMap<UserDto, User>();
         }
     }

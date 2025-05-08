@@ -1,4 +1,5 @@
 ﻿using Adis.Bll.Dtos;
+using Adis.Bll.Dtos.Project;
 using Adis.Bll.Interfaces;
 using Adis.Dm;
 using Microsoft.AspNetCore.Authorization;
@@ -13,7 +14,7 @@ namespace Adis.Api.Controllers
     /// <param name="projectService"></param>
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    
     public class ProjectsController(IProjectService projectService) : ControllerBase
     {
         private readonly IProjectService _projectService = projectService;
@@ -38,10 +39,11 @@ namespace Adis.Api.Controllers
         /// <param name="project">Данные нового проекта</param>
         /// <response code="200">Успешное выполнение</response>
         /// <response code="400">Ошибка валидации данных</response>
+        [Authorize]
         [HttpPost]
-        [ProducesResponseType(typeof(ProjectDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(PostProjectDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> AddProject(ProjectDto project)
+        public async Task<IActionResult> AddProject(PostProjectDto project)
         {
             try
             {
@@ -69,18 +71,20 @@ namespace Adis.Api.Controllers
         /// <param name="targetDate">Дата, в которую проект будет выполняться (yyyy-MM-dd)</param>
         /// <param name="startDateFrom">Начальная дата диапазона (yyyy-MM-dd)</param>
         /// <param name="startDateTo">Конечная дата диапазона (yyyy-MM-dd)</param>
+        /// <param name="search">Часть имени наименования проекта для поиска</param>
         /// <param name="page">Номер страницы для пагинации</param>
         /// <param name="pageSize">Количество записей на страницы</param>
         /// <param name="sortField">Свойство, по которому сортировать</param>
         /// <param name="sortOrder">Сортировать по возрастанию или по убыванию</param>
         /// <response code="200">Успешное выполнение</response>
         [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<ProjectDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<PostProjectDto>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetProjects(
-            [FromQuery] Status? status,
+            [FromQuery] ProjectStatus? status,
             [FromQuery] string? targetDate,
             [FromQuery] string? startDateFrom,
             [FromQuery] string? startDateTo,
+            [FromQuery] string? search,
             [FromQuery] string sortField = "StartDate",
             [FromQuery] string sortOrder = "desc",
             [FromQuery] int page = 1,
@@ -94,6 +98,7 @@ namespace Adis.Api.Controllers
                 targetDate,
                 startDateFrom,
                 startDateTo,
+                search,
                 sortField,
                 sortOrder,
                 page,
@@ -129,10 +134,11 @@ namespace Adis.Api.Controllers
         /// <param name="project">Новые данные проекта</param>
         /// <response code="200">Успешное выполнение</response>
         /// <response code="400">Ошибка валидации данных</response>
+        [Authorize]
         [HttpPut]
-        [ProducesResponseType(typeof(ProjectDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(PostProjectDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> UpdateProject(ProjectDto project)
+        public async Task<IActionResult> UpdateProject(PostProjectDto project)
         {
             try
             {

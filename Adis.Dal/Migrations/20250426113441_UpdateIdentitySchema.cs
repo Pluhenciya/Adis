@@ -358,15 +358,6 @@ namespace Adis.Dal.Migrations
                 column: "id_user",
                 principalTable: "users",
                 principalColumn: "id_user");
-
-            migrationBuilder.InsertData(
-                table: "roles",
-                columns: new[] { "name", "normalized_name" },
-                values: new object[,]
-                {
-                    { "Admin", "ADMIN" },
-                    { "Projecter", "PROJECTER" }
-                });
         }
 
         /// <inheritdoc />

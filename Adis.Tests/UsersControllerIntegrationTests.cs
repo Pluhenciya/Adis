@@ -22,7 +22,7 @@ namespace Adis.Tests
         private readonly IServiceScope _scope;
         private readonly AppDbContext _dbContext;
         private readonly UserManager<User> _userManager;
-        private readonly RoleManager<Role> _roleManager;
+        private readonly RoleManager<AppRole> _roleManager;
 
         public UsersControllerIntegrationTests(CustomWebApplicationFactory factory)
         {
@@ -31,7 +31,7 @@ namespace Adis.Tests
             _scope = _factory.Services.CreateScope();
             _dbContext = _scope.ServiceProvider.GetRequiredService<AppDbContext>();
             _userManager = _scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-            _roleManager = _scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
+            _roleManager = _scope.ServiceProvider.GetRequiredService<RoleManager<AppRole>>();
 
             InitializeAsync().Wait();
         }
@@ -42,8 +42,8 @@ namespace Adis.Tests
         private async Task InitializeAsync()
         {
             // Создаем роли
-            await CreateRoleIfNotExists("Admin");
-            await CreateRoleIfNotExists("User");
+            await CreateRoleIfNotExists(Role.Admin.ToString());
+            await CreateRoleIfNotExists(Role.Projecter.ToString());
 
             // Создаем администратора
             var admin = new User
@@ -52,7 +52,7 @@ namespace Adis.Tests
                 Email = "admin@example.com",
                 EmailConfirmed = true
             };
-            await CreateUserIfNotExists(admin, "AdminPassword123!", "Admin");
+            await CreateUserIfNotExists(admin, "AdminPassword123!", Role.Admin.ToString());
 
             // Создаем обычного пользователя
             var regularUser = new User
@@ -61,7 +61,7 @@ namespace Adis.Tests
                 Email = "user@example.com",
                 EmailConfirmed = true
             };
-            await CreateUserIfNotExists(regularUser, "UserPassword123!", "User");
+            await CreateUserIfNotExists(regularUser, "UserPassword123!", Role.Projecter.ToString());
         }
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace Adis.Tests
         {
             if (!await _roleManager.RoleExistsAsync(roleName))
             {
-                await _roleManager.CreateAsync(new Role { Name = roleName});
+                await _roleManager.CreateAsync(new AppRole { Name = roleName});
             }
         }
 
@@ -146,7 +146,7 @@ namespace Adis.Tests
             {
                 Email = "new.user@example.com",
                 Password = "NewUserPassword123!",
-                Role = "User",
+                Role = Role.Projecter,
                 FullName = "New User"
             };
 
@@ -174,7 +174,7 @@ namespace Adis.Tests
             {
                 Email = "another.user@example.com",
                 Password = "AnotherPassword123!",
-                Role = "Projecter"
+                Role = Role.Projecter
             };
 
             // Act

@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,14 +7,11 @@ using System.Threading.Tasks;
 
 namespace Adis.Dm
 {
-    /// <summary>
-    /// Роль
-    /// </summary>
-    public class Role : IdentityRole<int>
+    [JsonConverter(typeof(JsonStringEnumConverter<Role>))]
+    public enum Role
     {
-        /// <summary>
-        /// Пользователи с этой ролью
-        /// </summary>
-        public virtual IEnumerable<User> Users { get; set; } = null!;
+        Admin,
+        Projecter,
+        ProjectManager
     }
 }

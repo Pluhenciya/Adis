@@ -27,6 +27,7 @@ import { MatButtonModule } from '@angular/material/button';
 })
 export class LoginPageComponent {
   loginForm: FormGroup;
+  hidePassword: boolean = true;
   
   errorMessage: string | null = null;
 

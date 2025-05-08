@@ -17,5 +17,7 @@ namespace Adis.Dal.Interfaces
         /// </summary>
         /// <returns>Пользователь с ролью</returns>
         public Task<IEnumerable<User>> GetUsersWithRoleAsync();
+
+        public Task<User?> GetUserWithRoleByIdAsync(int id);
     }
 }

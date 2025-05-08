@@ -1,3 +1,46 @@
+html{
+  /* Основные цвета */
+  --mat-sys-primary: #FF6D00;
+  --mat-sys-primary-container: #FFE1CC;
+  --mat-sys-on-primary: #FFFFFF;
+  --mat-sys-on-primary-container: #2F1800;
+  
+  --mat-sys-secondary: #FF9E22;
+  --mat-sys-secondary-container: #FFE9D6;
+  --mat-sys-on-secondary: #000000;
+  --mat-sys-on-secondary-container: #2B1700;
+
+  --mat-sys-tertiary: #FFB74D;
+  --mat-sys-tertiary-container: #FFF3E0;
+  --mat-sys-on-tertiary: #000000;
+
+  /* Поверхности */
+  --mat-sys-background: #FFF5EB;
+  --mat-sys-surface: #FFF5EB;
+  --mat-sys-surface-variant: #FFEDE1;
+  --mat-sys-surface-container: #FFEEE5;
+  
+  /* Текст */
+  --mat-sys-on-background: #261A0D;
+  --mat-sys-on-surface: #261A0D;
+  --mat-sys-on-surface-variant: #664D33;
+
+  /* Границы и контуры */
+  --mat-sys-outline: #997A5C;
+  --mat-sys-outline-variant: #CCB8A3;
+
+  /* Состояния */
+  --mat-sys-surface-tint: #FF6D00;
+  --mat-sys-primary-fixed-dim: #FF8F40;
+  --mat-sys-secondary-fixed-dim: #FFB163;
+
+  /* Ошибки */
+  --mat-sys-error: #FF4D4D;
+  --mat-sys-error-container: #FFE5E5;
+  --mat-sys-on-error: #FFFFFF;
+  --mat-sys-on-error-container: #690000;
+}
+
 html, body { 
   height: 100%; 
   margin: 0;
@@ -5,25 +48,11 @@ html, body {
   background: #f5f5f5;
 }
 
-// Общие стили Material компонентов
-.mat-toolbar {
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.mat-button {
-  transition: all 0.3s ease;
-  
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-}
-
 .mat-card {
   border-radius: 12px !important;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05) !important;
 }
 
-// Адаптивные медиа-запросы
 @media (max-width: 768px) {
   .mat-toolbar {
     padding: 0 10px;
@@ -31,3 +60,37 @@ html, body {
 }
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.mat-datepicker-content {
+  background-color: var(--mat-sys-surface-container) !important;
+  border-radius: var(--mat-sys-corner-large) !important;
+  box-shadow: var(--mat-sys-level3) !important;
+}
+.mat-form-field.mat-focused .mat-form-field-outline {
+  color: var(--mat-sys-primary) !important;
+}
+.mat-input-element {
+  color: var(--mat-sys-on-surface);
+}
+
+.mat-form-field-label {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.mat-datepicker-toggle {
+  color: var(--mat-sys-on-surface);
+}
+
+.mat-form-field-outline,
+.mat-form-field-label,
+.mat-input-element {
+  transition: var(--transition) !important;
+}
+
+:root {
+  --primary-color: #FF6D00;
+  --accent-color: #FFAB40;
+  --text-light: #FFF;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.1);
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
