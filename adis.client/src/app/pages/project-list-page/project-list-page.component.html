@@ -65,10 +65,10 @@
         <div class="project-card" *ngFor="let project of projects" [class]="project.status"
           [style.--progress]="project.progress">
           <div class="actions">
-            <button mat-mini-fab class="edit-btn">
+            <button mat-mini-fab class="edit-btn" (click)="openProjectForm(project)">
               <mat-icon>edit</mat-icon>
             </button>
-            <button mat-mini-fab class="delete-btn">
+            <button mat-mini-fab class="delete-btn" (click)="deleteProject(project)">
               <mat-icon>delete</mat-icon>
             </button>
           </div>
@@ -96,7 +96,7 @@
             </div>
             <div class="location">
               <mat-icon>location_on</mat-icon>
-              <span>{{ project.nameWorkObject }}</span>
+              <span>{{ project.workObject.name }}</span>
             </div>
           </div>
         </div>
@@ -107,7 +107,7 @@
         <div *ngIf="selectedProject" class="selected-project-info">
           <h3>{{ selectedProject.name }}</h3>
           <p>Статус: {{ getStatusLabel(selectedProject.status) }}</p>
-          <p>Объект: {{ selectedProject.nameWorkObject }}</p>
+          <p>Объект: {{ selectedProject.workObject.name }}</p>
           <p>Прогресс: {{ selectedProject.progress }}%</p>
         </div>
       </div>

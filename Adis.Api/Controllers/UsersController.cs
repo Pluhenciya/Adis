@@ -1,5 +1,6 @@
 ﻿using Adis.Bll.Dtos;
 using Adis.Bll.Interfaces;
+using Adis.Dm;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -64,6 +65,18 @@ namespace Adis.Api.Controllers
         public async Task<IActionResult> GetUsers()
         {
             return Ok(await _userService.GetUsersAsync());
+        }
+
+        [HttpGet("{role}/{partialFullName}")]
+        public async Task<IActionResult> GetUsersByPartialFullNameWithRole(string partialFullName, string role)
+        {
+            return Ok(await _userService.GetUsersByPartialFullNameWithRoleAsync(partialFullName, role));
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetUserById(int id)
+        {
+            return Ok(await _userService.GetUserByIdAsync(id));
         }
     }
 }

@@ -4,6 +4,7 @@ using Adis.Dal.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 
@@ -12,9 +13,11 @@ using NetTopologySuite.Geometries;
 namespace Adis.Dal.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250509095131_RenameLocationInWorkObject")]
+    partial class RenameLocationInWorkObject
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -77,14 +80,14 @@ namespace Adis.Dal.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Adis.Dm.Contractor", b =>
+            modelBuilder.Entity("Adis.Dm.Constractor", b =>
                 {
-                    b.Property<int>("IdContractor")
+                    b.Property<int>("IdConstractor")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasColumnName("id_contractor");
+                        .HasColumnName("id_constractor");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("IdContractor"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("IdConstractor"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -92,10 +95,10 @@ namespace Adis.Dal.Migrations
                         .HasColumnType("varchar(255)")
                         .HasColumnName("name");
 
-                    b.HasKey("IdContractor")
+                    b.HasKey("IdConstractor")
                         .HasName("PRIMARY");
 
-                    b.ToTable("contractors", (string)null);
+                    b.ToTable("constractor", (string)null);
                 });
 
             modelBuilder.Entity("Adis.Dm.Project", b =>
@@ -115,7 +118,7 @@ namespace Adis.Dal.Migrations
                         .HasColumnType("date")
                         .HasColumnName("end_execution_date");
 
-                    b.Property<int?>("IdContractor")
+                    b.Property<int?>("IdConstractor")
                         .HasColumnType("int")
                         .HasColumnName("id_constractor");
 
@@ -126,12 +129,6 @@ namespace Adis.Dal.Migrations
                     b.Property<int>("IdWorkObject")
                         .HasColumnType("int")
                         .HasColumnName("id_location");
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("tinyint(1)")
-                        .HasDefaultValue(false)
-                        .HasColumnName("is_deleted");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -155,7 +152,7 @@ namespace Adis.Dal.Migrations
                     b.HasKey("IdProject")
                         .HasName("PRIMARY");
 
-                    b.HasIndex("IdContractor");
+                    b.HasIndex("IdConstractor");
 
                     b.HasIndex("IdUser");
 
@@ -535,9 +532,9 @@ namespace Adis.Dal.Migrations
 
             modelBuilder.Entity("Adis.Dm.Project", b =>
                 {
-                    b.HasOne("Adis.Dm.Contractor", "Contractor")
+                    b.HasOne("Adis.Dm.Constractor", "Constractor")
                         .WithMany("Projects")
-                        .HasForeignKey("IdContractor")
+                        .HasForeignKey("IdConstractor")
                         .HasConstraintName("fk_projects_constractor");
 
                     b.HasOne("Adis.Dm.User", "User")
@@ -553,7 +550,7 @@ namespace Adis.Dal.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .HasConstraintName("fk_work_object_project");
 
-                    b.Navigation("Contractor");
+                    b.Navigation("Constractor");
 
                     b.Navigation("User");
 
@@ -635,7 +632,7 @@ namespace Adis.Dal.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Adis.Dm.Contractor", b =>
+            modelBuilder.Entity("Adis.Dm.Constractor", b =>
                 {
                     b.Navigation("Projects");
                 });

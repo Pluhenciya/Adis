@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Adis.Dm
 {
-    public class Constractor
+    public class Contractor
     {
-        public int IdConstractor { get; set; }
+        public int IdContractor { get; set; }
 
         public string Name { get; set; } = null!;
 

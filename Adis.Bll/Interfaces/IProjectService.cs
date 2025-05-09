@@ -19,7 +19,7 @@ namespace Adis.Bll.Interfaces
         /// </summary>
         /// <param name="project">Данные нового проекта</param>
         /// <returns>Созданный проект</returns>
-        public Task<PostProjectDto> AddProjectAsync(PostProjectDto project);
+        public Task<GetProjectDto> AddProjectAsync(PostProjectDto project);
 
         /// <summary>
         /// Возвращает список проектов
@@ -49,6 +49,8 @@ namespace Adis.Bll.Interfaces
         /// </summary>
         /// <param name="project">Новые данные проекта</param>
         /// <returns>Изменненый проект</returns>
-        public Task<PostProjectDto> UpdateProjectAsync(PostProjectDto project);
+        public Task<GetProjectDto> UpdateProjectAsync(PostProjectDto project);
+
+        public Task DeleteProjectAsync(int id);
     }
 }

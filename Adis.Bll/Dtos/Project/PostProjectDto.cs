@@ -47,13 +47,11 @@ namespace Adis.Bll.Dtos.Project
         /// </summary>
         public int IdUser { get; set; }
 
-        public int IdLocation { get; set; }
+        public int IdWorkObject { get; set; }
 
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Место работ обязательно")]
-        public string NameWorkObject { get; set; } = null!;
+        public WorkObjectDto WorkObject { get; set; } = null!;
 
-        public LocationDto Location { get; set; } = null!;
-
+        [StringLength(255)]
         public string? ContractorName { get; set; } = null!;
 
         public int? IdContractor { get; set; }

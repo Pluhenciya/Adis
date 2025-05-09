@@ -36,27 +36,24 @@ namespace Adis.Dm
         /// </summary>
         public ProjectStatus Status { get; set; }
 
-        /// <summary>
-        /// Наименование объекта, на котором проводятся работы
-        /// </summary>
-        public string NameWorkObject { get; set; } = null!;
-
         public DateOnly? StartExecutionDate { get; set; }
 
         public DateOnly? EndExecutionDate { get; set; }
+
+        public bool IsDeleted { get; set; }
 
         /// <summary>
         /// Идентификатор пользователя создавшего проект
         /// </summary>
         public int IdUser { get; set; }
 
-        public int IdLocation { get; set; }
+        public int IdWorkObject { get; set; }
 
-        public int? IdConstractor { get; set; }
+        public int? IdContractor { get; set; }
 
-        public virtual Constractor Constractor { get; set; } = null!;
+        public virtual Contractor? Contractor { get; set; } = null!;
 
-        public virtual Location Location { get; set; } = null!;
+        public virtual WorkObject WorkObject { get; set; } = null!;
 
         /// <summary>
         /// Пользователь создавший проект

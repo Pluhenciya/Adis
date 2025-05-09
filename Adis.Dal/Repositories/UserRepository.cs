@@ -28,6 +28,12 @@ namespace Adis.Dal.Repositories
             UserWithRoleSpecification specification = new UserWithRoleSpecification(id);
             return (await GetAsync(specification)).FirstOrDefault();
         }
+
+        public async Task<IEnumerable<User>> GetUsersByPartialFullNameWithRoleAsync(string partialFullName, Role role)
+        {
+            UserByPartialFullNameSpecificationWithRole spec = new(partialFullName, role);
+            return await GetAsync(spec);
+        }
     }
 }
         

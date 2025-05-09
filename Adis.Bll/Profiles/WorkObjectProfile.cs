@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace Adis.Bll.Profiles
 {
-    public class LocationProfile : Profile
+    public class WorkObjectProfile : Profile
     {
-        public LocationProfile() 
+        public WorkObjectProfile() 
         {
-            CreateMap<Location, LocationDto>().ReverseMap();
+            CreateMap<WorkObject, WorkObjectDto>().ReverseMap();
         }
     }
 }

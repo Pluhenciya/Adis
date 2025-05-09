@@ -5,26 +5,42 @@ export enum ProjectStatus {
   Completed = 'Completed'
 }
 
-export interface Geometry {
-  type: string;
-  coordinates: number[];
-}
-
-export interface LocationDto {
-  idLocation: number;
-  geometry: Geometry;
-}
-
 export interface GetProjectDto {
   idProject: number;
   name: string;
-  startDate: string;
-  endDate: string;
+  startDate: Date;       
+  endDate: Date;         
   status: ProjectStatus;
-  nameWorkObject: string;
-  progress: number;
-  responsiblePerson: string;
   idUser: number;
-  idLocation: number;
-  location: LocationDto;
+  responsiblePerson: string;
+  workObject: {
+    name: string;
+    geometry: {
+      type: string;
+      coordinates: number[];
+    }
+  };
+  contractorName?: string;
+  startExecutionDate?: Date;  
+  endExecutionDate?: Date;  
+  progress: number;
+}
+
+export interface PostProjectDto {
+  idProject?: number;
+  name: string;
+  startDate: Date;       
+  endDate: Date;         
+  status: ProjectStatus;
+  idUser: number;
+  workObject: {
+    name: string;
+    geometry: {
+      type: string;
+      coordinates: number[];
+    }
+  };
+  contractorName?: string;
+  startExecutionDate?: Date;  
+  endExecutionDate?: Date;    
 }

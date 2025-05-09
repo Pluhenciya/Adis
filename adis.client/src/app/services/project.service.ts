@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { GetProjectDto, ProjectStatus } from '../models/project.model';
+import { GetProjectDto, PostProjectDto, ProjectStatus } from '../models/project.model';
 import { environment } from '../environments/environment';
+import { formatISO } from 'date-fns';
 
 interface ProjectsResponse {
   projects: GetProjectDto[];
@@ -43,12 +44,32 @@ export class ProjectService {
     return this.http.get<ProjectsResponse>(`${this.apiUrl}/projects`, { params });
   }
 
-  createProject(project: Partial<GetProjectDto>): Observable<GetProjectDto> {
-    return this.http.post<GetProjectDto>(`${this.apiUrl}/projects`, project);
+  createProject(project: PostProjectDto): Observable<GetProjectDto> {
+    return this.http.post<GetProjectDto>(`${this.apiUrl}/projects`, {
+      ...project,
+      startDate: this.formatDate(project.startDate),
+      endDate: this.formatDate(project.endDate),
+      startExecutionDate: project.startExecutionDate ? this.formatDate(project.startExecutionDate) : null,
+      endExecutionDate: project.endExecutionDate ? this.formatDate(project.endExecutionDate) : null
+    });
   }
-  
-  updateProject(project: Partial<GetProjectDto>): Observable<GetProjectDto> {
-    return this.http.put<GetProjectDto>(`${this.apiUrl}/projects`, project);
+
+  private formatDate(date: Date): string {
+    return formatISO(date, { representation: 'date' });
+  }
+
+  updateProject(project: Partial<PostProjectDto>): Observable<GetProjectDto> {
+    return this.http.put<GetProjectDto>(`${this.apiUrl}/projects`, {
+      ...project,
+      startDate: project.startDate ? this.formatDate(project.startDate) : null,
+      endDate: project.endDate ? this.formatDate(project.endDate) : null,
+      startExecutionDate: project.startExecutionDate ? this.formatDate(project.startExecutionDate) : null,
+      endExecutionDate: project.endExecutionDate ? this.formatDate(project.endExecutionDate) : null
+    });
+  }
+
+  deleteProject(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/projects/${id}`);
   }
 }
 

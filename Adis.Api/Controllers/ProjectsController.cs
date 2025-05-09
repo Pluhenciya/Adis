@@ -41,7 +41,7 @@ namespace Adis.Api.Controllers
         /// <response code="400">Ошибка валидации данных</response>
         [Authorize(Roles = "Admin, ProjectManager")]
         [HttpPost]
-        [ProducesResponseType(typeof(PostProjectDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(GetProjectDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> AddProject(PostProjectDto project)
         {
@@ -134,9 +134,9 @@ namespace Adis.Api.Controllers
         /// <param name="project">Новые данные проекта</param>
         /// <response code="200">Успешное выполнение</response>
         /// <response code="400">Ошибка валидации данных</response>
-        [Authorize]
+        [Authorize(Roles = "Admin, ProjectManager")]
         [HttpPut]
-        [ProducesResponseType(typeof(PostProjectDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(GetProjectDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> UpdateProject(PostProjectDto project)
         {
@@ -148,6 +148,13 @@ namespace Adis.Api.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteProject(int id)
+        {
+            await _projectService.DeleteProjectAsync(id);
+            return Ok();
         }
     }
 }

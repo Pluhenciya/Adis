@@ -7,9 +7,15 @@ using System.Threading.Tasks;
 
 namespace Adis.Dm
 {
-    public class Location
+    public class WorkObject
     {
-        public int IdLocation { get; set; }
+        public int IdWorkObject { get; set; }
+
+        /// <summary>
+        /// Наименование объекта, на котором проводятся работы
+        /// </summary>
+        public string Name { get; set; } = null!;
+
         public Geometry Geometry { get; set; } = null!;
         public IEnumerable<Project> Projects { get; set; } = null!;
     }

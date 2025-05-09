@@ -27,6 +27,8 @@ namespace Adis.Dal.Specifications
             int page = 1,
             int pageSize = 10)
         {
+            ApplyCriteria(p => !p.IsDeleted);
+
             // Фильтр по статусу
             if (status.HasValue)
             {
@@ -74,9 +76,10 @@ namespace Adis.Dal.Specifications
             // Пагинация
             ApplyPaging((page - 1) * pageSize, pageSize);
 
-            AddInclude(p => p.Location);
+            AddInclude(p => p.WorkObject);
             AddInclude(p => p.User);
             AddInclude(p => p.Tasks);
+            AddInclude(p => p.Contractor!);
         }
 
         /// <summary>
