@@ -125,9 +125,9 @@ namespace Adis.Tests
                 Name = "Test Project",
                 EndDate = new DateOnly(2025, 12, 31),
                 IdUser = _idTestUser, 
-                NameWorkObject = "Теst Location",
-                Location = new LocationDto
+                WorkObject = new WorkObjectDto
                 { 
+                    Name = "Теst Location",
                     Geometry = new Point(new Coordinate(65.566018, 41.534602))
                 }
             };
@@ -153,9 +153,9 @@ namespace Adis.Tests
                 Name = "Test Project",
                 EndDate = new DateOnly(2024, 12, 31),
                 IdUser = _idTestUser,
-                NameWorkObject = "Теst Location",
-                Location = new LocationDto
+                WorkObject = new WorkObjectDto
                 { 
+                    Name = "Теst Location",
                     Geometry = new Point(new Coordinate(65.566018, 41.534602))
                 }
             };
@@ -185,9 +185,9 @@ namespace Adis.Tests
                     Name = "Filtered Project",
                     EndDate = new DateOnly(2027, 3, 31),
                     IdUser = _idTestUser,
-                    NameWorkObject = "Теst Location",
-                    Location = new LocationDto
+                    WorkObject = new WorkObjectDto
                     {
+                        Name = "Теst Location",
                         Geometry = new Point(new Coordinate(65.566018, 41.534602))
                     }
                 },
@@ -196,9 +196,9 @@ namespace Adis.Tests
                     Name = "Other Project",
                     EndDate = new DateOnly(2025, 12, 31),
                     IdUser = _idTestUser,
-                    NameWorkObject = "Теst Location",
-                    Location = new LocationDto
+                    WorkObject = new WorkObjectDto
                     {
+                        Name = "Теst Location",
                         Geometry = new Point(new Coordinate(65.566018, 41.534602))
                     }
                 }

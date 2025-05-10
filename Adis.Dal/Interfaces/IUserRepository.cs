@@ -19,5 +19,7 @@ namespace Adis.Dal.Interfaces
         public Task<IEnumerable<User>> GetUsersWithRoleAsync();
 
         public Task<User?> GetUserWithRoleByIdAsync(int id);
+
+        public Task<IEnumerable<User>> GetUsersByPartialFullNameWithRoleAsync(string partialFullName, Role role);
     }
 }

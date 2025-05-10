@@ -66,26 +66,6 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   border-radius: var(--mat-sys-corner-large) !important;
   box-shadow: var(--mat-sys-level3) !important;
 }
-.mat-form-field.mat-focused .mat-form-field-outline {
-  color: var(--mat-sys-primary) !important;
-}
-.mat-input-element {
-  color: var(--mat-sys-on-surface);
-}
-
-.mat-form-field-label {
-  color: var(--mat-sys-on-surface-variant);
-}
-
-.mat-datepicker-toggle {
-  color: var(--mat-sys-on-surface);
-}
-
-.mat-form-field-outline,
-.mat-form-field-label,
-.mat-input-element {
-  transition: var(--transition) !important;
-}
 
 :root {
   --primary-color: #FF6D00;
@@ -94,3 +74,5 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   --shadow-sm: 0 2px 8px rgba(0,0,0,0.1);
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

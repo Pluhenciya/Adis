@@ -39,9 +39,9 @@ namespace Adis.Api.Controllers
         /// <param name="project">Данные нового проекта</param>
         /// <response code="200">Успешное выполнение</response>
         /// <response code="400">Ошибка валидации данных</response>
-        [Authorize]
+        [Authorize(Roles = "Admin, ProjectManager")]
         [HttpPost]
-        [ProducesResponseType(typeof(PostProjectDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(GetProjectDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> AddProject(PostProjectDto project)
         {
@@ -85,6 +85,7 @@ namespace Adis.Api.Controllers
             [FromQuery] string? startDateFrom,
             [FromQuery] string? startDateTo,
             [FromQuery] string? search,
+            [FromQuery] int? idUser,
             [FromQuery] string sortField = "StartDate",
             [FromQuery] string sortOrder = "desc",
             [FromQuery] int page = 1,
@@ -99,6 +100,7 @@ namespace Adis.Api.Controllers
                 startDateFrom,
                 startDateTo,
                 search,
+                idUser,
                 sortField,
                 sortOrder,
                 page,
@@ -134,9 +136,9 @@ namespace Adis.Api.Controllers
         /// <param name="project">Новые данные проекта</param>
         /// <response code="200">Успешное выполнение</response>
         /// <response code="400">Ошибка валидации данных</response>
-        [Authorize]
+        [Authorize(Roles = "Admin, ProjectManager")]
         [HttpPut]
-        [ProducesResponseType(typeof(PostProjectDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(GetProjectDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> UpdateProject(PostProjectDto project)
         {
@@ -148,6 +150,13 @@ namespace Adis.Api.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteProject(int id)
+        {
+            await _projectService.DeleteProjectAsync(id);
+            return Ok();
         }
     }
 }

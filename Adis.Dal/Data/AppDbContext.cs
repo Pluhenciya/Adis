@@ -68,16 +68,30 @@ namespace Adis.Dal.Data
                     .HasColumnType("enum('designing', 'contractorSearch', 'inExecution', 'completed')")
                     .IsRequired();
 
-                entity.Property(p => p.NameWorkObject)
-                    .HasColumnName("name_work_object")
-                    .IsRequired();
+                entity.Property(p => p.StartExecutionDate)
+                    .HasColumnName("start_execution_date")
+                    .HasColumnType("date")
+                    .IsRequired(false);
+
+                entity.Property(p => p.EndExecutionDate)
+                    .HasColumnName("end_execution_date")
+                    .HasColumnType("date")
+                    .IsRequired(false);
 
                 entity.Property(p => p.IdUser)
                     .HasColumnName("id_user")
                     .IsRequired();
 
-                entity.Property(p => p.IdLocation)
+                entity.Property(p => p.IdWorkObject)
                     .HasColumnName("id_location");
+
+                entity.Property(p => p.IdContractor)
+                     .HasColumnName("id_constractor")
+                     .IsRequired(false);
+
+                entity.Property(p => p.IsDeleted)
+                    .HasColumnName("is_deleted")
+                    .HasDefaultValue(false);
 
                 entity.HasIndex(p => p.Status)
                     .HasDatabaseName("ix_projects_status");
@@ -91,33 +105,59 @@ namespace Adis.Dal.Data
                     .WithMany(u => u.Projects)
                     .HasForeignKey(p => p.IdUser)
                     .HasConstraintName("fk_projects_user");
+
+                entity.HasOne(p => p.Contractor)
+                    .WithMany(c => c.Projects)
+                    .HasForeignKey(p =>p.IdContractor)
+                    .HasConstraintName("fk_projects_constractor");
             });
 
-            modelBuilder.Entity<Location>(entity =>
+            modelBuilder.Entity<Contractor>(entity =>
             {
-                entity.ToTable("locations");
+                entity.ToTable("contractors");
 
-                entity.HasKey(l => l.IdLocation)
+                entity.HasKey(p => p.IdContractor)
                     .HasName("PRIMARY");
 
-                entity.Property(l => l.IdLocation)
-                    .HasColumnName("id_location");
+                entity.Property(p => p.IdContractor)
+                    .HasColumnName("id_contractor");
 
-                entity.Property(l => l.Geometry)
+                entity.Property(p => p.Name)
+                    .HasColumnName("name")
+                    .HasMaxLength(255)
+                    .IsRequired();
+            });
+
+            modelBuilder.Entity<WorkObject>(entity =>
+            {
+                entity.ToTable("work_objects");
+
+                entity.HasKey(wo => wo.IdWorkObject)
+                    .HasName("PRIMARY");
+
+                entity.Property(wo => wo.IdWorkObject)
+                    .HasColumnName("id_work_object");
+
+                entity.Property(wo => wo.Name)
+                    .HasColumnName("name")
+                    .HasMaxLength(255)
+                    .IsRequired();
+
+                entity.Property(wo => wo.Geometry)
                     .HasColumnType("GEOMETRY")
                     .HasColumnName("geometry")
                     .IsRequired();
 
-                entity.HasIndex(l => l.Geometry)
-                    .HasDatabaseName("ix_locations_geometry")
+                entity.HasIndex(wo => wo.Geometry)
+                    .HasDatabaseName("ix_work_objects_geometry")
                     .IsSpatial();
 
                 entity.HasMany(l => l.Projects)
-                    .WithOne(p => p.Location) 
-                    .HasForeignKey(p => p.IdLocation) 
+                    .WithOne(p => p.WorkObject) 
+                    .HasForeignKey(p => p.IdWorkObject) 
                     .IsRequired(false)
                     .OnDelete(DeleteBehavior.NoAction)
-                    .HasConstraintName("fk_location_project");
+                    .HasConstraintName("fk_work_object_project");
             });
 
             modelBuilder.Entity<ProjectTask>(entity =>

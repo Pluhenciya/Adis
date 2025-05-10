@@ -79,5 +79,12 @@ namespace Adis.Bll.Services
         {
             return _mapper.Map<UserDto>(await _userRepository.GetUserWithRoleByIdAsync(id));
         }
+
+        public async Task<IEnumerable<UserDto>> GetUsersByPartialFullNameWithRoleAsync(string partialFullName, string role)
+        {
+            if (!Role.TryParse(typeof(Role), role, out var verifedRole))
+                new ArgumentException("Такой роли нету");
+            return _mapper.Map<IEnumerable<UserDto>>(await _userRepository.GetUsersByPartialFullNameWithRoleAsync(partialFullName, (Role)verifedRole!));
+        }
     }
 }

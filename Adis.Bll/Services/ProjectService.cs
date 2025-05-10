@@ -2,6 +2,7 @@
 using Adis.Bll.Dtos.Project;
 using Adis.Bll.Interfaces;
 using Adis.Dal.Interfaces;
+using Adis.Dal.Repositories;
 using Adis.Dm;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
@@ -27,36 +28,13 @@ namespace Adis.Bll.Services
 
         /// <inheritdoc/>
         /// <exception cref="ArgumentException">Возникает когда данные проекта не прошли валидацию</exception>
-        public async Task<PostProjectDto> AddProjectAsync(PostProjectDto projectDto)
+        public async Task<GetProjectDto> AddProjectAsync(PostProjectDto projectDto)
         {
-            if (DateOnly.FromDateTime(DateTime.Now) > projectDto.EndDate)
-                throw new ArgumentException("Дата оканчания не может быть в прошлом");
+            await ValidateProjectAsync(projectDto);
 
             var project = _mapper.Map<Project>(projectDto);
-            var user = _contextAccessor.HttpContext.User;
 
-            int idUser = project.IdUser == 0 ? Int32.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value!) : project.IdUser;
-
-            var responsiblePerson = await _userService.GetUserByIdAsync(idUser);
-
-            if (responsiblePerson.Role != Role.ProjectManager)
-                throw new ArgumentException("Этот пользователь не может управлять проектом");
-
-            if (project.StartDate == DateOnly.MinValue)
-                project.StartDate = DateOnly.FromDateTime(DateTime.Now);
-
-
-            if (project.IdLocation != 0)
-                project.Location = null!;
-
-            if (!user.IsInRole(Role.Admin.ToString()))
-            {
-                project.IdUser = idUser;
-                project.StartDate = DateOnly.FromDateTime(DateTime.Now);
-                project.Status = ProjectStatus.Designing;
-            }
-
-            return _mapper.Map<PostProjectDto>(await _projectRepository.AddAsync(project));
+            return _mapper.Map<GetProjectDto>(await _projectRepository.AddAsync(project));
         }
 
         public async Task<PaginatedResult<GetProjectDto>> GetProjectsAsync(
@@ -65,6 +43,7 @@ namespace Adis.Bll.Services
             string? startDateFrom,
             string? startDateTo,
             string? search,
+            int? idUser,
             string sortField = "StartDate",
             string sortOrder = "desc",
             int page = 1,
@@ -80,6 +59,7 @@ namespace Adis.Bll.Services
                 parsedStartDateFrom,
                 parsedStartDateTo,
                 search,
+                idUser,
                 sortField,
                 sortOrder,
                 page,
@@ -94,24 +74,75 @@ namespace Adis.Bll.Services
 
         /// <inheritdoc/>
         /// <exception cref="ArgumentException">Возникает когда данные проекта не прошли валидацию</exception>
-        public async Task<PostProjectDto> UpdateProjectAsync(PostProjectDto project)
+        public async Task<GetProjectDto> UpdateProjectAsync(PostProjectDto projectDto)
         {
             try
             {
-                var existingProject = await _projectRepository.GetByIdAsync(project.IdProject);
+                var existingProject = await _projectRepository.GetByIdAsync(projectDto.IdProject);
 
-                if (DateOnly.FromDateTime(DateTime.Now) > project.EndDate)
-                    throw new ArgumentException("Дата оканчания не может быть в прошлом");
+                await ValidateProjectAsync(projectDto);
 
-                _mapper.Map(project, existingProject);
+                _mapper.Map(projectDto, existingProject);
 
                 var updatedProject = await _projectRepository.UpdateAsync(existingProject);
 
-                return _mapper.Map<PostProjectDto>(updatedProject);
+                return _mapper.Map<GetProjectDto>(updatedProject);
             }
             catch (KeyNotFoundException)
             {
                 throw new ArgumentException("Проекта с таким идентификатором не существует");
+            }
+        }
+
+        private async Task ValidateProjectAsync(PostProjectDto projectDto)
+        {
+            if (projectDto.StartExecutionDate != null && projectDto.EndExecutionDate != null && projectDto.StartExecutionDate > projectDto.EndExecutionDate)
+                throw new ArgumentException("Дата начала выполнения работ не может быть позже чем дата оканчания");
+
+            if (projectDto.StartExecutionDate != null && projectDto.EndDate > projectDto.StartExecutionDate)
+                throw new ArgumentException("Дата начала проектирования не может быть позже чем дата оканчания работ");
+
+            if (projectDto.StartDate != null && projectDto.StartDate > projectDto.EndDate)
+                throw new ArgumentException("Дата начала проектирования не может быть позже чем дата оканчания");
+
+            if (projectDto.IdWorkObject == 0 && projectDto.WorkObject == null)
+                throw new ArgumentException("Локация объекта работ обязательна");
+
+            var user = _contextAccessor.HttpContext.User;
+
+            int idUser = projectDto.IdUser == 0 ? Int32.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value!) : projectDto.IdUser;
+
+            var responsiblePerson = await _userService.GetUserByIdAsync(idUser);
+
+            if (responsiblePerson.Role != Role.ProjectManager)
+                throw new ArgumentException("Этот пользователь не может управлять проектом");
+
+            if (projectDto.StartDate == DateOnly.MinValue)
+                projectDto.StartDate = DateOnly.FromDateTime(DateTime.Now);
+
+            if (projectDto.IdContractor != null)
+                projectDto.ContractorName = null!;
+
+            if (projectDto.IdWorkObject != 0)
+                projectDto.WorkObject = null!;
+
+            if((projectDto.Status == ProjectStatus.InExecution
+                || projectDto.Status == ProjectStatus.Completed)
+                && projectDto.StartExecutionDate == null 
+                && projectDto.EndExecutionDate == null
+                && (projectDto.ContractorName == null 
+                || projectDto.IdContractor == null))
+                throw new ArgumentException("Данные выполнения отсутствуют при статусе Исполнение или Завершен");
+
+            if (!user.IsInRole(Role.Admin.ToString()))
+            {
+                projectDto.StartExecutionDate = null;
+                projectDto.EndExecutionDate = null;
+                projectDto.ContractorName = null!;
+                projectDto.IdContractor = null!;
+                projectDto.IdUser = Int32.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+                projectDto.StartDate = DateOnly.FromDateTime(DateTime.Now);
+                projectDto.Status = ProjectStatus.Designing;
             }
         }
 
@@ -126,6 +157,19 @@ namespace Adis.Bll.Services
                 return null;
 
             return DateOnly.ParseExact(dateString, "yyyy-MM-dd");
+        }
+
+        public async Task DeleteProjectAsync(int id)
+        {
+            var user = _contextAccessor.HttpContext.User;
+            if (user.IsInRole(Role.Admin.ToString()))
+                await _projectRepository.DeleteAsync(id);
+            else
+            {
+                var project = await _projectRepository.GetByIdAsync(id);
+                project.IsDeleted = true;
+                await _projectRepository.UpdateAsync(project);
+            }
         }
     }
 }

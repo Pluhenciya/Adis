@@ -83,7 +83,7 @@
              <response code="200">Успешное выполнение</response>
              <response code="400">Ошибка валидации данных</response>
         </member>
-        <member name="M:Adis.Api.Controllers.ProjectsController.GetProjects(System.Nullable{Adis.Dm.ProjectStatus},System.String,System.String,System.String,System.String,System.String,System.String,System.Int32,System.Int32)">
+        <member name="M:Adis.Api.Controllers.ProjectsController.GetProjects(System.Nullable{Adis.Dm.ProjectStatus},System.String,System.String,System.String,System.String,System.Nullable{System.Int32},System.String,System.String,System.Int32,System.Int32)">
              <summary>
              Возвращает список проектов с общим количеством и информации о страницах
              </summary>

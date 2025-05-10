@@ -18,7 +18,6 @@ namespace Adis.Bll.Dtos.Project
         /// <summary>
         /// Название проекта
         /// </summary>
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Наименование обязательно")]
         public string Name { get; set; } = null!;
 
         /// <summary>
@@ -29,7 +28,6 @@ namespace Adis.Bll.Dtos.Project
         /// <summary>
         /// Конец проектирования
         /// </summary>
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Дата конца обязательна")]
         public DateOnly EndDate { get; set; }
 
         /// <summary>
@@ -37,14 +35,21 @@ namespace Adis.Bll.Dtos.Project
         /// </summary>
         public ProjectStatus Status { get; set; } = ProjectStatus.Designing;
 
+        /// <summary>
+        /// Идентификатор пользователя, который создал проект
+        /// </summary>
+        public int IdUser { get; set; }
+
         public string ResponsiblePerson { get; set; } = null!;
 
         public int Progress { get; set; }
 
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Место работ обязательно")]
-        public string NameWorkObject { get; set; } = null!;
+        public WorkObjectDto WorkObject { get; set; } = null!;
 
-        [Required(ErrorMessage = "Локация обязательно")]
-        public LocationDto Location { get; set; } = null!;
+        public string? ContractorName { get; set; } = null!;
+
+        public DateOnly? StartExecutionDate { get; set; }
+
+        public DateOnly? EndExecutionDate { get; set; }
     }
 }

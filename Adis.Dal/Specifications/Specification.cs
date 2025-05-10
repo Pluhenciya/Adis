@@ -91,7 +91,7 @@ namespace Adis.Dal.Specifications
         /// <summary>
         /// Выключает пагинацию
         /// </summary>
-        protected void DisablePaging()
+        public void DisablePaging()
         {
             IsPagingEnabled = false;
             Skip = 0;

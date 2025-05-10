@@ -16,14 +16,20 @@ namespace Adis.Bll.Profiles
     {
         public ProjectProfile() 
         {
-            CreateMap<PostProjectDto, Project>().ReverseMap();
-
-            CreateMap<GetProjectDto, Project>();
+            CreateMap<PostProjectDto, Project>()
+                .ForMember(dest => dest.Contractor,
+                    opt => opt.MapFrom(src => src.ContractorName != null ? new Contractor
+                    {
+                        Name = src.ContractorName
+                    } : null));
+            
             CreateMap<Project, GetProjectDto>()
                 .ForMember(dest => dest.ResponsiblePerson,
                     opt => opt.MapFrom(src => src.User.FullName))
                 .ForMember(dest => dest.Progress,
-                    opt => opt.MapFrom(src => CalculateProgress(src)));
+                    opt => opt.MapFrom(src => CalculateProgress(src)))
+                .ForMember(dest => dest.ContractorName,
+                    opt => opt.MapFrom(src => src.Contractor != null ? src.Contractor.Name : null));
         }
 
         private static int CalculateProgress(Project project)
