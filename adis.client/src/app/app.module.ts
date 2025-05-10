@@ -18,8 +18,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 
 @NgModule({
   declarations: [
-    AppComponent,
-    HasRoleDirective
+    AppComponent
   ],
   imports: [
     BrowserModule,
@@ -31,7 +30,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
     MatNativeDateModule,
     MatFormFieldModule,
     MatMenuModule,
-    MatDividerModule
+    MatDividerModule,
+    HasRoleDirective
   ],
   providers: [
     AuthService,
@@ -43,8 +43,5 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
     { provide: MAT_DATE_LOCALE, useValue: 'ru-RU' },
     MatDatepickerModule],
   bootstrap: [AppComponent],
-  exports: [
-    HasRoleDirective
-  ]
 })
 export class AppModule { }

@@ -55,7 +55,7 @@ namespace Adis.Dal.Repositories
             await _dbContext.SaveChangesAsync();
             return entry.Entity;
         }
-        private IQueryable<T> ApplySpecification(ISpecification<T>? spec)
+        public IQueryable<T> ApplySpecification(ISpecification<T>? spec)
         {
             var query = _dbContext.Set<T>().AsQueryable();
 

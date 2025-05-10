@@ -58,11 +58,6 @@
         <mat-icon class="btn-icon">login</mat-icon>
       </button>
 
-      <div class="additional-actions">
-        <a class="link" routerLink="/forgot-password">Забыли пароль?</a>
-        <a class="link" routerLink="/register">Создать аккаунт</a>
-      </div>
-
       <div *ngIf="errorMessage" class="error-message">
         <mat-icon>error_outline</mat-icon>
         {{ errorMessage }}

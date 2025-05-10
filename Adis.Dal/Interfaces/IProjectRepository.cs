@@ -30,6 +30,7 @@ namespace Adis.Dal.Interfaces
         DateOnly? startDateFrom = null,
         DateOnly? startDateTo = null,
         string? search = null,
+        int? idUser = null,
         string sortField = "StartDate",
         string sortOrder = "desc",
         int page = 1,

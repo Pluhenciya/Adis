@@ -30,10 +30,12 @@ export class ProjectService {
     status?: ProjectStatus;
     targetDate?: string;
     search?: string;
+    idUser?: string | null;
   }): Observable<ProjectsResponse> {
     let params = new HttpParams()
       .set('page', requestParams.page.toString())
-      .set('pageSize', requestParams.pageSize.toString());
+      .set('pageSize', requestParams.pageSize.toString())
+      .set('idUser', requestParams.idUser || '');
   
     if (requestParams.sortField) params = params.set('sortField', requestParams.sortField);
     if (requestParams.sortOrder) params = params.set('sortOrder', requestParams.sortOrder);

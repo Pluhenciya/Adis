@@ -15,7 +15,7 @@
           <mat-error *ngIf="name?.hasError('required')">Обязательное поле</mat-error>
         </mat-form-field>
 
-        <mat-form-field appearance="outline">
+        <mat-form-field appearance="outline" *appHasRole="['admin']">
           <mat-label>Статус проекта</mat-label>
           <mat-select formControlName="status">
             <mat-option *ngFor="let status of projectStatuses" [value]="status">
@@ -26,7 +26,7 @@
           <mat-error *ngIf="status?.hasError('required')">Обязательное поле</mat-error>
         </mat-form-field>
 
-        <mat-form-field appearance="outline">
+        <mat-form-field appearance="outline" *appHasRole="['admin']">
           <mat-label>Ответственное лицо</mat-label>
           <input type="text" matInput formControlName="responsiblePerson" [matAutocomplete]="auto">
           <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayManager">
@@ -58,6 +58,9 @@
             <mat-datepicker #designEndPicker></mat-datepicker>
             <mat-error *ngIf="designEndDate?.hasError('required')">Обязательное поле</mat-error>
           </mat-form-field>
+        </div>
+        <div class="global-errors" *ngIf="projectForm.errors?.['designDateRange']">
+          <mat-error>Дата начала проектирования не может быть позже окончания</mat-error>
         </div>
       </div>
 
@@ -104,14 +107,16 @@
       </div>
 
       <!-- Секция Исполнение -->
-      <div class="section">
+      <div class="section" *appHasRole="['admin']">
         <h3>Исполнение</h3>
+        <mat-error *ngIf="projectForm.hasError('contractorRequired')">
+          Обязательные поля для текущего статуса
+        </mat-error>
         <mat-form-field appearance="outline">
           <mat-label>Подрядчик</mat-label>
           <input matInput formControlName="contractorName">
-          <mat-error *ngIf="contractor?.hasError('required')">Обязательное поле</mat-error>
         </mat-form-field>
-
+      
         <div class="date-fields">
           <mat-form-field appearance="outline">
             <mat-label>Дата начала</mat-label>
@@ -119,13 +124,19 @@
             <mat-datepicker-toggle matSuffix [for]="executionStartPicker"></mat-datepicker-toggle>
             <mat-datepicker #executionStartPicker></mat-datepicker>
           </mat-form-field>
-
+      
           <mat-form-field appearance="outline">
             <mat-label>Дата окончания</mat-label>
             <input matInput [matDatepicker]="executionEndPicker" formControlName="executionEndDate">
             <mat-datepicker-toggle matSuffix [for]="executionEndPicker"></mat-datepicker-toggle>
             <mat-datepicker #executionEndPicker></mat-datepicker>
           </mat-form-field>
+        </div>
+        <div class="global-errors" *ngIf="projectForm.errors?.['executionDateRange']">
+          <mat-error>Дата начала исполнения не может быть позже окончания</mat-error>
+        </div>
+        <div class="global-errors" *ngIf="projectForm.errors?.['designBeforeExecution']">
+          <mat-error>Исполнение не может начаться до окончания проектирования</mat-error>
         </div>
       </div>
     </form>

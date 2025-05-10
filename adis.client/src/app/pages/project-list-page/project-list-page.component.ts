@@ -24,6 +24,8 @@ import { FilterMenuComponent } from '../../components/filter-menu/filter-menu.co
 import { SortMenuComponent } from '../../components/sort-menu/sort-menu.component';
 import { MapService } from '../../services/map.service';
 import { ConfirmationDialogComponent } from '../../components/confirmation-dialog/confirmation-dialog.component';
+import { HasRoleDirective } from '../../directives/has-role.directive';
+import { AuthStateService } from '../../services/auth-state.service';
 
 @Component({
   selector: 'app-project-list-page',
@@ -49,10 +51,10 @@ import { ConfirmationDialogComponent } from '../../components/confirmation-dialo
     MatMenuModule,
     FilterMenuComponent,
     SortMenuComponent,
+    HasRoleDirective
   ],
   templateUrl: './project-list-page.component.html',
-  styleUrls: ['./project-list-page.component.scss'],
-  providers: []
+  styleUrls: ['./project-list-page.component.scss']
 })
 export class ProjectListPageComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnDestroy() {
@@ -94,7 +96,8 @@ export class ProjectListPageComponent implements OnInit, OnDestroy, AfterViewIni
   constructor(
     private dialog: MatDialog,
     private projectService: ProjectService,
-    private mapService: MapService
+    private mapService: MapService,
+    private authService: AuthStateService
   ) {
     this.searchSubject.pipe(
       debounceTime(300),
@@ -174,7 +177,10 @@ export class ProjectListPageComponent implements OnInit, OnDestroy, AfterViewIni
       sortOrder: this.sortOrder,
       status: this.statusFilter,
       targetDate: this.dateFilter?.toISOString().split('T')[0],
-      search: this.searchQuery.trim() // Добавляем trim()
+      search: this.searchQuery.trim(),
+      idUser: this.authService.currentRole?.toLowerCase() === 'projectmanager' 
+              ? this.authService.currentUserId 
+              : undefined
     };
   
     this.projectService.getProjects(requestParams).subscribe({

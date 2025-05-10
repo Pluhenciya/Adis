@@ -1,5 +1,5 @@
 import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, FormGroupDirective, FormsModule, NgForm, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { ProjectService } from '../../services/project.service';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { GetProjectDto, PostProjectDto, ProjectStatus } from '../../models/project.model';
@@ -9,7 +9,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { NgForOf, NgIf } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { formatISO, parseISO } from 'date-fns';
-import { MatOptionModule } from '@angular/material/core';
+import { ErrorStateMatcher, MatOptionModule } from '@angular/material/core';
 import { MapService } from '../../services/map.service';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
@@ -17,6 +17,7 @@ import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import { UserService } from '../../services/user.service';
 import { debounceTime, distinctUntilChanged, filter } from 'rxjs';
 import { UserDto } from '../../models/user.model';
+import { HasRoleDirective } from '../../directives/has-role.directive';
 
 @Component({
   selector: 'app-project-form',
@@ -33,10 +34,11 @@ import { UserDto } from '../../models/user.model';
     NgForOf,
     MatSelectModule,
     MatIconModule,
-    MatAutocompleteModule
+    MatAutocompleteModule,
+    HasRoleDirective
   ],
   templateUrl: './project-form.component.html',
-  styleUrl: './project-form.component.scss'
+  styleUrl: './project-form.component.scss',
 })
 export class ProjectFormComponent implements OnInit {
   projectStatuses = Object.values(ProjectStatus);
@@ -69,8 +71,8 @@ export class ProjectFormComponent implements OnInit {
     this.projectForm = this.fb.group({
       // Обновленная структура формы
       name: ['', Validators.required],
-      status: [ProjectStatus.Designing, Validators.required],
-      responsiblePerson: [null, Validators.required],
+      status: [ProjectStatus.Designing],
+      responsiblePerson: [null],
       designStartDate: [null, Validators.required],
       designEndDate: [null, Validators.required],
       workObject: this.fb.group({
@@ -83,8 +85,28 @@ export class ProjectFormComponent implements OnInit {
       contractorName: [''],
       executionStartDate: [null],
       executionEndDate: [null]
-    }, { validators: this.dateValidator });
+    }, { validators: [this.dateValidator,
+      this.executionValidator] });
   }
+
+  private executionValidator (control: AbstractControl): ValidationErrors | null {
+      const status = control.get('status')?.value;
+      const contractorName = control.get('contractorName')?.value;
+      const executionStartDate = control.get('executionStartDate')?.value;
+  
+    const errors: {[key: string]: any} = {};
+  
+    if (['InExecution', 'Completed'].includes(status)) {
+      if (!contractorName?.trim()) {
+        errors['contractorRequired'] = true;
+      }
+      if (!executionStartDate) {
+        errors['executionStartRequired'] = true;
+      }
+    }
+  
+    return Object.keys(errors).length ? errors : null;
+  };
 
   async ngAfterViewInit() {
     await this.mapService.initMapAsync(this.mapContainer.nativeElement, [55.75, 37.57], 10);
@@ -120,6 +142,10 @@ export class ProjectFormComponent implements OnInit {
   }
 
 ngOnInit(): void {
+  this.projectForm.get('status')?.valueChanges.subscribe(() => {
+    this.projectForm.get('contractorName')?.updateValueAndValidity();
+    this.projectForm.get('executionStartDate')?.updateValueAndValidity();
+  });
   if (this.data?.project) {
     var user =this.loadManagerData(this.data.project.idUser)
       const initialData = {
@@ -198,7 +224,7 @@ private async loadManagerData(idUser: number): Promise<UserDto | undefined> {
     const projectData: PostProjectDto = {
       name: this.projectForm.value.name,
       status: this.projectForm.value.status,
-      idUser: this.projectForm.value.responsiblePerson.id,
+      idUser: this.projectForm.value.responsiblePerson?.id,
       startDate: this.projectForm.value.designStartDate,
       endDate: this.projectForm.value.designEndDate,
       workObject: {

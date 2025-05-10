@@ -482,3 +482,14 @@ $status-colors: (
   visibility: hidden;
 }
 
+.contractor {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: $text-secondary;
+
+  .mat-icon {
+    color: $primary;
+    flex-shrink: 0;
+  }
+}

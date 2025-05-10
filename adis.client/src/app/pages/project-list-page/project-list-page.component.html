@@ -9,7 +9,7 @@
                (input)="onSearchInput($event)">
         <mat-icon matPrefix>search</mat-icon>
       </mat-form-field>
-      <button mat-raised-button class="add-btn" (click)="openProjectForm()">
+      <button mat-raised-button class="add-btn" (click)="openProjectForm()" *appHasRole="['admin', 'projectManager']">
         <mat-icon>add</mat-icon>
         Новый проект
       </button>
@@ -64,7 +64,7 @@
       <div *ngIf="viewMode === 'list'" class="project-cards">
         <div class="project-card" *ngFor="let project of projects" [class]="project.status"
           [style.--progress]="project.progress">
-          <div class="actions">
+          <div class="actions" *appHasRole="['admin', 'projectManager']">
             <button mat-mini-fab class="edit-btn" (click)="openProjectForm(project)">
               <mat-icon>edit</mat-icon>
             </button>
@@ -84,16 +84,36 @@
           <div class="details">
             <div class="date-item">
               <mat-icon>event_available</mat-icon>
-              <span>{{ project.startDate | date: 'dd.MM.yyyy' }}</span>
+              <span *ngIf="project.status !== 'InExecution' && project.status !== 'Completed'">
+                {{ project.startDate | date: 'dd.MM.yyyy' }}
+              </span>
+              <span *ngIf="project.status === 'InExecution' || project.status === 'Completed'">
+                {{ project.startExecutionDate | date: 'dd.MM.yyyy' }}
+              </span>
             </div>
+            
             <div class="date-item">
               <mat-icon>event_busy</mat-icon>
-              <span>{{ project.endDate | date: 'dd.MM.yyyy' }}</span>
+              <span *ngIf="project.status !== 'InExecution' && project.status !== 'Completed'">
+                {{ project.endDate | date: 'dd.MM.yyyy' }}
+              </span>
+              <span *ngIf="project.status === 'InExecution' || project.status === 'Completed'">
+                {{ project.endExecutionDate | date: 'dd.MM.yyyy' }}
+              </span>
             </div>
-            <div class="responsible">
+          
+            <div class="responsible" 
+                 *ngIf="project.status !== 'InExecution' && project.status !== 'Completed'">
               <mat-icon>person</mat-icon>
               <span>{{ project.responsiblePerson }}</span>
             </div>
+          
+            <div class="contractor" 
+                 *ngIf="project.status === 'InExecution' || project.status === 'Completed'">
+              <mat-icon>business</mat-icon>
+              <span>{{ project.contractorName || 'Не указан' }}</span>
+            </div>
+          
             <div class="location">
               <mat-icon>location_on</mat-icon>
               <span>{{ project.workObject.name }}</span>
