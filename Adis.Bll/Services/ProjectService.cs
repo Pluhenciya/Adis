@@ -171,5 +171,10 @@ namespace Adis.Bll.Services
                 await _projectRepository.UpdateAsync(project);
             }
         }
+
+        public async Task<GetProjectWithTasksDto?> GetProjectDetailsByIdAsync(int id)
+        {
+            return _mapper.Map<GetProjectWithTasksDto>(await _projectRepository.GetProjectDetailsByIdAsync(id));
+        }
     }
 }

@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable, of, switchMap, tap } from 'rxjs';
 import { AuthService } from './auth.service';
 import { RefreshTokenRequest } from '../models/auth.model';
 
 interface DecodedToken {
-  roles: string;  
+  roles: string;
   exp: number;
   sub: string;
   email: string;
@@ -16,11 +16,16 @@ interface DecodedToken {
 export class AuthStateService {
   private roleSubject = new BehaviorSubject<string | null>(null);
   private emailSubject = new BehaviorSubject<string | null>(null);
-  private userIdSubject = new BehaviorSubject<string | null>(null); 
+  private userIdSubject = new BehaviorSubject<string | null>(null);
+  private isRefreshing = false;
+  
   public role$ = this.roleSubject.asObservable();
-  public email$ = this.emailSubject.asObservable(); 
+  public email$ = this.emailSubject.asObservable();
 
-  constructor(private router: Router, private authService: AuthService) {
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {
     this.initializeAuthState();
   }
 
@@ -29,9 +34,7 @@ export class AuthStateService {
     if (token) {
       try {
         const decoded = jwtDecode<DecodedToken>(token);
-        this.roleSubject.next(decoded.roles.toString());
-        this.emailSubject.next(decoded.email);
-        this.userIdSubject.next(decoded.sub);
+        this.updateAuthState(decoded);
       } catch {
         this.clearAuthData();
       }
@@ -58,28 +61,44 @@ export class AuthStateService {
     return this.userIdSubject.value;
   }
 
-  isAuthenticated(): boolean {
+  isAuthenticated(): Observable<boolean> {
+    if (!this.accessToken) return of(false);
     
-    if(!!this.accessToken && !this.isTokenExpired())
-      return true;
-
-    if(!!this.refreshToken){
-      var tokens : RefreshTokenRequest = {
-        accessToken : this.accessToken!,
-        refreshToken : this.refreshToken!
+    if (this.isTokenExpired()) {
+      if (this.isRefreshing) {
+        return this.role$.pipe(switchMap(() => of(!!this.accessToken)));
       }
-      this.authService.refreshToken(tokens).
-      subscribe({
+      return this.handleTokenRefresh();
+    }
+    
+    return of(true);
+  }
+
+  private handleTokenRefresh(): Observable<boolean> {
+    if (!this.refreshToken) {
+      this.clearAuthData();
+      return of(false);
+    }
+
+    this.isRefreshing = true;
+    const tokens: RefreshTokenRequest = {
+      accessToken: this.accessToken!,
+      refreshToken: this.refreshToken!
+    };
+
+    return this.authService.refreshToken(tokens).pipe(
+      tap({
         next: (response) => {
           this.login(response.accessToken, response.refreshToken);
-          return true;
+          this.isRefreshing = false;
         },
         error: () => {
-          return false;
+          this.clearAuthData();
+          this.isRefreshing = false;
         }
-      });
-    }
-      return false;
+      }),
+      switchMap(() => of(!!this.accessToken))
+    );
   }
 
   isAdmin(): boolean {
@@ -101,15 +120,18 @@ export class AuthStateService {
     localStorage.setItem('accessToken', accessToken);
     localStorage.setItem('refreshToken', refreshToken);
     const decoded = jwtDecode<DecodedToken>(accessToken);
-    console.log(decoded.roles)
-    this.roleSubject.next(decoded.roles.toString());
-    this.emailSubject.next(decoded.email);
-    this.userIdSubject.next(decoded.sub);
+    this.updateAuthState(decoded);
   }
 
   logout(): void {
     this.clearAuthData();
     this.router.navigate(['/login']);
+  }
+
+  private updateAuthState(decoded: DecodedToken): void {
+    this.roleSubject.next(decoded.roles.toString());
+    this.emailSubject.next(decoded.email);
+    this.userIdSubject.next(decoded.sub);
   }
 
   private clearAuthData(): void {

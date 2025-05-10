@@ -30,6 +30,14 @@ namespace Adis.Bll.Profiles
                     opt => opt.MapFrom(src => CalculateProgress(src)))
                 .ForMember(dest => dest.ContractorName,
                     opt => opt.MapFrom(src => src.Contractor != null ? src.Contractor.Name : null));
+
+            CreateMap<Project, GetProjectWithTasksDto>()
+                .ForMember(dest => dest.ResponsiblePerson,
+                    opt => opt.MapFrom(src => src.User.FullName))
+                .ForMember(dest => dest.Progress,
+                    opt => opt.MapFrom(src => CalculateProgress(src)))
+                .ForMember(dest => dest.ContractorName,
+                    opt => opt.MapFrom(src => src.Contractor != null ? src.Contractor.Name : null));
         }
 
         private static int CalculateProgress(Project project)

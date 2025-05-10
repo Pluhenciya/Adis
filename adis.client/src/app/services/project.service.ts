@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { GetProjectDto, PostProjectDto, ProjectStatus } from '../models/project.model';
+import { GetProjectDto, GetProjectWithTasksDto, PostProjectDto, ProjectStatus } from '../models/project.model';
 import { environment } from '../environments/environment';
 import { formatISO } from 'date-fns';
 
@@ -72,6 +72,10 @@ export class ProjectService {
 
   deleteProject(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/projects/${id}`);
+  }
+
+  getProjectDetails(id : number): Observable<GetProjectWithTasksDto>  {
+    return this.http.get<GetProjectWithTasksDto>(`${this.apiUrl}/projects/${id}`);
   }
 }
 

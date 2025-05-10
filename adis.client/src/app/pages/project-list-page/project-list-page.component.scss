@@ -161,7 +161,7 @@ $status-colors: (
   padding: 1.5rem;
   display: grid;
   grid-template-columns: 1fr auto;
-  grid-template-rows: auto auto auto;
+  grid-template-rows: 43% 13% 44%;
   gap: 0.5rem 1rem;
   position: relative;
 
@@ -196,6 +196,7 @@ $status-colors: (
     font-size: 0.875rem;
     font-weight: 500;
     text-transform: uppercase;
+    height: 1rem;
 
     @each $status, $color in $status-colors {
       &.#{$status} {

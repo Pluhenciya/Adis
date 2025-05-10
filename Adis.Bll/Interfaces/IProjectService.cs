@@ -53,5 +53,7 @@ namespace Adis.Bll.Interfaces
         public Task<GetProjectDto> UpdateProjectAsync(PostProjectDto project);
 
         public Task DeleteProjectAsync(int id);
+
+        public Task<GetProjectWithTasksDto?> GetProjectDetailsByIdAsync(int id);
     }
 }

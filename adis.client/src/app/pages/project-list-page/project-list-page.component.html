@@ -72,7 +72,7 @@
               <mat-icon>delete</mat-icon>
             </button>
           </div>
-          <h3 class="project-title">{{ project.name }}</h3>
+          <h3 class="project-title" [routerLink]="['projects', project.idProject]">{{ project.name }}</h3>
           <div class="status-chip" [class]="project.status">
             {{ getStatusLabel(project.status) }}
           </div>
