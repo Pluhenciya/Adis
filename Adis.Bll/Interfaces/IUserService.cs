@@ -1,4 +1,5 @@
 ﻿using Adis.Bll.Dtos;
+using Adis.Dm;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,5 +25,9 @@ namespace Adis.Bll.Interfaces
         /// </summary>
         /// <returns>Список всех пользователей</returns>
         public Task<IEnumerable<UserDto>> GetUsersAsync();
+
+        public Task<UserDto> GetUserByIdAsync(int id);
+
+        public Task<IEnumerable<UserDto>> GetUsersByPartialFullNameWithRoleAsync(string partialFullName, string role);
     }
 }

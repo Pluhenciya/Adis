@@ -1,70 +1,152 @@
 <div class="project-form-container">
-    <h2 mat-dialog-title>
-      {{ data?.project ? 'Редактирование проекта' : 'Новый проект' }}
-    </h2>
-  
-    <mat-dialog-content>
-      <form [formGroup]="projectForm" (ngSubmit)="onSubmit()">
+  <h2 mat-dialog-title class="dialog-title">
+    <mat-icon>docs</mat-icon>
+    {{ data?.project ? 'Редактирование проекта' : 'Новый проект' }}
+  </h2>
+
+  <mat-dialog-content>
+    <form [formGroup]="projectForm" (ngSubmit)="onSubmit()">
+      <!-- Секция Проектирование -->
+      <div class="section">
+        <h3><mat-icon>engineering</mat-icon> Проектирование</h3>
         <mat-form-field appearance="outline">
-          <mat-label>Название проекта</mat-label>
+          <mat-label>Название</mat-label>
           <input matInput formControlName="name">
-          <mat-error *ngIf="name?.hasError('required')">
+          <mat-error *ngIf="name?.hasError('required')">Обязательное поле</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" *appHasRole="['admin']">
+          <mat-label>Статус проекта</mat-label>
+          <mat-select formControlName="status">
+            <mat-option *ngFor="let status of projectStatuses" [value]="status">
+              {{ getStatusLabel(status) }}
+            </mat-option>
+          </mat-select>
+          <mat-hint>Текущий этап реализации</mat-hint>
+          <mat-error *ngIf="status?.hasError('required')">Обязательное поле</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" *appHasRole="['admin']">
+          <mat-label>Ответственное лицо</mat-label>
+          <input type="text" matInput formControlName="responsiblePerson" [matAutocomplete]="auto">
+          <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayManager">
+            <mat-option 
+              *ngFor="let manager of projectManagers" 
+              [value]="manager">
+              {{ manager.fullName }} ({{ manager.email }})
+            </mat-option>
+          </mat-autocomplete>
+          <mat-icon matSuffix>person_search</mat-icon>
+          <mat-error *ngIf="responsiblePerson?.hasError('required')">
             Обязательное поле
           </mat-error>
-          <mat-error *ngIf="name?.hasError('maxlength')">
-            Максимальная длина 255 символов
-          </mat-error>
         </mat-form-field>
-  
-        <mat-form-field appearance="outline">
-          <mat-label>Бюджет</mat-label>
-          <input matInput type="number" formControlName="budget">
-          <mat-error *ngIf="budget?.hasError('required')">
-            Обязательное поле
-          </mat-error>
-          <mat-error *ngIf="budget?.hasError('min')">
-            Бюджет не может быть отрицательным
-          </mat-error>
-        </mat-form-field>
-  
+
         <div class="date-fields">
-            <mat-form-field appearance="outline">
-                <mat-label>Дата начала</mat-label>
-                <input matInput [matDatepicker]="startPicker" formControlName="startDate">
-                <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
-                <mat-datepicker #startPicker></mat-datepicker>
-                <mat-error *ngIf="projectForm.get('startDate')?.hasError('required')">
-                  Обязательное поле
-                </mat-error>
-              </mat-form-field>
-          
+          <mat-form-field appearance="outline">
+            <mat-label>Дата начала</mat-label>
+            <input matInput [matDatepicker]="designStartPicker" formControlName="designStartDate">
+            <mat-datepicker-toggle matSuffix [for]="designStartPicker"></mat-datepicker-toggle>
+            <mat-datepicker #designStartPicker></mat-datepicker>
+            <mat-error *ngIf="designStartDate?.hasError('required')">Обязательное поле</mat-error>
+          </mat-form-field>
+
           <mat-form-field appearance="outline">
             <mat-label>Дата окончания</mat-label>
-            <input matInput [matDatepicker]="endPicker" formControlName="endDate">
-            <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
-            <mat-datepicker #endPicker></mat-datepicker>
-            <mat-error *ngIf="projectForm.get('endDate')?.hasError('required')">
-              Обязательное поле
-            </mat-error>
+            <input matInput [matDatepicker]="designEndPicker" formControlName="designEndDate">
+            <mat-datepicker-toggle matSuffix [for]="designEndPicker"></mat-datepicker-toggle>
+            <mat-datepicker #designEndPicker></mat-datepicker>
+            <mat-error *ngIf="designEndDate?.hasError('required')">Обязательное поле</mat-error>
           </mat-form-field>
         </div>
-  
-        <div *ngIf="projectForm.hasError('dateRange')" class="error-message">
-          Дата окончания должна быть после даты начала
+        <div class="global-errors" *ngIf="projectForm.errors?.['designDateRange']">
+          <mat-error>Дата начала проектирования не может быть позже окончания</mat-error>
         </div>
-  
-        <div *ngIf="errorMessage" class="error-message">
-          {{ errorMessage }}
+      </div>
+
+      <!-- Секция Объект работ -->
+      <div class="section" formGroupName="workObject">
+        <h3>Объект работ</h3>
+        <mat-form-field appearance="outline">
+          <mat-label>Название объекта работ</mat-label>
+          <input matInput formControlName="nameWorkObject">
+          <mat-error *ngIf="nameWorkObject?.hasError('required')">Обязательное поле</mat-error>
+        </mat-form-field>
+
+        <div class="geometry-instructions">
+          <mat-icon class="help-icon">help_outline</mat-icon>
+          <div class="instructions-text">
+            <strong>Как рисовать на карте:</strong>
+            <ul>
+              <li><b>Точка:</b> Кликните в нужное место на карте</li>
+              <li><b>Линия:</b> Кликайте по точкам маршрута → Кликните по точке → Завершить</li>
+              <li><b>Полигон:</b> Кликайте по углам области → Кликните по точке → Завершить</li>
+            </ul>
+          </div>
         </div>
-      </form>
-    </mat-dialog-content>
-  
-    <mat-dialog-actions align="end">
-      <button mat-button mat-dialog-close>Отмена</button>
-      <button mat-raised-button color="primary" 
-              [disabled]="isSubmitting || projectForm.invalid"
-              (click)="onSubmit()">
-        {{ isSubmitting ? 'Сохранение...' : 'Сохранить' }}
-      </button>
-    </mat-dialog-actions>
-  </div>
+
+        <div class="geometry-type-selector">
+          <button mat-stroked-button type="button" (click)="startDrawing('Point')" [disabled]="isDrawing">
+            Точка
+          </button>
+          <button mat-stroked-button type="button" (click)="startDrawing('LineString')" [disabled]="isDrawing">
+            Линия
+          </button>
+          <button mat-stroked-button type="button" (click)="startDrawing('Polygon')" [disabled]="isDrawing">
+            Полигон
+          </button>
+        </div>
+
+        <!-- Контейнер для карты -->
+        <div class="map-container" #mapContainer></div>
+
+        <div formGroupName="location">
+          <input type="hidden" formControlName="type">
+          <input type="hidden" formControlName="coordinates">
+        </div>
+      </div>
+
+      <!-- Секция Исполнение -->
+      <div class="section" *appHasRole="['admin']">
+        <h3>Исполнение</h3>
+        <mat-error *ngIf="projectForm.hasError('contractorRequired')">
+          Обязательные поля для текущего статуса
+        </mat-error>
+        <mat-form-field appearance="outline">
+          <mat-label>Подрядчик</mat-label>
+          <input matInput formControlName="contractorName">
+        </mat-form-field>
+      
+        <div class="date-fields">
+          <mat-form-field appearance="outline">
+            <mat-label>Дата начала</mat-label>
+            <input matInput [matDatepicker]="executionStartPicker" formControlName="executionStartDate">
+            <mat-datepicker-toggle matSuffix [for]="executionStartPicker"></mat-datepicker-toggle>
+            <mat-datepicker #executionStartPicker></mat-datepicker>
+          </mat-form-field>
+      
+          <mat-form-field appearance="outline">
+            <mat-label>Дата окончания</mat-label>
+            <input matInput [matDatepicker]="executionEndPicker" formControlName="executionEndDate">
+            <mat-datepicker-toggle matSuffix [for]="executionEndPicker"></mat-datepicker-toggle>
+            <mat-datepicker #executionEndPicker></mat-datepicker>
+          </mat-form-field>
+        </div>
+        <div class="global-errors" *ngIf="projectForm.errors?.['executionDateRange']">
+          <mat-error>Дата начала исполнения не может быть позже окончания</mat-error>
+        </div>
+        <div class="global-errors" *ngIf="projectForm.errors?.['designBeforeExecution']">
+          <mat-error>Исполнение не может начаться до окончания проектирования</mat-error>
+        </div>
+      </div>
+    </form>
+  </mat-dialog-content>
+
+  <!-- Действия диалога -->
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close>Отмена</button>
+    <button mat-raised-button color="primary" [disabled]="isSubmitting || projectForm.invalid" (click)="onSubmit()">
+      {{ isSubmitting ? 'Сохранение...' : 'Сохранить' }}
+    </button>
+  </mat-dialog-actions>
+</div>

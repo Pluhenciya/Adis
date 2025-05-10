@@ -33,8 +33,7 @@ const routes: Routes = [
   {
     path: '',
     component: ProjectListPageComponent,
-    title: 'Главная',
-    canActivate: [AuthGuard]
+    title: 'Главная'
   },
 ];
 

@@ -4,7 +4,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using System.Text.Json.Serialization;
 
 namespace Adis.Tests.Helpers
 {
@@ -18,12 +21,12 @@ namespace Adis.Tests.Helpers
         {
             builder.ConfigureServices(services =>
             {
-                var descriptor = services
-                    .FirstOrDefault(d => d.ServiceType == typeof(DbContextOptions<AppDbContext>));
-                if (descriptor != null) services.Remove(descriptor);
+                services.RemoveAll<DbContextOptions<AppDbContext>>();
 
                 services.AddDbContext<AppDbContext>(options =>
-                    options.UseInMemoryDatabase("TestDb"));
+                {
+                    options.UseInMemoryDatabase("TestDb");
+                });
 
                 services.AddIdentityCore<User>(options =>
                 {
@@ -34,8 +37,8 @@ namespace Adis.Tests.Helpers
                     options.Password.RequireNonAlphanumeric = false;
                     options.User.RequireUniqueEmail = true;
                 })
-                .AddEntityFrameworkStores<AppDbContext>()
-                .AddDefaultTokenProviders();
+               .AddEntityFrameworkStores<AppDbContext>()
+               .AddDefaultTokenProviders();
             });
         }
     }

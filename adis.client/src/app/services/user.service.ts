@@ -31,4 +31,14 @@ export class UserService {
   deleteUser(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
+
+  searchProjectManagers(search: string) {
+    return this.http.get<any[]>(
+      `${this.apiUrl}/ProjectManager/${encodeURIComponent(search)}`
+    );
+  }
+
+  getUserById(id: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${id}`);
+  }
 }

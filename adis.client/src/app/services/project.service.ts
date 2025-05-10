@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Project } from '../models/project.model';
+import { GetProjectDto, PostProjectDto, ProjectStatus } from '../models/project.model';
 import { environment } from '../environments/environment';
+import { formatISO } from 'date-fns';
 
 interface ProjectsResponse {
-  projects: Project[];
+  projects: GetProjectDto[];
   totalCount: number;
   page: number;
   pageSize: number;
@@ -26,47 +27,51 @@ export class ProjectService {
     pageSize: number;
     sortField?: string;
     sortOrder?: 'asc' | 'desc';
-    status?: string;
-    targetDate?: string; 
-    startDateFrom?: Date;
-    startDateTo?: Date;
+    status?: ProjectStatus;
+    targetDate?: string;
+    search?: string;
+    idUser?: string | null;
   }): Observable<ProjectsResponse> {
-    let httpParams = new HttpParams()
+    let params = new HttpParams()
       .set('page', requestParams.page.toString())
-      .set('pageSize', requestParams.pageSize.toString());
+      .set('pageSize', requestParams.pageSize.toString())
+      .set('idUser', requestParams.idUser || '');
+  
+    if (requestParams.sortField) params = params.set('sortField', requestParams.sortField);
+    if (requestParams.sortOrder) params = params.set('sortOrder', requestParams.sortOrder);
+    if (requestParams.status) params = params.set('status', requestParams.status);
+    if (requestParams.targetDate) params = params.set('targetDate', requestParams.targetDate);
+    if (requestParams.search?.trim()) params = params.set('search', requestParams.search.trim());
+  
+    return this.http.get<ProjectsResponse>(`${this.apiUrl}/projects`, { params });
+  }
 
-    if (requestParams.sortField) {
-      httpParams = httpParams.set('sortField', requestParams.sortField);
-    }
-    if (requestParams.sortOrder) {
-      httpParams = httpParams.set('sortOrder', requestParams.sortOrder);
-    }
-    if (requestParams.status) {
-      httpParams = httpParams.set('status', requestParams.status);
-    }
-    if (requestParams.targetDate) {
-      httpParams = httpParams.set('targetDate', requestParams.targetDate);
-    }
-    if (requestParams.startDateFrom) {
-      httpParams = httpParams.set('startDateFrom', requestParams.startDateFrom.toISOString());
-    }
-    if (requestParams.startDateTo) {
-      httpParams = httpParams.set('startDateTo', requestParams.startDateTo.toISOString());
-    }
-
-    return this.http.get<ProjectsResponse>(`${this.apiUrl}/projects`, {
-      params: httpParams
+  createProject(project: PostProjectDto): Observable<GetProjectDto> {
+    return this.http.post<GetProjectDto>(`${this.apiUrl}/projects`, {
+      ...project,
+      startDate: this.formatDate(project.startDate),
+      endDate: this.formatDate(project.endDate),
+      startExecutionDate: project.startExecutionDate ? this.formatDate(project.startExecutionDate) : null,
+      endExecutionDate: project.endExecutionDate ? this.formatDate(project.endExecutionDate) : null
     });
   }
 
-  createProject(project: Partial<Project>): Observable<Project> {
-    project.idUser = 1; // Временно до авторизации
-    return this.http.post<Project>(`${this.apiUrl}/projects`, project);
+  private formatDate(date: Date): string {
+    return formatISO(date, { representation: 'date' });
   }
-  
-  updateProject(project: Partial<Project>): Observable<Project> {
-    project.idUser = 1; // Временно до авторизации
-    return this.http.put<Project>(`${this.apiUrl}/projects`, project);
+
+  updateProject(project: Partial<PostProjectDto>): Observable<GetProjectDto> {
+    return this.http.put<GetProjectDto>(`${this.apiUrl}/projects`, {
+      ...project,
+      startDate: project.startDate ? this.formatDate(project.startDate) : null,
+      endDate: project.endDate ? this.formatDate(project.endDate) : null,
+      startExecutionDate: project.startExecutionDate ? this.formatDate(project.startExecutionDate) : null,
+      endExecutionDate: project.endExecutionDate ? this.formatDate(project.endExecutionDate) : null
+    });
+  }
+
+  deleteProject(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/projects/${id}`);
   }
 }
 

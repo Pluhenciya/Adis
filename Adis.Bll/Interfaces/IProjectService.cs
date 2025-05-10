@@ -1,4 +1,5 @@
 ﻿using Adis.Bll.Dtos;
+using Adis.Bll.Dtos.Project;
 using Adis.Dm;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,7 @@ namespace Adis.Bll.Interfaces
         /// </summary>
         /// <param name="project">Данные нового проекта</param>
         /// <returns>Созданный проект</returns>
-        public Task<ProjectDto> AddProjectAsync(ProjectDto project);
+        public Task<GetProjectDto> AddProjectAsync(PostProjectDto project);
 
         /// <summary>
         /// Возвращает список проектов
@@ -32,11 +33,13 @@ namespace Adis.Bll.Interfaces
         /// <param name="sortField">Свойство, по которому сортировать</param>
         /// <param name="sortOrder">Сортировать по возрастанию или по убыванию</param>
         /// <returns>Список проектов</returns>
-        public Task<PaginatedResult<ProjectDto>> GetProjectsAsync(
-        Status? status,
+        public Task<PaginatedResult<GetProjectDto>> GetProjectsAsync(
+        ProjectStatus? status,
         string? targetDate,
         string? startDateFrom,
         string? startDateTo,
+        string? search,
+        int? idUser,
         string sortField = "StartDate",
         string sortOrder = "desc",
         int page = 1,
@@ -47,6 +50,8 @@ namespace Adis.Bll.Interfaces
         /// </summary>
         /// <param name="project">Новые данные проекта</param>
         /// <returns>Изменненый проект</returns>
-        public Task<ProjectDto> UpdateProjectAsync(ProjectDto project);
+        public Task<GetProjectDto> UpdateProjectAsync(PostProjectDto project);
+
+        public Task DeleteProjectAsync(int id);
     }
 }

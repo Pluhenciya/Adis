@@ -17,13 +17,13 @@ namespace Adis.Bll.Services
     public class UserService : IUserService
     {
         private readonly UserManager<User> _userManager;
-        private readonly RoleManager<Role> _roleManager;
+        private readonly RoleManager<AppRole> _roleManager;
         private readonly IMapper _mapper;
         private readonly IUserRepository _userRepository;
 
         public UserService(
             UserManager<User> userManager,
-            RoleManager<Role> roleManager,
+            RoleManager<AppRole> roleManager,
             IMapper mapper,
             IUserRepository userRepository)
         {
@@ -41,7 +41,7 @@ namespace Adis.Bll.Services
             if (!new EmailAddressAttribute().IsValid(userDto.Email))
                 throw new ArgumentException("Некорректный email");
 
-            if (string.IsNullOrWhiteSpace(userDto.Role))
+            if (string.IsNullOrWhiteSpace(userDto.Role.ToString()))
                 throw new ArgumentException("Роль обязательна для заполнения");
 
             // Проверка существования пользователя
@@ -49,10 +49,8 @@ namespace Adis.Bll.Services
             if (existingUser != null)
                 throw new ArgumentException("Пользователь с таким email уже существует");
 
-            // Проверка существования роли
-            var roleExists = await _roleManager.RoleExistsAsync(userDto.Role);
-            if (!roleExists)
-                throw new ArgumentException($"Роль '{userDto.Role}' не существует");
+            if (userDto.FullName == null && userDto.Role != Role.Admin)
+                throw new ArgumentException("Пользователь без ФИО, если он не администратор нельзя");
 
             // Создание пользователя
             var user = _mapper.Map<User>(userDto);
@@ -63,7 +61,7 @@ namespace Adis.Bll.Services
                 throw new ArgumentException(string.Join(", ", result.Errors.Select(e => e.Description)));
 
             // Назначение роли
-            var roleResult = await _userManager.AddToRoleAsync(user, userDto.Role);
+            var roleResult = await _userManager.AddToRoleAsync(user, userDto.Role.ToString());
             if (!roleResult.Succeeded)
                 throw new ArgumentException("Ошибка назначения роли");
 
@@ -75,6 +73,18 @@ namespace Adis.Bll.Services
         public async Task<IEnumerable<UserDto>> GetUsersAsync()
         {
             return _mapper.Map<IEnumerable<UserDto>>(await _userRepository.GetUsersWithRoleAsync());
+        }
+
+        public async Task<UserDto> GetUserByIdAsync(int id)
+        {
+            return _mapper.Map<UserDto>(await _userRepository.GetUserWithRoleByIdAsync(id));
+        }
+
+        public async Task<IEnumerable<UserDto>> GetUsersByPartialFullNameWithRoleAsync(string partialFullName, string role)
+        {
+            if (!Role.TryParse(typeof(Role), role, out var verifedRole))
+                new ArgumentException("Такой роли нету");
+            return _mapper.Map<IEnumerable<UserDto>>(await _userRepository.GetUsersByPartialFullNameWithRoleAsync(partialFullName, (Role)verifedRole!));
         }
     }
 }

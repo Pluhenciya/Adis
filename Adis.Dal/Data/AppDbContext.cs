@@ -10,7 +10,7 @@ namespace Adis.Dal.Data
     /// <summary>
     /// Позволяет использовать EFCore
     /// </summary>
-    public class AppDbContext : IdentityDbContext<User, Role, int>
+    public class AppDbContext : IdentityDbContext<User, AppRole, int>
     {
         /// <summary>
         /// Основной конструктор для контекста БД
@@ -27,6 +27,11 @@ namespace Adis.Dal.Data
         /// Проекты
         /// </summary>
         public virtual DbSet<Project> Projects { get; set; }
+
+        /// <summary>
+        /// Задачи
+        /// </summary>
+        public virtual DbSet<ProjectTask> Tasks { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -47,15 +52,6 @@ namespace Adis.Dal.Data
                     .HasMaxLength(255)
                     .IsRequired();
 
-                entity.Property(p => p.Description)
-                    .HasColumnName("description")
-                    .HasColumnType("text");
-
-                entity.Property(p => p.Budget)
-                    .HasColumnName("budget")
-                    .HasColumnType("DECIMAL(15,2)")
-                    .IsRequired();
-
                 entity.Property(p => p.StartDate)
                     .HasColumnName("start_date")
                     .HasColumnType("date")
@@ -66,20 +62,36 @@ namespace Adis.Dal.Data
                     .HasColumnType("date")
                     .IsRequired();
 
-                entity.Property(p => p.CreatedAt)
-                    .HasColumnName("created_at")
-                    .HasColumnType("datetime")
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
                 entity.Property(p => p.Status)
                     .HasColumnName("status")
-                    .HasConversion(new EnumToStringConverter<Status>())
-                    .HasColumnType("enum('draft', 'inProgress', 'completed', 'overdue')")
+                    .HasConversion(new EnumToStringConverter<ProjectStatus>())
+                    .HasColumnType("enum('designing', 'contractorSearch', 'inExecution', 'completed')")
                     .IsRequired();
+
+                entity.Property(p => p.StartExecutionDate)
+                    .HasColumnName("start_execution_date")
+                    .HasColumnType("date")
+                    .IsRequired(false);
+
+                entity.Property(p => p.EndExecutionDate)
+                    .HasColumnName("end_execution_date")
+                    .HasColumnType("date")
+                    .IsRequired(false);
 
                 entity.Property(p => p.IdUser)
                     .HasColumnName("id_user")
                     .IsRequired();
+
+                entity.Property(p => p.IdWorkObject)
+                    .HasColumnName("id_location");
+
+                entity.Property(p => p.IdContractor)
+                     .HasColumnName("id_constractor")
+                     .IsRequired(false);
+
+                entity.Property(p => p.IsDeleted)
+                    .HasColumnName("is_deleted")
+                    .HasDefaultValue(false);
 
                 entity.HasIndex(p => p.Status)
                     .HasDatabaseName("ix_projects_status");
@@ -87,14 +99,109 @@ namespace Adis.Dal.Data
                 entity.HasIndex(p => new { p.StartDate, p.EndDate })
                     .HasDatabaseName("ix_projects_dates");
 
-                entity.ToTable(t => t.HasCheckConstraint("chk_projects_budget", "budget >= 0"));
-
                 entity.ToTable(t => t.HasCheckConstraint("chk_projects_dates", "start_date <= end_date"));
 
                 entity.HasOne(p => p.User)
                     .WithMany(u => u.Projects)
                     .HasForeignKey(p => p.IdUser)
                     .HasConstraintName("fk_projects_user");
+
+                entity.HasOne(p => p.Contractor)
+                    .WithMany(c => c.Projects)
+                    .HasForeignKey(p =>p.IdContractor)
+                    .HasConstraintName("fk_projects_constractor");
+            });
+
+            modelBuilder.Entity<Contractor>(entity =>
+            {
+                entity.ToTable("contractors");
+
+                entity.HasKey(p => p.IdContractor)
+                    .HasName("PRIMARY");
+
+                entity.Property(p => p.IdContractor)
+                    .HasColumnName("id_contractor");
+
+                entity.Property(p => p.Name)
+                    .HasColumnName("name")
+                    .HasMaxLength(255)
+                    .IsRequired();
+            });
+
+            modelBuilder.Entity<WorkObject>(entity =>
+            {
+                entity.ToTable("work_objects");
+
+                entity.HasKey(wo => wo.IdWorkObject)
+                    .HasName("PRIMARY");
+
+                entity.Property(wo => wo.IdWorkObject)
+                    .HasColumnName("id_work_object");
+
+                entity.Property(wo => wo.Name)
+                    .HasColumnName("name")
+                    .HasMaxLength(255)
+                    .IsRequired();
+
+                entity.Property(wo => wo.Geometry)
+                    .HasColumnType("GEOMETRY")
+                    .HasColumnName("geometry")
+                    .IsRequired();
+
+                entity.HasIndex(wo => wo.Geometry)
+                    .HasDatabaseName("ix_work_objects_geometry")
+                    .IsSpatial();
+
+                entity.HasMany(l => l.Projects)
+                    .WithOne(p => p.WorkObject) 
+                    .HasForeignKey(p => p.IdWorkObject) 
+                    .IsRequired(false)
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .HasConstraintName("fk_work_object_project");
+            });
+
+            modelBuilder.Entity<ProjectTask>(entity =>
+            {
+                entity.ToTable("tasks");
+
+                // Primary Key configuration
+                entity.HasKey(t => t.IdTask)
+                    .HasName("PRIMARY");
+
+                // Properties configuration
+                entity.Property(t => t.IdTask)
+                    .HasColumnName("id_task");
+
+                entity.Property(t => t.Name)
+                    .HasColumnName("name")
+                    .HasMaxLength(255)
+                    .IsRequired();
+
+                entity.Property(t => t.Description)
+                    .HasColumnName("description")
+                    .HasColumnType("text")
+                    .IsRequired(false);
+
+                entity.Property(t => t.IdProject)
+                    .HasColumnName("id_project")
+                    .IsRequired();
+
+                entity.Property(t => t.Status)
+                    .HasColumnName("status")
+                    .HasConversion(new EnumToStringConverter<Status>())
+                    .HasColumnType("enum('toDo', 'doing', 'checking', 'completed')")
+                    .IsRequired();
+
+                // Indexes
+                entity.HasIndex(t => t.IdProject)
+                    .HasDatabaseName("ix_id_project");
+
+                // Relationships
+                entity.HasOne(t => t.Project)
+                    .WithMany(p => p.Tasks)
+                    .HasForeignKey(t => t.IdProject)
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .HasConstraintName("fk_project_tasks");
             });
 
             modelBuilder.Entity<User>(entity =>
@@ -187,7 +294,7 @@ namespace Adis.Dal.Data
                     "email LIKE '%@%'"));
             });
 
-            modelBuilder.Entity<Role>(entity =>
+            modelBuilder.Entity<AppRole>(entity =>
             {
                 entity.ToTable("roles");
 
@@ -361,6 +468,8 @@ namespace Adis.Dal.Data
                     "chk_refresh_tokens_revoked",
                     "revoked_at IS NULL OR revoked_at > created_at"));
             });
+
+            modelBuilder.Entity<AppRole>().HasData(InitialData.RolesList);
         }
     }
 }

@@ -12,8 +12,11 @@ namespace Adis.Dal.Specifications
     /// </summary>
     public class UserWithRoleSpecification : Specification<User>
     {
-        public UserWithRoleSpecification() 
+        public UserWithRoleSpecification(int? id = null) 
         {
+            if(id.HasValue)
+                ApplyCriteria(u => u.Id == id);
+
             AddInclude(u => u.Roles);
         }
     }

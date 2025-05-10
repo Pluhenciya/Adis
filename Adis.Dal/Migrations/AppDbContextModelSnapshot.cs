@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using NetTopologySuite.Geometries;
 
 #nullable disable
 
@@ -22,6 +23,81 @@ namespace Adis.Dal.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
+            modelBuilder.Entity("Adis.Dm.AppRole", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id_role");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("longtext")
+                        .HasColumnName("concurrency_stamp");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("normalized_name");
+
+                    b.HasKey("Id")
+                        .HasName("PRIMARY");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex");
+
+                    b.ToTable("roles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Projecter",
+                            NormalizedName = "PROJECTER"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "ProjectManager",
+                            NormalizedName = "PROJECTMANAGER"
+                        });
+                });
+
+            modelBuilder.Entity("Adis.Dm.Contractor", b =>
+                {
+                    b.Property<int>("IdContractor")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id_contractor");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("IdContractor"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("name");
+
+                    b.HasKey("IdContractor")
+                        .HasName("PRIMARY");
+
+                    b.ToTable("contractors", (string)null);
+                });
+
             modelBuilder.Entity("Adis.Dm.Project", b =>
                 {
                     b.Property<int>("IdProject")
@@ -31,27 +107,31 @@ namespace Adis.Dal.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("IdProject"));
 
-                    b.Property<decimal>("Budget")
-                        .HasColumnType("DECIMAL(15,2)")
-                        .HasColumnName("budget");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
-                        .HasColumnName("created_at")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text")
-                        .HasColumnName("description");
-
                     b.Property<DateOnly>("EndDate")
                         .HasColumnType("date")
                         .HasColumnName("end_date");
 
+                    b.Property<DateOnly?>("EndExecutionDate")
+                        .HasColumnType("date")
+                        .HasColumnName("end_execution_date");
+
+                    b.Property<int?>("IdContractor")
+                        .HasColumnType("int")
+                        .HasColumnName("id_constractor");
+
                     b.Property<int>("IdUser")
                         .HasColumnType("int")
                         .HasColumnName("id_user");
+
+                    b.Property<int>("IdWorkObject")
+                        .HasColumnType("int")
+                        .HasColumnName("id_location");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_deleted");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -63,15 +143,23 @@ namespace Adis.Dal.Migrations
                         .HasColumnType("date")
                         .HasColumnName("start_date");
 
+                    b.Property<DateOnly?>("StartExecutionDate")
+                        .HasColumnType("date")
+                        .HasColumnName("start_execution_date");
+
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("enum('draft', 'inProgress', 'completed', 'overdue')")
+                        .HasColumnType("enum('designing', 'contractorSearch', 'inExecution', 'completed')")
                         .HasColumnName("status");
 
                     b.HasKey("IdProject")
                         .HasName("PRIMARY");
 
+                    b.HasIndex("IdContractor");
+
                     b.HasIndex("IdUser");
+
+                    b.HasIndex("IdWorkObject");
 
                     b.HasIndex("Status")
                         .HasDatabaseName("ix_projects_status");
@@ -81,10 +169,45 @@ namespace Adis.Dal.Migrations
 
                     b.ToTable("projects", null, t =>
                         {
-                            t.HasCheckConstraint("chk_projects_budget", "budget >= 0");
-
                             t.HasCheckConstraint("chk_projects_dates", "start_date <= end_date");
                         });
+                });
+
+            modelBuilder.Entity("Adis.Dm.ProjectTask", b =>
+                {
+                    b.Property<int>("IdTask")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id_task");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("IdTask"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<int>("IdProject")
+                        .HasColumnType("int")
+                        .HasColumnName("id_project");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("enum('toDo', 'doing', 'checking', 'completed')")
+                        .HasColumnName("status");
+
+                    b.HasKey("IdTask")
+                        .HasName("PRIMARY");
+
+                    b.HasIndex("IdProject")
+                        .HasDatabaseName("ix_id_project");
+
+                    b.ToTable("tasks", (string)null);
                 });
 
             modelBuilder.Entity("Adis.Dm.RefreshToken", b =>
@@ -152,40 +275,6 @@ namespace Adis.Dal.Migrations
 
                             t.HasCheckConstraint("chk_refresh_tokens_revoked", "revoked_at IS NULL OR revoked_at > created_at");
                         });
-                });
-
-            modelBuilder.Entity("Adis.Dm.Role", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id_role");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("longtext")
-                        .HasColumnName("concurrency_stamp");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("name");
-
-                    b.Property<string>("NormalizedName")
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("normalized_name");
-
-                    b.HasKey("Id")
-                        .HasName("PRIMARY");
-
-                    b.HasIndex("NormalizedName")
-                        .IsUnique()
-                        .HasDatabaseName("RoleNameIndex");
-
-                    b.ToTable("roles", (string)null);
                 });
 
             modelBuilder.Entity("Adis.Dm.User", b =>
@@ -291,6 +380,36 @@ namespace Adis.Dal.Migrations
                         {
                             t.HasCheckConstraint("chk_users_email_format", "email LIKE '%@%'");
                         });
+                });
+
+            modelBuilder.Entity("Adis.Dm.WorkObject", b =>
+                {
+                    b.Property<int>("IdWorkObject")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id_work_object");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("IdWorkObject"));
+
+                    b.Property<Geometry>("Geometry")
+                        .IsRequired()
+                        .HasColumnType("GEOMETRY")
+                        .HasColumnName("geometry");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("name");
+
+                    b.HasKey("IdWorkObject")
+                        .HasName("PRIMARY");
+
+                    b.HasIndex("Geometry")
+                        .HasDatabaseName("ix_work_objects_geometry")
+                        .HasAnnotation("MySql:SpatialIndex", true);
+
+                    b.ToTable("work_objects", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -416,6 +535,11 @@ namespace Adis.Dal.Migrations
 
             modelBuilder.Entity("Adis.Dm.Project", b =>
                 {
+                    b.HasOne("Adis.Dm.Contractor", "Contractor")
+                        .WithMany("Projects")
+                        .HasForeignKey("IdContractor")
+                        .HasConstraintName("fk_projects_constractor");
+
                     b.HasOne("Adis.Dm.User", "User")
                         .WithMany("Projects")
                         .HasForeignKey("IdUser")
@@ -423,7 +547,29 @@ namespace Adis.Dal.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_projects_user");
 
+                    b.HasOne("Adis.Dm.WorkObject", "WorkObject")
+                        .WithMany("Projects")
+                        .HasForeignKey("IdWorkObject")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .HasConstraintName("fk_work_object_project");
+
+                    b.Navigation("Contractor");
+
                     b.Navigation("User");
+
+                    b.Navigation("WorkObject");
+                });
+
+            modelBuilder.Entity("Adis.Dm.ProjectTask", b =>
+                {
+                    b.HasOne("Adis.Dm.Project", "Project")
+                        .WithMany("Tasks")
+                        .HasForeignKey("IdProject")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired()
+                        .HasConstraintName("fk_project_tasks");
+
+                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("Adis.Dm.RefreshToken", b =>
@@ -440,7 +586,7 @@ namespace Adis.Dal.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
-                    b.HasOne("Adis.Dm.Role", null)
+                    b.HasOne("Adis.Dm.AppRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -467,7 +613,7 @@ namespace Adis.Dal.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
                 {
-                    b.HasOne("Adis.Dm.Role", null)
+                    b.HasOne("Adis.Dm.AppRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -489,11 +635,26 @@ namespace Adis.Dal.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Adis.Dm.Contractor", b =>
+                {
+                    b.Navigation("Projects");
+                });
+
+            modelBuilder.Entity("Adis.Dm.Project", b =>
+                {
+                    b.Navigation("Tasks");
+                });
+
             modelBuilder.Entity("Adis.Dm.User", b =>
                 {
                     b.Navigation("Projects");
 
                     b.Navigation("RefreshTokens");
+                });
+
+            modelBuilder.Entity("Adis.Dm.WorkObject", b =>
+                {
+                    b.Navigation("Projects");
                 });
 #pragma warning restore 612, 618
         }

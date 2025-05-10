@@ -18,18 +18,26 @@ namespace Adis.Dal.Repositories
         }
 
         public async Task<(IEnumerable<Project>, int)> GetFilteredProjectsAsync(
-            Status? status = null,
+            ProjectStatus? status = null,
             DateOnly? targetDate = null,
             DateOnly? startDateFrom = null,
             DateOnly? startDateTo = null,
+            string? search = null,
+            int? idUser = null,
             string sortField = "StartDate",
             string sortOrder = "desc",
             int page = 1,
             int pageSize = 10)
         {
-            var spec = new ProjectFilterSpecification(status, targetDate, startDateFrom, startDateTo, sortField, sortOrder, page, pageSize);
+            var spec = new ProjectFilterSpecification(status, targetDate, startDateFrom, startDateTo, search, idUser, sortField, sortOrder, page, pageSize);
 
-            return (await GetAsync(spec), (await GetAsync()).Count());
+            var projects = await GetAsync(spec);
+
+            spec.DisablePaging();
+
+            var projectsCount = ApplySpecification(spec).Count();
+
+            return (projects, projects.Count());
         }
     }
 }

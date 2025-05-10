@@ -7,27 +7,12 @@ using System.Threading.Tasks;
 
 namespace Adis.Dm
 {
-    /// <summary>
-    /// Статус
-    /// </summary>
     [JsonConverter(typeof(JsonStringEnumConverter<Status>))]
     public enum Status
     {
-        /// <summary>
-        /// Черновик
-        /// </summary>
-        Draft,
-        /// <summary>
-        /// Выполняется
-        /// </summary>
-        InProgress,
-        /// <summary>
-        /// Завершен
-        /// </summary>
-        Completed,
-        /// <summary>
-        /// Просрочен
-        /// </summary>
-        Overdue
+        ToDo,
+        Doing,
+        Checking,
+        Completed
     }
 }
