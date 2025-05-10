@@ -6,6 +6,7 @@ import { UserListPageComponent } from './pages/user-list-page/user-list-page.com
 import { RoleGuard } from './core/guards/role.guard';
 import { AuthGuard } from './core/guards/user.guard';
 import { ForbiddenPageComponent } from './pages/forbidden-page/forbidden-page.component';
+import { ProjectDetailsPageComponent } from './pages/project-details-page/project-details-page.component';
 
 const routes: Routes = [
   { 
@@ -34,6 +35,11 @@ const routes: Routes = [
     path: '',
     component: ProjectListPageComponent,
     title: 'Главная'
+  },
+  { 
+    path: 'projects/:id', 
+    component: ProjectDetailsPageComponent,
+    title: 'Проект'
   },
 ];
 

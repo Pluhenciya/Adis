@@ -152,11 +152,21 @@ namespace Adis.Api.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin, ProjectManager")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProject(int id)
         {
             await _projectService.DeleteProjectAsync(id);
             return Ok();
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetProjectDetailsById(int id)
+        {
+            var project = await _projectService.GetProjectDetailsByIdAsync(id);
+            if(project == null) 
+                return NotFound("Проект с таким id не найден");
+            return Ok(project);
         }
     }
 }

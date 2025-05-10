@@ -37,7 +37,13 @@ namespace Adis.Dal.Repositories
 
             var projectsCount = ApplySpecification(spec).Count();
 
-            return (projects, projects.Count());
+            return (projects, projectsCount);
+        }
+
+        public async Task<Project?> GetProjectDetailsByIdAsync(int id)
+        {
+            var spec = new ProjectDetailsByIdSpecification(id);
+            return (await GetAsync(spec)).FirstOrDefault();
         }
     }
 }

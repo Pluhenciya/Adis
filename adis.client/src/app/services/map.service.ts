@@ -164,6 +164,7 @@ export class MapService {
   }
 
   addMarker(project: GetProjectDto): void {
+    if (!project.workObject?.geometry?.coordinates) return;
     ymaps.ready().then(() => {
       const geometry = project.workObject.geometry;
       if (!geometry) return;

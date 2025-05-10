@@ -26,6 +26,7 @@ import { MapService } from '../../services/map.service';
 import { ConfirmationDialogComponent } from '../../components/confirmation-dialog/confirmation-dialog.component';
 import { HasRoleDirective } from '../../directives/has-role.directive';
 import { AuthStateService } from '../../services/auth-state.service';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-project-list-page',
@@ -51,7 +52,8 @@ import { AuthStateService } from '../../services/auth-state.service';
     MatMenuModule,
     FilterMenuComponent,
     SortMenuComponent,
-    HasRoleDirective
+    HasRoleDirective,
+    RouterLink
   ],
   templateUrl: './project-list-page.component.html',
   styleUrls: ['./project-list-page.component.scss']
