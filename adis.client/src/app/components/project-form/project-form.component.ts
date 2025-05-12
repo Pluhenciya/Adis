@@ -18,6 +18,7 @@ import { UserService } from '../../services/user.service';
 import { debounceTime, distinctUntilChanged, filter } from 'rxjs';
 import { UserDto } from '../../models/user.model';
 import { HasRoleDirective } from '../../directives/has-role.directive';
+import { AuthStateService } from '../../services/auth-state.service';
 
 @Component({
   selector: 'app-project-form',
@@ -66,7 +67,8 @@ export class ProjectFormComponent implements OnInit {
     private dialogRef: MatDialogRef<ProjectFormComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { project?: GetProjectDto },
     private mapService: MapService,
-    private userService: UserService
+    private userService: UserService,
+    private authState: AuthStateService
   ) {
     this.projectForm = this.fb.group({
       // Обновленная структура формы
@@ -163,7 +165,7 @@ ngOnInit(): void {
       };
       this.projectForm.patchValue(initialData, { emitEvent: false });
   }
-
+  if (this.authState.isAdmin()) {
   this.responsiblePerson?.valueChanges
     .pipe(
       filter(value => typeof value === 'string'),
@@ -172,6 +174,7 @@ ngOnInit(): void {
       filter(value => value.length > 2)
     )
     .subscribe(value => this.onSearchProjectManagers(value));
+  }
 }
 
 private async loadManagerData(idUser: number): Promise<UserDto | undefined> {

@@ -63,7 +63,7 @@ export class AuthStateService {
 
   isAuthenticated(): Observable<boolean> {
     if (!this.accessToken) return of(false);
-    
+
     if (this.isTokenExpired()) {
       if (this.isRefreshing) {
         return this.role$.pipe(switchMap(() => of(!!this.accessToken)));

@@ -30,5 +30,13 @@ namespace Adis.Dm
         /// Токены обновления этого пользователя
         /// </summary>
         public virtual IEnumerable<RefreshToken> RefreshTokens { get; set; }= null!;
+
+        public virtual IEnumerable<ProjectTask> PerformedTasks { get; set; } = null!;
+
+        public virtual IEnumerable<ProjectTask> CheckingTasks { get; set; } = null!;
+
+        public virtual IEnumerable<Document> Documents { get; set; } = null!;
+
+        public virtual IEnumerable<Comment> Comments { get; set; } = null!;
     }
 }

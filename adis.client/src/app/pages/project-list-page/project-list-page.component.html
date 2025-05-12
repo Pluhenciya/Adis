@@ -125,7 +125,7 @@
       <div *ngIf="viewMode === 'map'" class="map-container">
         <div #mapContainerRef id="map-container" style="height: 100%"></div>
         <div *ngIf="selectedProject" class="selected-project-info">
-          <h3>{{ selectedProject.name }}</h3>
+          <h3 [routerLink]="['projects', selectedProject.idProject]">{{ selectedProject.name }}</h3>
           <p>Статус: {{ getStatusLabel(selectedProject.status) }}</p>
           <p>Объект: {{ selectedProject.workObject.name }}</p>
           <p>Прогресс: {{ selectedProject.progress }}%</p>

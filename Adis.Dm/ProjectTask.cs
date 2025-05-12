@@ -33,9 +33,19 @@ namespace Adis.Dm
 
         public Status Status { get; set; }
 
+        public string? TextResult { get; set; } = null!;
+
         /// <summary>
         /// Проект с этой задачей
         /// </summary>
         public virtual Project Project { get; set; } = null!;
+
+        public virtual IEnumerable<User> Performers { get; set; } = null!;
+
+        public virtual IEnumerable<User> Checkers { get; set; } = null!;
+
+        public virtual IEnumerable<Document> Documents { get; set; } = null!;
+
+        public virtual IEnumerable<Comment> Comments { get; set; } = null!;
     }
 }

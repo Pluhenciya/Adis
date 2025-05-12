@@ -4,6 +4,7 @@ using Adis.Dal.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 
@@ -12,9 +13,11 @@ using NetTopologySuite.Geometries;
 namespace Adis.Dal.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250511184013_AddDocuments")]
+    partial class AddDocuments
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -75,38 +78,6 @@ namespace Adis.Dal.Migrations
                             Name = "ProjectManager",
                             NormalizedName = "PROJECTMANAGER"
                         });
-                });
-
-            modelBuilder.Entity("Adis.Dm.Comment", b =>
-                {
-                    b.Property<int>("IdComment")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id_document");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("IdComment"));
-
-                    b.Property<int>("IdSender")
-                        .HasColumnType("int")
-                        .HasColumnName("id_sender");
-
-                    b.Property<int>("IdTask")
-                        .HasColumnType("int")
-                        .HasColumnName("id_task");
-
-                    b.Property<string>("Text")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("filename");
-
-                    b.HasKey("IdComment")
-                        .HasName("PRIMARY");
-
-                    b.HasIndex("IdSender");
-
-                    b.HasIndex("IdTask");
-
-                    b.ToTable("comments", (string)null);
                 });
 
             modelBuilder.Entity("Adis.Dm.Contractor", b =>
@@ -652,27 +623,6 @@ namespace Adis.Dal.Migrations
                     b.ToTable("users_execute_tasks");
                 });
 
-            modelBuilder.Entity("Adis.Dm.Comment", b =>
-                {
-                    b.HasOne("Adis.Dm.User", "Sender")
-                        .WithMany("Comments")
-                        .HasForeignKey("IdSender")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired()
-                        .HasConstraintName("fk_user_comments");
-
-                    b.HasOne("Adis.Dm.ProjectTask", "Task")
-                        .WithMany("Comments")
-                        .HasForeignKey("IdTask")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired()
-                        .HasConstraintName("fk_task_comments");
-
-                    b.Navigation("Sender");
-
-                    b.Navigation("Task");
-                });
-
             modelBuilder.Entity("Adis.Dm.Document", b =>
                 {
                     b.HasOne("Adis.Dm.User", "User")
@@ -847,15 +797,8 @@ namespace Adis.Dal.Migrations
                     b.Navigation("Tasks");
                 });
 
-            modelBuilder.Entity("Adis.Dm.ProjectTask", b =>
-                {
-                    b.Navigation("Comments");
-                });
-
             modelBuilder.Entity("Adis.Dm.User", b =>
                 {
-                    b.Navigation("Comments");
-
                     b.Navigation("Documents");
 
                     b.Navigation("Projects");
