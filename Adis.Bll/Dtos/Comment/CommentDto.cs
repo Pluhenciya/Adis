@@ -16,5 +16,7 @@ namespace Adis.Bll.Dtos.Comment
         public int IdSender { get; set; }
 
         public string FullNameSender { get; set; } = null!;
+
+        public DateTime CreatedAt { get; set; }
     }
 }

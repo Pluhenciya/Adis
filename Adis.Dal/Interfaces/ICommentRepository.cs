@@ -9,5 +9,6 @@ namespace Adis.Dal.Interfaces
 {
     public interface ICommentRepository : IRepository<Comment>
     {
+        public Task<Comment?> GetCommentByIdAsync(int id);
     }
 }

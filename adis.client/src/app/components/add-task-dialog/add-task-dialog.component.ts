@@ -13,7 +13,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { AsyncPipe, NgForOf, NgIf } from '@angular/common';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { Observable, debounceTime, distinctUntilChanged, map, startWith, switchMap } from 'rxjs';
+import { Observable, debounceTime, distinctUntilChanged, map, of, startWith, switchMap } from 'rxjs';
 import { MatChipsModule } from '@angular/material/chips';
 import { PostTaskDto } from '../../models/task.model';
 
@@ -67,31 +67,57 @@ export class AddTaskDialogComponent {
     this.initAutocomplete();
   }
 
+  ngAfterViewInit() {
+    this.taskForm.get('performers')?.valueChanges.subscribe(() => {
+      this.performersControl.updateValueAndValidity();
+    });
+    
+    this.taskForm.get('checkers')?.valueChanges.subscribe(() => {
+      this.checkersControl.updateValueAndValidity();
+    });
+  }
+
+  private getExcludedIds(field: 'performers' | 'checkers'): number[] {
+    const oppositeField = field === 'performers' ? 'checkers' : 'performers';
+    return this.taskForm.get(oppositeField)?.value || [];
+  }
+  
+
   private initAutocomplete() {
     this.filteredPerformers = this.performersControl.valueChanges.pipe(
       debounceTime(300),
       distinctUntilChanged(),
       switchMap(value => {
         const search = typeof value === 'string' ? value : '';
-        if(search != '')
-          return this.userService.searchProjecters(search);
-        return []
+        const excludedIds = this.getExcludedIds('performers');
+        
+        return search 
+          ? this.userService.searchProjecters(search).pipe(
+              map(users => users.filter(u => !excludedIds.includes(u.id))))
+          : of([]);
       })
     );
-
+  
     this.filteredCheckers = this.checkersControl.valueChanges.pipe(
       debounceTime(300),
       distinctUntilChanged(),
       switchMap(value => {
         const search = typeof value === 'string' ? value : '';
-        if(search != '')
-          return this.userService.searchProjecters(search);
-        return []
+        const excludedIds = this.getExcludedIds('checkers');
+        
+        return search 
+          ? this.userService.searchProjecters(search).pipe(
+              map(users => users.filter(u => !excludedIds.includes(u.id))))
+          : of([]);
       })
     );
   }
 
   addPerformer(userId: number): void {
+    if (this.taskForm.get('checkers')?.value.includes(userId)) {
+      this.snackBar.open('Этот пользователь уже выбран как проверяющий', 'Закрыть', {duration: 3000});
+      return;
+    }
     const user = this.selectedUsers.find(u => u.id === userId);
     if (!user) {
       // Загружаем полные данные пользователя
@@ -105,6 +131,10 @@ export class AddTaskDialogComponent {
   }
   
   addChecker(userId: number): void {
+    if (this.taskForm.get('performers')?.value.includes(userId)) {
+      this.snackBar.open('Этот пользователь уже выбран как исполнитель', 'Закрыть', {duration: 3000});
+      return;
+    }
     const user = this.selectedUsers.find(u => u.id === userId);
     if (!user) {
       this.userService.getUserById(userId).subscribe(fullUser => {

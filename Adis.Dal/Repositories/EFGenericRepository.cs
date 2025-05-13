@@ -38,7 +38,7 @@ namespace Adis.Dal.Repositories
 
         public async Task<IEnumerable<T>> GetAsync(ISpecification<T>? specification = null)
         {
-            return await ApplySpecification(specification).ToListAsync();
+            return await ApplySpecificationAsync(specification).ToListAsync();
         }
 
         /// <inheritdoc/>
@@ -55,7 +55,7 @@ namespace Adis.Dal.Repositories
             await _dbContext.SaveChangesAsync();
             return entry.Entity;
         }
-        public IQueryable<T> ApplySpecification(ISpecification<T>? spec)
+        public IQueryable<T> ApplySpecificationAsync(ISpecification<T>? spec)
         {
             var query = _dbContext.Set<T>().AsQueryable();
 

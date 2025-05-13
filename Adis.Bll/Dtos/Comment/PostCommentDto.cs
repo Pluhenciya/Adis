@@ -8,6 +8,7 @@ namespace Adis.Bll.Dtos.Comment
 {
     public class PostCommentDto
     {
+        public int IdTask { get; set; }
         public string Text { get; set; } = null!;
     }
 }

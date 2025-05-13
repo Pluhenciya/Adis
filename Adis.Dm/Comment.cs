@@ -19,5 +19,7 @@ namespace Adis.Dm
         public int IdTask { get; set; }
 
         public virtual ProjectTask  Task { get; set; } = null!;
+
+        public DateTime CreatedAt { get; set; }
     }
 }

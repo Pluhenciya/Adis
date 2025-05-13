@@ -14,10 +14,14 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { UserDto } from '../../models/user.model';
-import { Observable, debounceTime, distinctUntilChanged, of, switchMap } from 'rxjs';
+import { Observable, debounceTime, distinctUntilChanged, map, of, switchMap } from 'rxjs';
 import { UserService } from '../../services/user.service';
+import { CommentService } from '../../services/comment.service';
+import { CommentDto, PostCommentDto } from '../../models/comment.model';
+import { HasRoleDirective } from '../../directives/has-role.directive';
 
 @Component({
+  standalone: true,
   selector: 'app-task-details-dialog',
   imports: [
     MatIconModule,
@@ -32,7 +36,9 @@ import { UserService } from '../../services/user.service';
     MatInputModule,
     FormsModule,
     MatAutocompleteModule,
-    AsyncPipe
+    AsyncPipe,
+    DatePipe,
+    HasRoleDirective
   ],
   templateUrl: './task-details-dialog.component.html',
   styleUrl: './task-details-dialog.component.scss',
@@ -46,11 +52,13 @@ export class TaskDetailsDialogComponent implements OnInit {
   filteredPerformers: Observable<UserDto[]> = new Observable<UserDto[]>();
   filteredCheckers: Observable<UserDto[]> = new Observable<UserDto[]>();
   allUsers: UserDto[] = [];
+  commentControl = new FormControl('', [Validators.required, Validators.maxLength(1000)]);
 
   constructor(
     private fb: FormBuilder,
     private taskService: TaskService,
     private userService: UserService,
+    private commentService: CommentService,
     private snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<TaskDetailsDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: TaskDetailsDto
@@ -64,8 +72,27 @@ export class TaskDetailsDialogComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    setTimeout(() => {
+      const list = document.querySelector('.comments-list');
+      if (list) list.scrollTop = list.scrollHeight;
+    }, 100);
     this.taskForm.disable();
     this.initAutocomplete();
+  }
+
+  ngAfterViewInit() {
+    this.taskForm.get('performers')?.valueChanges.subscribe(() => {
+      this.performersControl.updateValueAndValidity();
+    });
+    
+    this.taskForm.get('checkers')?.valueChanges.subscribe(() => {
+      this.checkersControl.updateValueAndValidity();
+    });
+  }
+
+  private getExcludedUserIds(field: 'performers' | 'checkers'): number[] {
+    const oppositeField = field === 'performers' ? 'checkers' : 'performers';
+    return this.taskForm.get(oppositeField)?.value.map((u: UserDto) => u.id) || [];
   }
 
   private initAutocomplete() {
@@ -74,16 +101,26 @@ export class TaskDetailsDialogComponent implements OnInit {
       distinctUntilChanged(),
       switchMap(value => {
         const search = typeof value === 'string' ? value : '';
-        return search ? this.userService.searchProjecters(search) : of([]);
+        const excludedIds = this.getExcludedUserIds('performers');
+        
+        return search 
+          ? this.userService.searchProjecters(search).pipe(
+              map(users => users.filter(u => !excludedIds.includes(u.id))))
+          : of([]);
       })
     );
-
+  
     this.filteredCheckers = this.checkersControl.valueChanges.pipe(
       debounceTime(300),
       distinctUntilChanged(),
       switchMap(value => {
         const search = typeof value === 'string' ? value : '';
-        return search ? this.userService.searchProjecters(search) : of([]);
+        const excludedIds = this.getExcludedUserIds('checkers');
+        
+        return search 
+          ? this.userService.searchProjecters(search).pipe(
+              map(users => users.filter(u => !excludedIds.includes(u.id))))
+          : of([]);
       })
     );
   }
@@ -143,7 +180,37 @@ export class TaskDetailsDialogComponent implements OnInit {
     });
   }
 
+  get sortedComments(): CommentDto[] {
+    return [...this.data.comments].sort((a, b) => 
+      new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
+  }
+
   onClose(): void {
     this.dialogRef.close();
+  }
+
+  addComment(): void {
+    if (this.commentControl.invalid) return;
+
+    const commentDto: PostCommentDto = {
+      idTask: this.data.idTask,
+      text: this.commentControl.value!
+    };
+
+    this.commentService.addComment(commentDto).subscribe({
+      next: (newComment) => {
+        // Добавляем новый комментарий в начало списка
+        this.data.comments = [{
+          ...newComment 
+        }, ...this.data.comments];
+        
+        this.commentControl.reset();
+      },
+      error: (err) => {
+        this.snackBar.open('Ошибка отправки комментария', 'Закрыть');
+        console.error(err);
+      }
+    });
   }
 }

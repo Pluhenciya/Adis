@@ -4,7 +4,7 @@
       <div class="title-container">
         <div *ngIf="!isEditing" class="title-view">
           <h2 class="task-title">{{ taskForm.value.name }}</h2>
-          <button type="button" mat-icon-button (click)="toggleEdit()" class="edit-button">
+          <button type="button" mat-icon-button (click)="toggleEdit()" class="edit-button" *appHasRole="['admin', 'projectManager']">
             <mat-icon>edit</mat-icon>
           </button>
         </div>
@@ -114,40 +114,59 @@
 
         <!-- Результат выполнения -->
         <div *ngIf="data.textResult" class="result-card">
-          <h3>Результат выполнения</h3>
-          <div class="result-content">
+          <div class="result-header">
             <mat-icon class="result-icon">task_alt</mat-icon>
+            <h3>Результат выполнения</h3>
+          </div>
+          <div class="result-content">
             <p class="result-text">{{ data.textResult }}</p>
           </div>
         </div>
-      </div>
 
       <!-- Комментарии -->
-      <div class="comments-section">
+      <div class="comments-section" *appHasRole="['admin', 'projectManager', 'projecter']">
         <div class="comments-header">
           <h3>Комментарии ({{ data.comments?.length || 0 }})</h3>
-          <button mat-stroked-button color="primary" type="button" class="add-comment-btn">
-            <mat-icon>add_comment</mat-icon>
-            Добавить комментарий
-          </button>
         </div>
 
         <mat-divider></mat-divider>
 
         <div class="comments-list">
-          <div *ngFor="let comment of data.comments" class="comment-item">
+          <div *ngFor="let comment of sortedComments" class="comment-item">
             <div class="comment-avatar">
               <mat-icon>account_circle</mat-icon>
             </div>
             <div class="comment-body">
               <div class="comment-header">
                 <span class="author">{{ comment.fullNameSender }}</span>
+                <span class="comment-time">{{ comment.createdAt | date:'dd.MM.yyyy HH:mm' }}</span>
               </div>
               <p class="comment-text">{{ comment.text }}</p>
             </div>
           </div>
         </div>
-      </div>
+
+        <div class="comment-input-container" *appHasRole="['projectManager', 'projecter']">
+          <form (submit)="addComment()" class="comment-form">
+            <mat-form-field appearance="outline" class="comment-field">
+              <input 
+                matInput 
+                placeholder="Написать комментарий..." 
+                [formControl]="commentControl"
+                (keydown.enter)="$event.preventDefault(); addComment()"
+              >
+              <button 
+                mat-icon-button 
+                matSuffix 
+                type="submit" 
+                [disabled]="commentControl.invalid"
+                class="send-button"
+              >
+                <mat-icon>send</mat-icon>
+              </button>
+            </mat-form-field>
+          </form>
+        </div>
 
       <!-- Кнопки сохранения -->
       <div *ngIf="isEditing" class="form-actions">

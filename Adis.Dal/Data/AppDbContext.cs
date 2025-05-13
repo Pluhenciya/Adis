@@ -320,6 +320,11 @@ namespace Adis.Dal.Data
                 entity.Property(c => c.IdTask)
                     .HasColumnName("id_task");
 
+                entity.Property(c => c.CreatedAt)
+                    .HasColumnName("created_at")
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
                 entity.HasOne(c => c.Sender)
                     .WithMany(u => u.Comments)
                     .HasForeignKey(c => c.IdSender)

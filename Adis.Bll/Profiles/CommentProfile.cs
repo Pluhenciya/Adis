@@ -16,6 +16,8 @@ namespace Adis.Bll.Profiles
             CreateMap<Comment, CommentDto>()
                 .ForMember(dest => dest.FullNameSender,
                     opt => opt.MapFrom(src => src.Sender.FullName));
+
+            CreateMap<PostCommentDto, Comment>();
         }
     }
 }

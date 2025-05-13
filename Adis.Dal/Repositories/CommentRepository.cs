@@ -1,5 +1,6 @@
 ﻿using Adis.Dal.Data;
 using Adis.Dal.Interfaces;
+using Adis.Dal.Specifications;
 using Adis.Dm;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,12 @@ namespace Adis.Dal.Repositories
     {
         public CommentRepository(AppDbContext dbContext) : base(dbContext)
         {
+        }
+
+        public async Task<Comment?> GetCommentByIdAsync(int id)
+        {
+            CommentWithUserByIdSpecification spec = new(id);
+            return (await GetAsync(spec)).FirstOrDefault();
         }
     }
 }
