@@ -1,4 +1,5 @@
-﻿using Adis.Bll.Interfaces;
+﻿using Adis.Bll.Dtos.Task;
+using Adis.Bll.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,11 +7,11 @@ namespace Adis.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TaskController : ControllerBase
+    public class TasksController : ControllerBase
     {
         private readonly ITaskService _taskService;
 
-        public TaskController(ITaskService taskService)
+        public TasksController(ITaskService taskService)
         {
             _taskService = taskService;
         }
@@ -22,6 +23,18 @@ namespace Adis.Api.Controllers
             if(task == null)
                 return NotFound("Задача с таким id не найдена");
             return Ok(task);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddTask(PostTaskDto taskDto)
+        {
+            return Ok(await _taskService.AddTaskAsync(taskDto));
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateTask(PutTaskDto taskDto)
+        {
+            return Ok(await _taskService.UpdateTaskAsync(taskDto));
         }
     }
 }

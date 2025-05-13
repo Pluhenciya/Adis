@@ -1,0 +1,160 @@
+<div class="task-dialog-container">
+  <form [formGroup]="taskForm" (ngSubmit)="onSave()" class="task-form">
+    <div class="dialog-header">
+      <div class="title-container">
+        <div *ngIf="!isEditing" class="title-view">
+          <h2 class="task-title">{{ taskForm.value.name }}</h2>
+          <button type="button" mat-icon-button (click)="toggleEdit()" class="edit-button">
+            <mat-icon>edit</mat-icon>
+          </button>
+        </div>
+        <mat-form-field *ngIf="isEditing" appearance="outline" class="title-edit">
+          <input matInput formControlName="name">
+        </mat-form-field>
+      </div>
+      <div class="header-actions">
+        <button mat-icon-button (click)="onClose()" class="close-button" type="button">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <div class="dialog-content">
+      <div class="main-info">
+        <div class="task-meta-grid">
+          <!-- Исполнители -->
+          <div class="meta-card">
+            <mat-icon class="meta-icon accent">group</mat-icon>
+            <div class="meta-content">
+              <h3 class="meta-title">Исполнители</h3>
+              <div class="user-chips" *ngIf="!isEditing; else editPerformers">
+                <mat-chip-listbox>
+                  <mat-chip *ngFor="let user of taskForm.value.performers" class="user-chip">
+                    <mat-icon matChipAvatar>person</mat-icon>
+                    {{ user.fullName || user.email }}
+                  </mat-chip>
+                </mat-chip-listbox>
+              </div>
+              <ng-template #editPerformers>
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Добавить исполнителя</mat-label>
+                  <input type="text" matInput [formControl]="performersControl" [matAutocomplete]="autoPerformers">
+                  <mat-autocomplete #autoPerformers="matAutocomplete"
+                    (optionSelected)="addPerformer($event.option.value)">
+                    <mat-option *ngFor="let user of filteredPerformers | async" [value]="user">
+                      <div class="user-option">
+                        <mat-icon>person</mat-icon>
+                        {{ user.fullName || user.email }}
+                      </div>
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field>
+                <mat-chip-listbox>
+                  <mat-chip *ngFor="let user of taskForm.value.performers" removable
+                    (removed)="removePerformer(user.id)">
+                    {{ user.fullName || user.email }}
+                    <mat-icon matChipRemove>cancel</mat-icon>
+                  </mat-chip>
+                </mat-chip-listbox>
+              </ng-template>
+            </div>
+          </div>
+
+          <!-- Проверяющие -->
+          <div class="meta-card">
+            <mat-icon class="meta-icon accent">verified_user</mat-icon>
+            <div class="meta-content">
+              <h3 class="meta-title">Проверяющие</h3>
+              <div class="user-chips" *ngIf="!isEditing; else editCheckers">
+                <mat-chip-listbox>
+                  <mat-chip *ngFor="let user of taskForm.value.checkers" class="user-chip">
+                    <mat-icon matChipAvatar>security</mat-icon>
+                    {{ user.fullName || user.email }}
+                  </mat-chip>
+                </mat-chip-listbox>
+              </div>
+              <ng-template #editCheckers>
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Добавить проверяющего</mat-label>
+                  <input type="text" matInput [formControl]="checkersControl" [matAutocomplete]="autoCheckers">
+                  <mat-autocomplete #autoCheckers="matAutocomplete" (optionSelected)="addChecker($event.option.value)">
+                    <mat-option *ngFor="let user of filteredCheckers | async" [value]="user">
+                      <div class="user-option">
+                        <mat-icon>verified_user</mat-icon>
+                        {{ user.fullName || user.email }}
+                      </div>
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field>
+                <mat-chip-listbox>
+                  <mat-chip *ngFor="let user of taskForm.value.checkers" removable (removed)="removeChecker(user.id)">
+                    {{ user.fullName || user.email }}
+                    <mat-icon matChipRemove>cancel</mat-icon>
+                  </mat-chip>
+                </mat-chip-listbox>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+
+        <!-- Описание задачи -->
+        <div class="description-card">
+          <div class="description-header">
+            <h3>Описание задачи</h3>
+          </div>
+
+          <div *ngIf="!isEditing" class="description-view">
+            {{ data.description || 'Описание отсутствует' }}
+          </div>
+
+          <mat-form-field *ngIf="isEditing" appearance="outline" class="full-width">
+            <textarea matInput formControlName="description" placeholder="Описание задачи"></textarea>
+          </mat-form-field>
+        </div>
+
+        <!-- Результат выполнения -->
+        <div *ngIf="data.textResult" class="result-card">
+          <h3>Результат выполнения</h3>
+          <div class="result-content">
+            <mat-icon class="result-icon">task_alt</mat-icon>
+            <p class="result-text">{{ data.textResult }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Комментарии -->
+      <div class="comments-section">
+        <div class="comments-header">
+          <h3>Комментарии ({{ data.comments?.length || 0 }})</h3>
+          <button mat-stroked-button color="primary" type="button" class="add-comment-btn">
+            <mat-icon>add_comment</mat-icon>
+            Добавить комментарий
+          </button>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="comments-list">
+          <div *ngFor="let comment of data.comments" class="comment-item">
+            <div class="comment-avatar">
+              <mat-icon>account_circle</mat-icon>
+            </div>
+            <div class="comment-body">
+              <div class="comment-header">
+                <span class="author">{{ comment.fullNameSender }}</span>
+              </div>
+              <p class="comment-text">{{ comment.text }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Кнопки сохранения -->
+      <div *ngIf="isEditing" class="form-actions">
+        <button type="button" mat-stroked-button (click)="toggleEdit()">Отмена</button>
+        <button type="submit" mat-raised-button color="primary" [disabled]="taskForm.invalid">
+          <mat-icon>save</mat-icon>
+          Сохранить изменения
+        </button>
+      </div>
+    </div>

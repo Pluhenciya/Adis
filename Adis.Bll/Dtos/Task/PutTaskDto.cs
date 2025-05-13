@@ -1,14 +1,13 @@
-﻿using Adis.Bll.Dtos.Comment;
-using Adis.Dm;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Adis.Bll.Dtos.Task
 {
-    public class TaskDetailsDto
+    public class PutTaskDto
     {
         /// <summary>
         /// Идентификатор задачи
@@ -18,6 +17,7 @@ namespace Adis.Bll.Dtos.Task
         /// <summary>
         /// Наименование задачи
         /// </summary>
+        [StringLength(255)]
         public string Name { get; set; } = null!;
 
         /// <summary>
@@ -25,16 +25,8 @@ namespace Adis.Bll.Dtos.Task
         /// </summary>
         public string Description { get; set; } = null!;
 
-        public Status Status { get; set; }
+        public IEnumerable<int> IdPerformers { get; set; } = null!;
 
-        public string? TextResult { get; set; } = null!;
-
-        public IEnumerable<UserDto> Performers { get; set; } = null!;
-
-        public IEnumerable<UserDto> Checkers { get; set; } = null!;
-
-        public IEnumerable<DocumentDto> Documents { get; set; } = null!;
-
-        public IEnumerable<CommentDto> Comments { get; set; } = null!;
+        public IEnumerable<int> IdCheckers { get; set; } = null!;
     }
 }

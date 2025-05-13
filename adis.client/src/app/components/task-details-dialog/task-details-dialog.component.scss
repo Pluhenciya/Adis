@@ -1,0 +1,262 @@
+.task-dialog-container {
+    width: 800px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px 24px;
+  padding-bottom: 0;
+
+  .title-container {
+    flex: 1;
+    min-width: 0;
+    
+    .title-view {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      
+      .task-title {
+        margin: 0;
+        line-height: 1.3;
+        word-break: break-word;
+      }
+      
+      .edit-button {
+        color: #666;
+        margin-top: -6px;
+        
+        &:hover {
+          color: #FF6D00;
+        }
+      }
+    }
+    
+    .title-edit {
+      width: 100%;
+      
+      .mat-form-field-wrapper {
+        padding-bottom: 0;
+      }
+      
+      input {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #2d3038;
+      }
+    }
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: -8px;
+  }
+}
+  
+    .dialog-content {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
+    }
+  
+    .task-form {
+      display: flex;
+      flex-direction: column;
+    }
+  
+    .meta-card {
+      padding: 16px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+  
+      .meta-icon {
+        font-size: 28px;
+        width: 28px;
+        height: 28px;
+        color: #FF6D00;
+      }
+  
+      .meta-title {
+        margin: 0 0 8px 0;
+        font-size: 1rem;
+        color: #2d3038;
+      }
+  
+      .user-chip {
+        margin: 4px;
+        background: rgba(#FF6D00, 0.08);
+        border-radius: 16px;
+      }
+    }
+  
+    .description-card {
+      padding: 16px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+  
+      .description-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+  
+        h3 {
+          margin: 0;
+          font-size: 1.1rem;
+        }
+  
+        .edit-button {
+          color: #6c757d;
+          
+          &:hover {
+            color: #FF6D00;
+          }
+        }
+      }
+  
+      .full-width{
+        display: inline;
+      }
+
+      textarea {
+        min-height: 100px;
+        line-height: 1.5;
+        font-size: 0.95rem;
+      }
+    }
+  
+    .result-card {
+      padding: 16px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+  
+      .result-icon {
+        color: #4CAF50;
+        margin-top: 4px;
+      }
+  
+      .result-text {
+        margin: 0;
+        color: #4A4A4A;
+        line-height: 1.5;
+      }
+    }
+  
+    .comments-section {
+      margin-top: 24px;
+  
+      .comments-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+  
+        h3 {
+          margin: 0;
+          font-size: 1.1rem;
+        }
+      }
+  
+      .comment-item {
+        display: flex;
+        gap: 12px;
+        padding: 12px 0;
+        border-bottom: 1px solid #eee;
+  
+        &:last-child {
+          border-bottom: none;
+        }
+  
+        .comment-avatar {
+          mat-icon {
+            color: #6c757d;
+            font-size: 32px;
+          }
+        }
+  
+        .comment-body {
+          flex: 1;
+  
+          .comment-header {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 4px;
+  
+            .author {
+              font-weight: 500;
+            }
+  
+            .comment-time {
+              color: #6c757d;
+              font-size: 0.8rem;
+            }
+          }
+  
+          .comment-text {
+            margin: 0;
+            color: #4A4A4A;
+            line-height: 1.4;
+          }
+        }
+      }
+    }
+  
+    .form-actions {
+      margin-top: 24px;
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      padding-top: 16px;
+      border-top: 1px solid #eee;
+    }
+  }
+
+  .description-view {
+    padding: 12px;
+    border-radius: 4px;
+    background: #f8f9fa;
+    white-space: pre-wrap;
+    line-height: 1.5;
+  }
+  
+  .user-chips {
+    max-height: 120px;
+    padding: 8px 0;
+  }
+  
+  .full-width {
+    width: 100%;
+  }
+  
+  .meta-content {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .user-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+    
+    mat-icon {
+      color: #666;
+    }
+  }

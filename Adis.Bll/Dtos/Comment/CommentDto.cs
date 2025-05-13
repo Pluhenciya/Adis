@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Adis.Bll.Dtos
+namespace Adis.Bll.Dtos.Comment
 {
     public class CommentDto
     {

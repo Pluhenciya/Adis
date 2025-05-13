@@ -1,0 +1,109 @@
+<div class="add-task-dialog">
+    <h2 mat-dialog-title>Создание новой задачи</h2>
+    
+    <form [formGroup]="taskForm" (ngSubmit)="onSubmit()">
+      <mat-dialog-content class="dialog-content">
+        <!-- Название задачи -->
+        <mat-form-field appearance="outline" floatLabel="always">
+          <mat-label>Название задачи</mat-label>
+          <input matInput formControlName="name" required>
+          <mat-error *ngIf="taskForm.get('name')?.hasError('required')">
+            Обязательное поле
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Описание задачи -->
+        <mat-form-field appearance="outline" floatLabel="always">
+          <mat-label>Описание задачи</mat-label>
+          <textarea matInput 
+                    formControlName="description"
+                    cdkTextareaAutosize
+                    cdkAutosizeMinRows="3"
+                    cdkAutosizeMaxRows="5"
+                    required></textarea>
+          <mat-error *ngIf="taskForm.get('description')?.hasError('required')">
+            Обязательное поле
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Секция выбора пользователей -->
+        <div class="users-section">
+          <!-- Исполнители -->
+          <div class="user-selector">
+            <h3 class="section-title">Исполнители</h3>
+            <mat-form-field appearance="outline">
+              <mat-label>Добавить исполнителя</mat-label>
+              <input type="text" matInput 
+                     [formControl]="performersControl" 
+                     [matAutocomplete]="autoPerformers">
+              <mat-icon matSuffix>person_add</mat-icon>
+              <mat-autocomplete #autoPerformers="matAutocomplete" 
+                               (optionSelected)="addPerformer($event.option.value)">
+                <mat-option *ngFor="let user of filteredPerformers | async" [value]="user.id">
+                  <div class="user-option">
+                    <mat-icon>person</mat-icon>
+                    <span>{{ user.fullName || user.email }}</span>
+                  </div>
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+            <mat-chip-set aria-label="Selected performers">
+              <mat-chip *ngFor="let userId of taskForm.get('performers')?.value" 
+                       (removed)="removePerformer(userId)">
+                {{ getUsername(userId) }}
+                <mat-icon matChipRemove>cancel</mat-icon>
+              </mat-chip>
+            </mat-chip-set>
+            <mat-error *ngIf="taskForm.get('performers')?.hasError('required')"
+                      class="section-error">
+              Необходимо выбрать минимум одного исполнителя
+            </mat-error>
+          </div>
+
+          <!-- Проверяющие -->
+          <div class="user-selector">
+            <h3 class="section-title">Проверяющие</h3>
+            <mat-form-field appearance="outline">
+              <mat-label>Добавить проверяющего</mat-label>
+              <input type="text" matInput 
+                     [formControl]="checkersControl" 
+                     [matAutocomplete]="autoCheckers">
+              <mat-icon matSuffix>person_add</mat-icon>
+              <mat-autocomplete #autoCheckers="matAutocomplete" 
+                               (optionSelected)="addChecker($event.option.value)">
+                <mat-option *ngFor="let user of filteredCheckers | async" [value]="user.id">
+                  <div class="user-option">
+                    <mat-icon>verified_user</mat-icon>
+                    <span>{{ user.fullName || user.email }}</span>
+                  </div>
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+            <mat-chip-set aria-label="Selected checkers">
+              <mat-chip *ngFor="let userId of taskForm.get('checkers')?.value" 
+                       (removed)="removeChecker(userId)">
+                {{ getUsername(userId) }}
+                <mat-icon matChipRemove>cancel</mat-icon>
+              </mat-chip>
+            </mat-chip-set>
+            <mat-error *ngIf="taskForm.get('checkers')?.hasError('required')"
+                      class="section-error">
+              Необходимо выбрать минимум одного проверяющего
+            </mat-error>
+          </div>
+        </div>
+      </mat-dialog-content>
+
+      <mat-dialog-actions align="end">
+        <button mat-button mat-dialog-close type="button">Отмена</button>
+        <button mat-raised-button 
+                color="primary" 
+                type="submit"
+                [disabled]="taskForm.invalid || isLoading"
+                class="submit-button">
+          <mat-icon>add_task</mat-icon>
+          Создать задачу
+        </button>
+      </mat-dialog-actions>
+    </form>
+  </div>

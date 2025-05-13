@@ -61,11 +61,14 @@ namespace Adis.Dal.Repositories
 
             if (spec == null) return query;
 
-            // Включаем связанные сущности
-            if (spec.Includes != null)
+            foreach (var include in spec.IncludeStrings)
             {
-                query = spec.Includes
-                    .Aggregate(query, (current, include) => current.Include(include));
+                query = query.Include(include);
+            }
+
+            foreach (var include in spec.Includes)
+            {
+                query = query.Include(include);
             }
 
             // Фильтрация

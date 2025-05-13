@@ -16,6 +16,7 @@ namespace Adis.Bll.Profiles
             CreateMap<ProjectTask, TaskDto>().ReverseMap();
             CreateMap<ProjectTask, TaskDetailsDto>().ReverseMap();
             CreateMap<PostTaskDto, ProjectTask>();
+            CreateMap<PutTaskDto, ProjectTask>();
         }
     }
 }

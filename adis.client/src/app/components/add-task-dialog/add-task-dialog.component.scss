@@ -1,0 +1,122 @@
+.add-task-dialog {
+  padding: 24px;
+  width: 700px;
+  max-width: 95vw;
+
+  h2 {
+    margin: 0 0 24px 0;
+    font-size: 1.75rem;
+    color: #2d3038;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0;
+    
+    mat-icon {
+      font-size: 1.5rem;
+      width: auto;
+      height: auto;
+    }
+  }
+
+  .dialog-content {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    padding: 16px 0;
+  }
+
+  .users-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+
+    @media (max-width: 600px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .user-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .section-title {
+      margin: 0;
+      font-size: 1.1rem;
+      color: #5f6368;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    mat-chip-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 8px 0;
+
+      mat-chip {
+        background: #e8f0fe;
+        color: #1967d2;
+        border-radius: 16px;
+        padding: 8px 12px;
+        font-size: 0.9rem;
+
+        mat-icon {
+          color: #1967d2;
+          font-size: 18px;
+          margin-left: 8px;
+        }
+      }
+    }
+  }
+
+  .section-error {
+    font-size: 0.9rem;
+    color: #d93025;
+    margin-top: -8px;
+  }
+
+  .user-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+
+    mat-icon {
+      color: #5f6368;
+      font-size: 20px;
+    }
+  }
+
+  mat-form-field {
+    width: 100%;
+
+    mat-icon[matSuffix] {
+      color: #5f6368;
+      margin-right: 8px;
+    }
+
+    textarea {
+      min-height: 120px;
+      line-height: 1.5;
+    }
+  }
+
+  mat-dialog-actions {
+    padding: 24px 0 0 0;
+    border-top: 1px solid #eee;
+    margin-top: 16px;
+
+    .submit-button {
+      padding: 8px 24px;
+      font-weight: 500;
+      mat-icon {
+        margin-right: 8px;
+      }
+    }
+  }
+}

@@ -13,5 +13,7 @@ namespace Adis.Bll.Interfaces
         public Task<TaskDetailsDto?> GetTaskDetailsByIdAsync(int id);
 
         public Task<TaskDetailsDto> AddTaskAsync(PostTaskDto task);
+
+        public Task<TaskDetailsDto> UpdateTaskAsync(PutTaskDto taskDto);
     }
 }

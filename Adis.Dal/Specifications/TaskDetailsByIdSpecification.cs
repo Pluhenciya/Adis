@@ -17,7 +17,7 @@ namespace Adis.Dal.Specifications
             AddInclude(t => t.Performers);
             AddInclude(t => t.Documents);
             AddInclude(t => t.Comments);
-            AddInclude(t => t.Comments.Select(c => c.Sender));
+            AddInclude($"{nameof(ProjectTask.Comments)}.{nameof(Comment.Sender)}");
         }
     }
 }

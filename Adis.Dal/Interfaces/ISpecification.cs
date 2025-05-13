@@ -42,5 +42,7 @@ namespace Adis.Dal.Interfaces
         /// Активна ли пагинация
         /// </summary>
         bool IsPagingEnabled { get; }
+
+        List<string> IncludeStrings { get; }
     }
 }

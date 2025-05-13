@@ -1,4 +1,4 @@
-﻿using Adis.Bll.Dtos;
+﻿using Adis.Bll.Dtos.Comment;
 using Adis.Dm;
 using AutoMapper;
 using System;
