@@ -13,10 +13,15 @@ import { ConfirmationDialogComponent } from '../../components/confirmation-dialo
 import { ProjectService } from '../../services/project.service';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { switchMap } from 'rxjs';
-import {MatProgressBarModule} from '@angular/material/progress-bar';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MapService } from '../../services/map.service';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { TaskService } from '../../services/task.service';
+import { TaskDetailsDialogComponent } from '../../components/task-details-dialog/task-details-dialog.component';
+import { MatDialogModule } from '@angular/material/dialog';
+import { AddTaskDialogComponent } from '../../components/add-task-dialog/add-task-dialog.component';
+import { AuthStateService } from '../../services/auth-state.service';
 
 interface TaskColumn {
   title: string;
@@ -40,7 +45,8 @@ interface TaskColumn {
     RouterModule,
     MatProgressBarModule,
     MatProgressSpinnerModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatDialogModule
   ],
   templateUrl: './project-details-page.component.html',
   styleUrl: './project-details-page.component.scss'
@@ -83,7 +89,9 @@ export class ProjectDetailsPageComponent implements OnInit, OnDestroy {
     private mapService: MapService,
     private route: ActivatedRoute,
     private dialog: MatDialog,
-    private projectService: ProjectService
+    private projectService: ProjectService,
+    private taskService: TaskService,
+    public authService: AuthStateService
     ){}
 
     ngOnInit() {
@@ -103,6 +111,26 @@ export class ProjectDetailsPageComponent implements OnInit, OnDestroy {
       if (this.showMap) {
         this.mapService.destroyMap();
       }
+    }
+
+    openTaskDetails(task: TaskDto) {
+      this.taskService.getTaskDetails(task.idTask).subscribe(fullTask => {
+        const dialogRef = this.dialog.open(TaskDetailsDialogComponent, {
+          maxWidth: '900px',
+          data: {task: fullTask, projectStatus: this.project.status},
+          panelClass: 'task-details-dialog'
+        });
+    
+        dialogRef.afterClosed().subscribe(updatedTask => {
+          if (updatedTask) {
+            const index = this.project.tasks.findIndex(t => t.idTask === updatedTask.idTask);
+            if (index !== -1) {
+              this.project.tasks[index] = updatedTask;
+              this.updateTaskColumns();
+            }
+          }
+        });
+      });
     }
 
     private checkGeoData() {
@@ -198,6 +226,20 @@ export class ProjectDetailsPageComponent implements OnInit, OnDestroy {
         } catch (err) {
           console.error('Ошибка удаления проекта:', err);
         }
+      }
+    });
+  }
+
+  openAddTaskDialog(): void {
+    const dialogRef = this.dialog.open(AddTaskDialogComponent, {
+      maxWidth: '800px',
+      data: this.project.idProject
+    });
+  
+    dialogRef.afterClosed().subscribe(newTask => {
+      if (newTask) {
+        this.project.tasks.push(newTask);
+        this.updateTaskColumns();
       }
     });
   }

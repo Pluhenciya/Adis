@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Adis.Bll.Dtos
+namespace Adis.Bll.Dtos.Task
 {
     public class TaskDto
     {
@@ -25,5 +25,9 @@ namespace Adis.Bll.Dtos
         public string Description { get; set; } = null!;
 
         public Status Status { get; set; }
+
+        public IEnumerable<UserDto> Performers { get; set; } = null!;
+
+        public IEnumerable<UserDto> Checkers { get; set; } = null!;
     }
 }

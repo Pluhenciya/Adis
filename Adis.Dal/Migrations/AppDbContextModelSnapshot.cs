@@ -77,6 +77,44 @@ namespace Adis.Dal.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Adis.Dm.Comment", b =>
+                {
+                    b.Property<int>("IdComment")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id_document");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("IdComment"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<int>("IdSender")
+                        .HasColumnType("int")
+                        .HasColumnName("id_sender");
+
+                    b.Property<int>("IdTask")
+                        .HasColumnType("int")
+                        .HasColumnName("id_task");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("filename");
+
+                    b.HasKey("IdComment")
+                        .HasName("PRIMARY");
+
+                    b.HasIndex("IdSender");
+
+                    b.HasIndex("IdTask");
+
+                    b.ToTable("comments", (string)null);
+                });
+
             modelBuilder.Entity("Adis.Dm.Contractor", b =>
                 {
                     b.Property<int>("IdContractor")
@@ -96,6 +134,38 @@ namespace Adis.Dal.Migrations
                         .HasName("PRIMARY");
 
                     b.ToTable("contractors", (string)null);
+                });
+
+            modelBuilder.Entity("Adis.Dm.Document", b =>
+                {
+                    b.Property<int>("IdDocument")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id_document");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("IdDocument"));
+
+                    b.Property<string>("DocumentType")
+                        .IsRequired()
+                        .HasColumnType("enum('estimate', 'other')")
+                        .HasColumnName("type");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("filename");
+
+                    b.Property<int?>("IdUser")
+                        .HasColumnType("int")
+                        .HasColumnName("id_user");
+
+                    b.HasKey("IdDocument")
+                        .HasName("PRIMARY");
+
+                    b.HasIndex("IdUser");
+
+                    b.ToTable("documents", (string)null);
                 });
 
             modelBuilder.Entity("Adis.Dm.Project", b =>
@@ -186,6 +256,10 @@ namespace Adis.Dal.Migrations
                         .HasColumnType("text")
                         .HasColumnName("description");
 
+                    b.Property<DateOnly>("EndDate")
+                        .HasColumnType("date")
+                        .HasColumnName("end_date");
+
                     b.Property<int>("IdProject")
                         .HasColumnType("int")
                         .HasColumnName("id_project");
@@ -200,6 +274,10 @@ namespace Adis.Dal.Migrations
                         .IsRequired()
                         .HasColumnType("enum('toDo', 'doing', 'checking', 'completed')")
                         .HasColumnName("status");
+
+                    b.Property<string>("TextResult")
+                        .HasColumnType("text")
+                        .HasColumnName("text_result");
 
                     b.HasKey("IdTask")
                         .HasName("PRIMARY");
@@ -533,6 +611,89 @@ namespace Adis.Dal.Migrations
                     b.ToTable("user_tokens", (string)null);
                 });
 
+            modelBuilder.Entity("tasks_has_documents", b =>
+                {
+                    b.Property<int>("id_document")
+                        .HasColumnType("int")
+                        .HasColumnName("id_document");
+
+                    b.Property<int>("id_task")
+                        .HasColumnType("int")
+                        .HasColumnName("id_task");
+
+                    b.HasKey("id_document", "id_task");
+
+                    b.HasIndex("id_task");
+
+                    b.ToTable("tasks_has_documents");
+                });
+
+            modelBuilder.Entity("users_check_tasks", b =>
+                {
+                    b.Property<int>("id_task")
+                        .HasColumnType("int")
+                        .HasColumnName("id_task");
+
+                    b.Property<int>("id_user")
+                        .HasColumnType("int")
+                        .HasColumnName("id_user");
+
+                    b.HasKey("id_task", "id_user");
+
+                    b.HasIndex("id_user");
+
+                    b.ToTable("users_check_tasks");
+                });
+
+            modelBuilder.Entity("users_execute_tasks", b =>
+                {
+                    b.Property<int>("id_task")
+                        .HasColumnType("int")
+                        .HasColumnName("id_task");
+
+                    b.Property<int>("id_user")
+                        .HasColumnType("int")
+                        .HasColumnName("id_user");
+
+                    b.HasKey("id_task", "id_user");
+
+                    b.HasIndex("id_user");
+
+                    b.ToTable("users_execute_tasks");
+                });
+
+            modelBuilder.Entity("Adis.Dm.Comment", b =>
+                {
+                    b.HasOne("Adis.Dm.User", "Sender")
+                        .WithMany("Comments")
+                        .HasForeignKey("IdSender")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired()
+                        .HasConstraintName("fk_user_comments");
+
+                    b.HasOne("Adis.Dm.ProjectTask", "Task")
+                        .WithMany("Comments")
+                        .HasForeignKey("IdTask")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired()
+                        .HasConstraintName("fk_task_comments");
+
+                    b.Navigation("Sender");
+
+                    b.Navigation("Task");
+                });
+
+            modelBuilder.Entity("Adis.Dm.Document", b =>
+                {
+                    b.HasOne("Adis.Dm.User", "User")
+                        .WithMany("Documents")
+                        .HasForeignKey("IdUser")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .HasConstraintName("fk_user_documents");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Adis.Dm.Project", b =>
                 {
                     b.HasOne("Adis.Dm.Contractor", "Contractor")
@@ -635,6 +796,57 @@ namespace Adis.Dal.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("tasks_has_documents", b =>
+                {
+                    b.HasOne("Adis.Dm.Document", null)
+                        .WithMany()
+                        .HasForeignKey("id_document")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_document_tasks");
+
+                    b.HasOne("Adis.Dm.ProjectTask", null)
+                        .WithMany()
+                        .HasForeignKey("id_task")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_task_documents");
+                });
+
+            modelBuilder.Entity("users_check_tasks", b =>
+                {
+                    b.HasOne("Adis.Dm.ProjectTask", null)
+                        .WithMany()
+                        .HasForeignKey("id_task")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_task_check_tasks");
+
+                    b.HasOne("Adis.Dm.User", null)
+                        .WithMany()
+                        .HasForeignKey("id_user")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_user_check_tasks");
+                });
+
+            modelBuilder.Entity("users_execute_tasks", b =>
+                {
+                    b.HasOne("Adis.Dm.ProjectTask", null)
+                        .WithMany()
+                        .HasForeignKey("id_task")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_task_execute_tasks");
+
+                    b.HasOne("Adis.Dm.User", null)
+                        .WithMany()
+                        .HasForeignKey("id_user")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_user_execute_tasks");
+                });
+
             modelBuilder.Entity("Adis.Dm.Contractor", b =>
                 {
                     b.Navigation("Projects");
@@ -645,8 +857,17 @@ namespace Adis.Dal.Migrations
                     b.Navigation("Tasks");
                 });
 
+            modelBuilder.Entity("Adis.Dm.ProjectTask", b =>
+                {
+                    b.Navigation("Comments");
+                });
+
             modelBuilder.Entity("Adis.Dm.User", b =>
                 {
+                    b.Navigation("Comments");
+
+                    b.Navigation("Documents");
+
                     b.Navigation("Projects");
 
                     b.Navigation("RefreshTokens");

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
-import { BehaviorSubject, Observable, of, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, filter, map, of, switchMap, take, tap } from 'rxjs';
 import { AuthService } from './auth.service';
 import { RefreshTokenRequest } from '../models/auth.model';
 
@@ -63,7 +63,7 @@ export class AuthStateService {
 
   isAuthenticated(): Observable<boolean> {
     if (!this.accessToken) return of(false);
-    
+
     if (this.isTokenExpired()) {
       if (this.isRefreshing) {
         return this.role$.pipe(switchMap(() => of(!!this.accessToken)));
@@ -75,31 +75,48 @@ export class AuthStateService {
   }
 
   private handleTokenRefresh(): Observable<boolean> {
-    if (!this.refreshToken) {
+    if (!this.refreshToken || !this.accessToken) {
       this.clearAuthData();
       return of(false);
     }
-
+  
+    if (this.isRefreshing) {
+      return this.role$.pipe(
+        filter(role => role !== null),
+        take(1),
+        switchMap(() => of(!!this.accessToken))
+      );
+    }
+  
     this.isRefreshing = true;
-    const tokens: RefreshTokenRequest = {
-      accessToken: this.accessToken!,
-      refreshToken: this.refreshToken!
+  
+    const request: RefreshTokenRequest = {
+      refreshToken: this.refreshToken,
+      accessToken: this.accessToken
     };
-
-    return this.authService.refreshToken(tokens).pipe(
+  
+    return this.authService.refreshToken(request).pipe(
       tap({
         next: (response) => {
           this.login(response.accessToken, response.refreshToken);
           this.isRefreshing = false;
         },
-        error: () => {
-          this.clearAuthData();
+        error: (err) => {
+          console.error('Refresh token failed:', err);
+          if (err.status === 401 || err.status === 400) {
+            this.clearAuthData();
+          }
           this.isRefreshing = false;
         }
       }),
-      switchMap(() => of(!!this.accessToken))
+      map(() => true),
+      catchError(() => {
+        this.isRefreshing = false;
+        return of(false);
+      })
     );
   }
+
 
   isAdmin(): boolean {
     return this.currentRole === 'Admin';

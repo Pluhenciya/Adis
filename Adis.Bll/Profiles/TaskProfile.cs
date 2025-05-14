@@ -1,4 +1,4 @@
-﻿using Adis.Bll.Dtos;
+﻿using Adis.Bll.Dtos.Task;
 using Adis.Dm;
 using AutoMapper;
 using System;
@@ -11,9 +11,12 @@ namespace Adis.Bll.Profiles
 {
     public class TaskProfile : Profile
     {
-        public TaskProfile() 
-        { 
+        public TaskProfile()
+        {
             CreateMap<ProjectTask, TaskDto>().ReverseMap();
+            CreateMap<ProjectTask, TaskDetailsDto>().ReverseMap();
+            CreateMap<PostTaskDto, ProjectTask>();
+            CreateMap<PutTaskDto, ProjectTask>();
         }
     }
 }

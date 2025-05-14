@@ -35,7 +35,7 @@ namespace Adis.Dal.Repositories
 
             spec.DisablePaging();
 
-            var projectsCount = ApplySpecification(spec).Count();
+            var projectsCount = ApplySpecificationAsync(spec).Count();
 
             return (projects, projectsCount);
         }

@@ -13,12 +13,12 @@
       <div class="auth-section">
         <div class="auth-block">
           <a mat-button color="accent" routerLink="/login" class="login-button"
-             *ngIf="!authService.isAuthenticated()">
+             *ngIf="!(authService.isAuthenticated() | async)">
             <mat-icon>login</mat-icon>
             <span class="button-text">Войти</span>
           </a>
 
-          <div class="user-profile" *ngIf="authService.isAuthenticated()">
+          <div class="user-profile" *ngIf="authService.isAuthenticated() | async">
             <button mat-button [matMenuTriggerFor]="userMenu" class="profile-btn">
               <mat-icon class="user-icon">account_circle</mat-icon>
               <span class="user-name">{{ authService.currentEmail }}</span>

@@ -38,6 +38,12 @@ export class UserService {
     );
   }
 
+  searchProjecters(search: string){
+    return this.http.get<any[]>(
+      `${this.apiUrl}/Projecter/${encodeURIComponent(search)}`
+    );
+  }
+
   getUserById(id: number): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/${id}`);
   }

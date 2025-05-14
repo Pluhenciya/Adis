@@ -38,7 +38,7 @@ namespace Adis.Dal.Repositories
 
         public async Task<IEnumerable<T>> GetAsync(ISpecification<T>? specification = null)
         {
-            return await ApplySpecification(specification).ToListAsync();
+            return await ApplySpecificationAsync(specification).ToListAsync();
         }
 
         /// <inheritdoc/>
@@ -55,17 +55,20 @@ namespace Adis.Dal.Repositories
             await _dbContext.SaveChangesAsync();
             return entry.Entity;
         }
-        public IQueryable<T> ApplySpecification(ISpecification<T>? spec)
+        public IQueryable<T> ApplySpecificationAsync(ISpecification<T>? spec)
         {
             var query = _dbContext.Set<T>().AsQueryable();
 
             if (spec == null) return query;
 
-            // Включаем связанные сущности
-            if (spec.Includes != null)
+            foreach (var include in spec.IncludeStrings)
             {
-                query = spec.Includes
-                    .Aggregate(query, (current, include) => current.Include(include));
+                query = query.Include(include);
+            }
+
+            foreach (var include in spec.Includes)
+            {
+                query = query.Include(include);
             }
 
             // Фильтрация

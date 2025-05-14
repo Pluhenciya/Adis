@@ -64,14 +64,18 @@
       <div *ngIf="viewMode === 'list'" class="project-cards">
         <div class="project-card" *ngFor="let project of projects" [class]="project.status"
           [style.--progress]="project.progress">
-          <div class="actions" *appHasRole="['admin', 'projectManager']">
-            <button mat-mini-fab class="edit-btn" (click)="openProjectForm(project)">
-              <mat-icon>edit</mat-icon>
-            </button>
-            <button mat-mini-fab class="delete-btn" (click)="deleteProject(project)">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </div>
+          <div class="actions" 
+          *appHasRole="['admin', 'projectManager']"
+          [style.display]="(project.status === 'Designing' || authService.isAdmin()) ? 'flex' : 'none'">
+        <button mat-mini-fab class="edit-btn" 
+                (click)="openProjectForm(project)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-mini-fab class="delete-btn" 
+                (click)="deleteProject(project)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
           <h3 class="project-title" [routerLink]="['projects', project.idProject]">{{ project.name }}</h3>
           <div class="status-chip" [class]="project.status">
             {{ getStatusLabel(project.status) }}
@@ -125,7 +129,7 @@
       <div *ngIf="viewMode === 'map'" class="map-container">
         <div #mapContainerRef id="map-container" style="height: 100%"></div>
         <div *ngIf="selectedProject" class="selected-project-info">
-          <h3>{{ selectedProject.name }}</h3>
+          <h3 [routerLink]="['projects', selectedProject.idProject]">{{ selectedProject.name }}</h3>
           <p>Статус: {{ getStatusLabel(selectedProject.status) }}</p>
           <p>Объект: {{ selectedProject.workObject.name }}</p>
           <p>Прогресс: {{ selectedProject.progress }}%</p>
