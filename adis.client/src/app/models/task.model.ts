@@ -39,7 +39,8 @@ export interface TaskDto {
     idPerformers: number[];
     idCheckers: number[];
     idProject: number;
-    endDate: Date;
+    endDate: string;
+    status?: TaskStatus;
   }
 
   export interface PutTaskDto {
@@ -48,5 +49,6 @@ export interface TaskDto {
     description: string;
     idPerformers: number[];
     idCheckers: number[];
-    endDate: Date;
+    endDate: string;
+    status?: TaskStatus;
   }

@@ -97,7 +97,7 @@
       </div>
 
       <!-- Действия -->
-      <div class="actions" *appHasRole="['admin', 'projectManager']">
+      <div class="actions" *appHasRole="['admin', 'projectManager']" [style.display]="(project.status === 'Designing' || authService.isAdmin()) ? 'flex' : 'none'">
         <button mat-mini-fab class="edit-btn" (click)="openProjectForm(project)">
           <mat-icon>edit</mat-icon>
         </button>
@@ -114,7 +114,7 @@
         <div class="header-content">
           <span class="tasks-title">Задачи проекта</span>
           <button mat-stroked-button color="primary" class="add-task-btn" 
-          (click)="openAddTaskDialog()" *appHasRole="['admin', 'projectManager']">
+          (click)="openAddTaskDialog()" *appHasRole="['admin', 'projectManager']" [style.display]="(project.status === 'Designing' || authService.isAdmin()) ? 'flex' : 'none'">
             <mat-icon>add</mat-icon>
             Добавить задачу
           </button>

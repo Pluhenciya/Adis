@@ -77,7 +77,7 @@ namespace Adis.Api.Controllers
         /// <remarks>
         /// Примеры запросов:
         ///
-        ///     GET /api/projects?status=1
+        ///     GET /api/projects?status=Designing
         ///     GET /api/projects?targetDate=2024-05-15
         ///     GET /api/projects?startDateFrom=2024-01-01&amp;startDateTo=2024-06-30
         ///     GET /api/projects?status=Designing&amp;targetDate=2024-07-01
@@ -185,19 +185,58 @@ namespace Adis.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Удаляет проект по идентификатору
+        /// </summary>
+        /// <remarks>
+        /// Пример запроса:
+        ///
+        ///     DELETE /api/projects/1
+        ///     
+        /// </remarks>
+        /// <param name="id">Идентификатор удаляемого проекта</param>
+        /// <response code="200">Успешное выполнение</response>
+        /// <response code="404">Проект с данным идентификатором не найден</response>
+        /// <response code="401">Неавторизованный пользователь</response>
+        /// <response code="403">Пользователь без прав на это действие</response>
         [Authorize(Roles = "Admin, ProjectManager")]
         [HttpDelete("{id}")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.Forbidden)]
         public async Task<IActionResult> DeleteProject(int id)
         {
-            await _projectService.DeleteProjectAsync(id);
-            return Ok();
+            try
+            {
+                await _projectService.DeleteProjectAsync(id);
+                return Ok();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
+        /// <summary>
+        /// Возвращает проект по идентификатору
+        /// </summary>
+        /// <remarks>
+        /// Пример запроса:
+        ///
+        ///     GET /api/projects/1
+        ///     
+        /// </remarks>
+        /// <param name="id">Идентификатор искомого проекта</param>
+        /// <response code="200">Успешное выполнение</response>
+        /// <response code="404">Проект с данным идентификатором не найден</response>
         [HttpGet("{id}")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> GetProjectDetailsById(int id)
         {
             var project = await _projectService.GetProjectDetailsByIdAsync(id);
-            if(project == null) 
+            if (project == null)
                 return NotFound("Проект с таким id не найден");
             return Ok(project);
         }

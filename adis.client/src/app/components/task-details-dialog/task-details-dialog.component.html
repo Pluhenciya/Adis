@@ -5,7 +5,7 @@
         <div *ngIf="!isEditing" class="title-view">
           <h2 class="task-title">{{ taskForm.value.name }}</h2>
           <ng-container *appHasRole="['admin', 'projectManager']">
-            <button *ngIf="!isEditAllowed" type="button" mat-icon-button (click)="toggleEdit()" 
+            <button *ngIf="isEditAllowed" type="button" mat-icon-button (click)="toggleEdit()" 
                     class="edit-button">
               <mat-icon>edit</mat-icon>
             </button>
@@ -107,7 +107,7 @@
           </div>
 
           <div *ngIf="!isEditing" class="description-view">
-            {{ data.task }}
+            {{ data.task.description }}
           </div>
 
           <mat-form-field *ngIf="isEditing" appearance="outline" class="full-width">
@@ -121,7 +121,7 @@
             <h3>Дата окончания</h3>
           </div>
           <div *ngIf="!isEditing" class="date-view">
-            {{ taskForm.value.endDate | date:'dd.MM.yyyy' }}
+            {{ data.task.endDate ? (data.task.endDate | date:'dd.MM.yyyy') : 'Дата не указана' }}
           </div>
           <mat-form-field *ngIf="isEditing" appearance="outline">
             <input matInput [matDatepicker]="picker" formControlName="endDate">
@@ -130,8 +130,30 @@
           </mat-form-field>
         </div>
 
+        <div class="status-card" *ngIf="authService.isAdmin()">
+          <div class="status-header">
+            <mat-icon class="status-icon">swap_vert</mat-icon>
+            <h3>Статус задачи</h3>
+          </div>
+          
+          <mat-form-field *ngIf="isEditing" appearance="outline" class="status-select">
+            <mat-label>Выберите статус</mat-label>
+            <mat-select formControlName="status">
+              <mat-option *ngFor="let status of taskStatuses" [value]="status">
+                {{ getStatusLabel(status) }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        
+          <div *ngIf="!isEditing" class="current-status">
+            <span class="status-badge" [class]="taskForm.value.status">
+              {{ getStatusLabel(taskForm.value.status) }}
+            </span>
+          </div>
+        </div>
+
         <!-- Результат выполнения -->
-        <div *ngIf="data.task" class="result-card">
+        <div *ngIf="data.task.textResult" class="result-card">
           <div class="result-header">
             <mat-icon class="result-icon">task_alt</mat-icon>
             <h3>Результат выполнения</h3>

@@ -30,7 +30,7 @@ namespace Adis.Bll.Services
 
         public async Task<CommentDto> AddCommentAsync(PostCommentDto commentDto)
         {
-            if (await _taskService.TaskExistAsync(commentDto.IdTask))
+            if (!(await _taskService.TaskExistAsync(commentDto.IdTask)))
                 throw new KeyNotFoundException($"Задача с id {commentDto.IdTask} не найдена");
 
             var comment = _mapper.Map<Comment>(commentDto);

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Adis.Dm;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -30,5 +31,7 @@ namespace Adis.Bll.Dtos.Task
         public IEnumerable<int> IdCheckers { get; set; } = null!;
 
         public DateOnly EndDate { get; set; }
+
+        public Status Status { get; set; }
     }
 }

@@ -21,6 +21,7 @@ import { TaskService } from '../../services/task.service';
 import { TaskDetailsDialogComponent } from '../../components/task-details-dialog/task-details-dialog.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { AddTaskDialogComponent } from '../../components/add-task-dialog/add-task-dialog.component';
+import { AuthStateService } from '../../services/auth-state.service';
 
 interface TaskColumn {
   title: string;
@@ -89,7 +90,8 @@ export class ProjectDetailsPageComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private dialog: MatDialog,
     private projectService: ProjectService,
-    private taskService: TaskService
+    private taskService: TaskService,
+    public authService: AuthStateService
     ){}
 
     ngOnInit() {
@@ -114,8 +116,7 @@ export class ProjectDetailsPageComponent implements OnInit, OnDestroy {
     openTaskDetails(task: TaskDto) {
       this.taskService.getTaskDetails(task.idTask).subscribe(fullTask => {
         const dialogRef = this.dialog.open(TaskDetailsDialogComponent, {
-          width: '800px',
-          maxWidth: '800px',
+          maxWidth: '900px',
           data: {task: fullTask, projectStatus: this.project.status},
           panelClass: 'task-details-dialog'
         });
@@ -231,8 +232,7 @@ export class ProjectDetailsPageComponent implements OnInit, OnDestroy {
 
   openAddTaskDialog(): void {
     const dialogRef = this.dialog.open(AddTaskDialogComponent, {
-      width: '748px',
-      maxWidth: '748px',
+      maxWidth: '800px',
       data: this.project.idProject
     });
   

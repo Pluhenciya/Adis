@@ -33,5 +33,7 @@ namespace Adis.Bll.Dtos.Task
         public DateOnly EndDate { get; set; }
 
         public int IdProject { get; set; }
+
+        public Status Status { get; set; }
     }
 }

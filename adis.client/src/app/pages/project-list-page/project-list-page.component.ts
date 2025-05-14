@@ -99,7 +99,7 @@ export class ProjectListPageComponent implements OnInit, OnDestroy, AfterViewIni
     private dialog: MatDialog,
     private projectService: ProjectService,
     private mapService: MapService,
-    private authService: AuthStateService
+    public authService: AuthStateService
   ) {
     this.searchSubject.pipe(
       debounceTime(300),

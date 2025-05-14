@@ -26,6 +26,31 @@
           </mat-error>
         </mat-form-field>
 
+        <mat-form-field appearance="outline" floatLabel="always">
+          <mat-label>Дата окончания</mat-label>
+          <input matInput 
+                 [matDatepicker]="picker" 
+                 formControlName="endDate"
+                 required>
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+          <mat-error *ngIf="taskForm.get('endDate')?.hasError('required')">
+            Обязательное поле
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field *ngIf="isAdmin" appearance="outline" floatLabel="always">
+          <mat-label>Статус задачи</mat-label>
+          <mat-select formControlName="status">
+            <mat-option *ngFor="let status of taskStatuses" [value]="status">
+              {{ getStatusLabel(status) }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="taskForm.get('status')?.hasError('required')">
+            Обязательное поле
+          </mat-error>
+        </mat-form-field>
+
         <!-- Секция выбора пользователей -->
         <div class="users-section">
           <!-- Исполнители -->

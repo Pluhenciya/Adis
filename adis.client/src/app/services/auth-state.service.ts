@@ -80,12 +80,6 @@ export class AuthStateService {
       return of(false);
     }
   
-    // Проверяем срок действия refresh token
-    if (this.isRefreshTokenExpired()) {
-      this.clearAuthData();
-      return of(false);
-    }
-  
     if (this.isRefreshing) {
       return this.role$.pipe(
         filter(role => role !== null),
@@ -109,7 +103,6 @@ export class AuthStateService {
         },
         error: (err) => {
           console.error('Refresh token failed:', err);
-          // Удаляем токены только при определенных ошибках
           if (err.status === 401 || err.status === 400) {
             this.clearAuthData();
           }
@@ -124,17 +117,6 @@ export class AuthStateService {
     );
   }
 
-  private isRefreshTokenExpired(): boolean {
-    const token = this.refreshToken;
-    if (!token) return true;
-    
-    try {
-      const decoded = jwtDecode<DecodedToken>(token);
-      return decoded.exp * 1000 < Date.now();
-    } catch {
-      return true;
-    }
-  }
 
   isAdmin(): boolean {
     return this.currentRole === 'Admin';

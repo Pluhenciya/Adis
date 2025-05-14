@@ -29,6 +29,8 @@ namespace Adis.Bll.Dtos.Task
 
         public string? TextResult { get; set; } = null!;
 
+        public DateOnly EndDate { get; set; }
+
         public IEnumerable<UserDto> Performers { get; set; } = null!;
 
         public IEnumerable<UserDto> Checkers { get; set; } = null!;

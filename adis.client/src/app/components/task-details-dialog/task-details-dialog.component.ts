@@ -4,7 +4,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import {MatListModule} from '@angular/material/list';
-import { PostTaskDto, PutTaskDto, TaskDetailsDto } from '../../models/task.model';
+import { PostTaskDto, PutTaskDto, TaskDetailsDto, TaskStatus } from '../../models/task.model';
 import { MatButtonModule } from '@angular/material/button';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TaskService } from '../../services/task.service';
@@ -22,6 +22,7 @@ import { HasRoleDirective } from '../../directives/has-role.directive';
 import { AuthService } from '../../services/auth.service';
 import { AuthStateService } from '../../services/auth-state.service';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatSelectModule } from '@angular/material/select';
 
 export interface TaskDialogData {
   task: TaskDetailsDto;
@@ -47,7 +48,8 @@ export interface TaskDialogData {
     AsyncPipe,
     DatePipe,
     HasRoleDirective,
-    MatDatepickerModule
+    MatDatepickerModule,
+    MatSelectModule
   ],
   templateUrl: './task-details-dialog.component.html',
   styleUrl: './task-details-dialog.component.scss',
@@ -62,11 +64,12 @@ export class TaskDetailsDialogComponent implements OnInit {
   filteredCheckers: Observable<UserDto[]> = new Observable<UserDto[]>();
   allUsers: UserDto[] = [];
   commentControl = new FormControl('', [Validators.required, Validators.maxLength(1000)]);
+  taskStatuses = Object.values(TaskStatus);
 
   constructor(
     private fb: FormBuilder,
     private taskService: TaskService,
-    private authService: AuthStateService,
+    public authService: AuthStateService,
     private userService: UserService,
     private commentService: CommentService,
     private snackBar: MatSnackBar,
@@ -78,8 +81,19 @@ export class TaskDetailsDialogComponent implements OnInit {
       description: [data.task.description, [Validators.required, Validators.maxLength(2000)]],
       performers: [data.task.performers, [Validators.required]],
       checkers: [data.task.checkers, [Validators.required]],
-      endDate: [data.task.endDate, [Validators.required]]
+      endDate: [data.task.endDate, [Validators.required]],
+      status: [data.task.status]
     });
+  }
+
+  getStatusLabel(status: TaskStatus): string {
+    switch(status) {
+      case TaskStatus.ToDo: return 'Надо выполнить';
+      case TaskStatus.Doing: return 'Выполняется';
+      case TaskStatus.Checking: return 'На проверке';
+      case TaskStatus.Completed: return 'Завершена';
+      default: return 'Неизвестный статус';
+    }
   }
 
   get isEditAllowed(): boolean {
@@ -189,7 +203,8 @@ export class TaskDetailsDialogComponent implements OnInit {
       description: updatedTask.description,
       idPerformers: updatedTask.performers.map((u: UserDto) => u.id),
       idCheckers: updatedTask.checkers.map((u: UserDto) => u.id),
-      endDate: this.taskForm.value.endDate
+      endDate: this.taskForm.value.endDate,
+      status: this.taskForm.value.status
     };
   
     this.taskService.updateTask(updateDto).subscribe({
