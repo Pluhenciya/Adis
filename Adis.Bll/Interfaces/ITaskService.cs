@@ -15,5 +15,7 @@ namespace Adis.Bll.Interfaces
         public Task<TaskDetailsDto> AddTaskAsync(PostTaskDto task);
 
         public Task<TaskDetailsDto> UpdateTaskAsync(PutTaskDto taskDto);
+
+        public Task<bool> TaskExistAsync(int id);
     }
 }

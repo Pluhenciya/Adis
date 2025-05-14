@@ -198,6 +198,10 @@ namespace Adis.Dal.Data
                     .HasColumnName("text_result")
                     .HasColumnType("text");
 
+                entity.Property(t => t.EndDate)
+                    .HasColumnName("end_date")
+                    .HasColumnType("date");
+
                 // Indexes
                 entity.HasIndex(t => t.IdProject)
                     .HasDatabaseName("ix_id_project");

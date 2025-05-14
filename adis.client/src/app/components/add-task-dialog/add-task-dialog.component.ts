@@ -59,7 +59,8 @@ export class AddTaskDialogComponent {
       name: ['', [Validators.required, Validators.maxLength(255)]],
       description: ['', Validators.required],
       performers: [[], Validators.required],
-      checkers: [[], Validators.required]
+      checkers: [[], Validators.required],
+      endDate: [new Date(), Validators.required]
     });
   }
 
@@ -162,7 +163,8 @@ export class AddTaskDialogComponent {
       description: this.taskForm.value.description,
       idPerformers: this.taskForm.value.performers,
       idCheckers: this.taskForm.value.checkers,
-      idProject: this.projectId
+      idProject: this.projectId,
+      endDate: this.taskForm.value.endDate
     };
 
     this.isLoading = true;

@@ -14,6 +14,9 @@
             Позволяет авторизовываться пользавателям
             </summary>
         </member>
+        <member name="F:Adis.Api.Controllers.AuthController._authService">
+            <inheritdoc cref="T:Adis.Bll.Interfaces.IAuthService"/>
+        </member>
         <member name="M:Adis.Api.Controllers.AuthController.Login(Adis.Bll.Dtos.Auth.LoginRequest)">
              <summary>
              Возврашает два токена для Bearer авторизации по данным для входа
@@ -39,7 +42,7 @@
              <remarks>
              Пример запроса:
             
-                 POST /api/auth/login
+                 POST /api/auth/refresh-token
                  {
                      "accessToken": "access_token",
                      "refreshToken": "refresh_token"
@@ -48,6 +51,35 @@
              </remarks>
              <param name="request">Токены для обновления</param>
              <response code="200">Успешное выполнение</response>
+             <response code="400">Ошибка валидации данных</response>
+        </member>
+        <member name="T:Adis.Api.Controllers.CommentsController">
+            <summary>
+            Позволяет управлять комментариями
+            </summary>
+        </member>
+        <member name="M:Adis.Api.Controllers.CommentsController.#ctor(Adis.Bll.Interfaces.ICommentService)">
+            <summary>
+            Позволяет управлять комментариями
+            </summary>
+        </member>
+        <member name="M:Adis.Api.Controllers.CommentsController.AddComment(Adis.Bll.Dtos.Comment.PostCommentDto)">
+             <summary>
+             Создает новый комментарий
+             </summary>
+             <remarks>
+             Пример запроса:
+            
+                 POST /api/comments
+                 {
+                     "idTask": 123,
+                     "text": "Это пример текста комментария"
+                 }
+            
+             </remarks>
+             <param name="comment">Данные нового комментария</param>
+             <response code="200">Успешное выполнение</response>
+             <response code="400">Ошибка валидации данных</response>
         </member>
         <member name="T:Adis.Api.Controllers.ProjectsController">
             <summary>

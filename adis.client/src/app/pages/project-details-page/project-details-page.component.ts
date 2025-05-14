@@ -116,7 +116,7 @@ export class ProjectDetailsPageComponent implements OnInit, OnDestroy {
         const dialogRef = this.dialog.open(TaskDetailsDialogComponent, {
           width: '800px',
           maxWidth: '800px',
-          data: fullTask,
+          data: {task: fullTask, projectStatus: this.project.status},
           panelClass: 'task-details-dialog'
         });
     

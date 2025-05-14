@@ -28,5 +28,7 @@ namespace Adis.Bll.Dtos.Task
         public IEnumerable<int> IdPerformers { get; set; } = null!;
 
         public IEnumerable<int> IdCheckers { get; set; } = null!;
+
+        public DateOnly EndDate { get; set; }
     }
 }

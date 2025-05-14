@@ -19,6 +19,14 @@ import { UserService } from '../../services/user.service';
 import { CommentService } from '../../services/comment.service';
 import { CommentDto, PostCommentDto } from '../../models/comment.model';
 import { HasRoleDirective } from '../../directives/has-role.directive';
+import { AuthService } from '../../services/auth.service';
+import { AuthStateService } from '../../services/auth-state.service';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+
+export interface TaskDialogData {
+  task: TaskDetailsDto;
+  projectStatus: 'Designing' | 'ContractorSearch' | 'InExecution' | 'Completed';
+}
 
 @Component({
   standalone: true,
@@ -38,7 +46,8 @@ import { HasRoleDirective } from '../../directives/has-role.directive';
     MatAutocompleteModule,
     AsyncPipe,
     DatePipe,
-    HasRoleDirective
+    HasRoleDirective,
+    MatDatepickerModule
   ],
   templateUrl: './task-details-dialog.component.html',
   styleUrl: './task-details-dialog.component.scss',
@@ -57,18 +66,24 @@ export class TaskDetailsDialogComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private taskService: TaskService,
+    private authService: AuthStateService,
     private userService: UserService,
     private commentService: CommentService,
     private snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<TaskDetailsDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: TaskDetailsDto
+    @Inject(MAT_DIALOG_DATA) public data: TaskDialogData
   ) {
     this.taskForm = this.fb.group({
-      name: [data.name, [Validators.required, Validators.maxLength(255)]],
-      description: [data.description, [Validators.required, Validators.maxLength(2000)]],
-      performers: [data.performers, [Validators.required]],
-      checkers: [data.checkers, [Validators.required]]
+      name: [data.task.name, [Validators.required, Validators.maxLength(255)]],
+      description: [data.task.description, [Validators.required, Validators.maxLength(2000)]],
+      performers: [data.task.performers, [Validators.required]],
+      checkers: [data.task.checkers, [Validators.required]],
+      endDate: [data.task.endDate, [Validators.required]]
     });
+  }
+
+  get isEditAllowed(): boolean {
+    return this.data.projectStatus  === 'Designing' || this.authService.isAdmin();
   }
 
   ngOnInit(): void {
@@ -77,7 +92,12 @@ export class TaskDetailsDialogComponent implements OnInit {
       if (list) list.scrollTop = list.scrollHeight;
     }, 100);
     this.taskForm.disable();
-    this.initAutocomplete();
+    if (this.isEditAllowed) {
+      this.initAutocomplete();
+    } else {
+      this.performersControl.disable();
+      this.checkersControl.disable();
+    }
   }
 
   ngAfterViewInit() {
@@ -154,17 +174,22 @@ export class TaskDetailsDialogComponent implements OnInit {
   }
 
   onSave(): void {
+    if (!this.isEditAllowed) {
+      this.snackBar.open('Сохранение изменений запрещено', 'Закрыть');
+      return;
+    }
     if (this.taskForm.invalid) return;
   
     this.isLoading = true;
-    const updatedTask = { ...this.data, ...this.taskForm.value };
+    const updatedTask = { ...this.data.task, ...this.taskForm.value };
   
     const updateDto: PutTaskDto = {
       idTask: updatedTask.idTask,
       name: updatedTask.name,
       description: updatedTask.description,
       idPerformers: updatedTask.performers.map((u: UserDto) => u.id),
-      idCheckers: updatedTask.checkers.map((u: UserDto) => u.id)
+      idCheckers: updatedTask.checkers.map((u: UserDto) => u.id),
+      endDate: this.taskForm.value.endDate
     };
   
     this.taskService.updateTask(updateDto).subscribe({
@@ -181,7 +206,7 @@ export class TaskDetailsDialogComponent implements OnInit {
   }
 
   get sortedComments(): CommentDto[] {
-    return [...this.data.comments].sort((a, b) => 
+    return [...this.data.task.comments].sort((a, b) => 
       new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
     );
   }
@@ -194,16 +219,16 @@ export class TaskDetailsDialogComponent implements OnInit {
     if (this.commentControl.invalid) return;
 
     const commentDto: PostCommentDto = {
-      idTask: this.data.idTask,
+      idTask: this.data.task.idTask,
       text: this.commentControl.value!
     };
 
     this.commentService.addComment(commentDto).subscribe({
       next: (newComment) => {
         // Добавляем новый комментарий в начало списка
-        this.data.comments = [{
+        this.data.task.comments = [{
           ...newComment 
-        }, ...this.data.comments];
+        }, ...this.data.task.comments];
         
         this.commentControl.reset();
       },

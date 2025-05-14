@@ -33,6 +33,8 @@ namespace Adis.Dm
 
         public Status Status { get; set; }
 
+        public DateOnly EndDate { get; set; }
+
         public string? TextResult { get; set; } = null!;
 
         /// <summary>

@@ -4,9 +4,12 @@
       <div class="title-container">
         <div *ngIf="!isEditing" class="title-view">
           <h2 class="task-title">{{ taskForm.value.name }}</h2>
-          <button type="button" mat-icon-button (click)="toggleEdit()" class="edit-button" *appHasRole="['admin', 'projectManager']">
-            <mat-icon>edit</mat-icon>
-          </button>
+          <ng-container *appHasRole="['admin', 'projectManager']">
+            <button *ngIf="!isEditAllowed" type="button" mat-icon-button (click)="toggleEdit()" 
+                    class="edit-button">
+              <mat-icon>edit</mat-icon>
+            </button>
+          </ng-container>
         </div>
         <mat-form-field *ngIf="isEditing" appearance="outline" class="title-edit">
           <input matInput formControlName="name">
@@ -104,7 +107,7 @@
           </div>
 
           <div *ngIf="!isEditing" class="description-view">
-            {{ data.description || 'Описание отсутствует' }}
+            {{ data.task }}
           </div>
 
           <mat-form-field *ngIf="isEditing" appearance="outline" class="full-width">
@@ -112,21 +115,36 @@
           </mat-form-field>
         </div>
 
+        <div class="date-card">
+          <div class="date-header">
+            <mat-icon class="date-icon">event</mat-icon>
+            <h3>Дата окончания</h3>
+          </div>
+          <div *ngIf="!isEditing" class="date-view">
+            {{ taskForm.value.endDate | date:'dd.MM.yyyy' }}
+          </div>
+          <mat-form-field *ngIf="isEditing" appearance="outline">
+            <input matInput [matDatepicker]="picker" formControlName="endDate">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+        </div>
+
         <!-- Результат выполнения -->
-        <div *ngIf="data.textResult" class="result-card">
+        <div *ngIf="data.task" class="result-card">
           <div class="result-header">
             <mat-icon class="result-icon">task_alt</mat-icon>
             <h3>Результат выполнения</h3>
           </div>
           <div class="result-content">
-            <p class="result-text">{{ data.textResult }}</p>
+            <p class="result-text">{{ data.task.textResult }}</p>
           </div>
         </div>
 
       <!-- Комментарии -->
       <div class="comments-section" *appHasRole="['admin', 'projectManager', 'projecter']">
         <div class="comments-header">
-          <h3>Комментарии ({{ data.comments?.length || 0 }})</h3>
+          <h3>Комментарии ({{ data.task.comments?.length || 0 }})</h3>
         </div>
 
         <mat-divider></mat-divider>

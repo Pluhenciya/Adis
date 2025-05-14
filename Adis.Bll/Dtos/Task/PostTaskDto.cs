@@ -30,6 +30,8 @@ namespace Adis.Bll.Dtos.Task
 
         public IEnumerable<int> IdCheckers { get; set; } = null!;
 
+        public DateOnly EndDate { get; set; }
+
         public int IdProject { get; set; }
     }
 }

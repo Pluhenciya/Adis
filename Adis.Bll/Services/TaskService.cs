@@ -68,5 +68,18 @@ namespace Adis.Bll.Services
 
             return (await GetTaskDetailsByIdAsync(idTask))!;
         }
+
+        public async Task<bool> TaskExistAsync(int id)
+        {
+            try
+            {
+                await _taskRepository.GetByIdAsync(id);
+                return true;
+            }
+            catch (KeyNotFoundException)
+            {
+                return false;
+            }
+        }
     }
 }

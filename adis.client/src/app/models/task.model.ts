@@ -30,6 +30,7 @@ export interface TaskDto {
     checkers: UserDto[];
     documents: DocumentDto[];
     comments: CommentDto[];
+    endDate: Date;
   }
 
   export interface PostTaskDto {
@@ -38,6 +39,7 @@ export interface TaskDto {
     idPerformers: number[];
     idCheckers: number[];
     idProject: number;
+    endDate: Date;
   }
 
   export interface PutTaskDto {
@@ -46,4 +48,5 @@ export interface TaskDto {
     description: string;
     idPerformers: number[];
     idCheckers: number[];
+    endDate: Date;
   }
