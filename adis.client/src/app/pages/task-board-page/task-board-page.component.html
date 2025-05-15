@@ -1,0 +1,87 @@
+<!-- task-board-page.component.html -->
+<div class="task-board-container">
+  <div class="board-header">
+    <h1>Мои задачи</h1>
+  </div>
+
+  <div class="status-columns">
+    <!-- Новые -->
+    <div class="column new-column">
+      <div class="column-header">
+        <h2>Новые задания</h2>
+        <span class="count-badge">{{ todoTasks.length }}</span>
+      </div>
+      <div class="tasks-list">
+        <app-task-card 
+          *ngFor="let task of todoTasks" 
+          [task]="task"
+          (taskUpdated)="handleTaskUpdate($event)">
+          <div class="custom-actions">
+            <button mat-raised-button color="primary" (click)="acceptTask(task)">
+              Принять задачу
+            </button>
+          </div>
+        </app-task-card>
+      </div>
+    </div>
+
+    <!-- В работе -->
+    <div class="column in-progress-column">
+      <div class="column-header">
+        <h2>В процессе</h2>
+        <span class="count-badge">{{ doingTasks.length }}</span>
+      </div>
+      <div class="tasks-list">
+        <app-task-card 
+          *ngFor="let task of doingTasks" 
+          [task]="task"
+          (taskUpdated)="handleTaskUpdate($event)">
+          <div class="custom-actions">
+            <button mat-raised-button color="primary" (click)="submitForReview(task)">
+              <mat-icon>send</mat-icon>
+              Сдать на проверку
+            </button>
+          </div>
+        </app-task-card>
+      </div>
+    </div>
+
+    <!-- На проверке -->
+    <div class="column checking-column">
+      <div class="column-header">
+        <h2>На проверке</h2>
+        <span class="count-badge">{{ checkingTasks.length }}</span>
+      </div>
+      <div class="tasks-list">
+        <app-task-card 
+          *ngFor="let task of checkingTasks" 
+          [task]="task"
+          (taskUpdated)="handleTaskUpdate($event)">
+          <div class="custom-actions">
+            <button mat-raised-button color="primary" (click)="approveTask(task)">
+              Утвердить
+            </button>
+            <button mat-button color="warn" (click)="rejectTask(task)">
+              Вернуть
+            </button>
+          </div>
+        </app-task-card>
+      </div>
+    </div>
+
+    <!-- Завершенные -->
+    <div class="column completed-column">
+      <div class="column-header">
+        <h2>Завершено</h2>
+        <span class="count-badge">{{ completedTasks.length }}</span>
+      </div>
+      <div class="tasks-list">
+        <app-task-card 
+          *ngFor="let task of completedTasks" 
+          [task]="task"
+          (taskUpdated)="handleTaskUpdate($event)">
+        </app-task-card>
+      </div>
+    </div>
+  </div>
+</div>

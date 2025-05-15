@@ -1,6 +1,7 @@
 ﻿using Adis.Bll.Dtos.Project;
 using Adis.Bll.Dtos.Task;
 using Adis.Bll.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -40,16 +41,94 @@ namespace Adis.Api.Controllers
             return Ok(task);
         }
 
+        /// <summary>
+        /// Добавляет новую задачу
+        /// </summary>
+        /// <remarks>
+        /// Пример запроса:
+        ///
+        ///     POST /api/tasks
+        ///     {
+        ///         "name": "Разработка сметы проекта",
+        ///         "description": "Смета должна соответствовать гостам и выполнена в Гранд-Смете",
+        ///         "idPerformers": [45, 78],
+        ///         "idCheckers": [32],
+        ///         "endDate": "2025-11-30",
+        ///         "idProject": 15,
+        ///         "status": "ToDo"
+        ///     }
+        ///
+        /// </remarks>
+        /// <param name="taskDto">Данные новой задачи</param>
+        /// <response code="200">Успешное выполнение</response>
+        /// <response code="400">Ошибка валидации данных</response>
+        /// <response code="401">Неавторизованный пользователь</response>
+        /// <response code="403">Пользователь без прав на это действие</response>
         [HttpPost]
+        [ProducesResponseType(typeof(TaskDetailsDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.Forbidden)]
+        [Authorize(Roles = "Admin, ProjectManager")]
         public async Task<IActionResult> AddTask(PostTaskDto taskDto)
         {
             return Ok(await _taskService.AddTaskAsync(taskDto));
         }
 
+        /// <summary>
+        /// Изменяет данные задачи
+        /// </summary>
+        /// <remarks>
+        /// Пример запроса:
+        ///
+        ///     PUT /api/tasks
+        ///     {
+        ///         "name": "Разработка сметы проекта",
+        ///         "description": "Смета должна соответствовать гостам и выполнена в Гранд-Смете",
+        ///         "idPerformers": [45, 78],
+        ///         "idCheckers": [32],
+        ///         "endDate": "2025-11-30",
+        ///         "idProject": 15,
+        ///         "status": "ToDo"
+        ///     }
+        ///
+        /// </remarks>
+        /// <param name="taskDto">Новые данные задачи</param>
+        /// <response code="200">Успешное выполнение</response>
+        /// <response code="400">Ошибка валидации данных</response>
+        /// <response code="401">Неавторизованный пользователь</response>
+        /// <response code="403">Пользователь без прав на это действие</response>
         [HttpPut]
+        [ProducesResponseType(typeof(TaskDetailsDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.Forbidden)]
+        [Authorize(Roles = "Admin, ProjectManager")]
         public async Task<IActionResult> UpdateTask(PutTaskDto taskDto)
         {
             return Ok(await _taskService.UpdateTaskAsync(taskDto));
+        }
+
+        /// <summary>
+        /// Возвращает задачи для пользователя
+        /// </summary>
+        /// <remarks>
+        /// Пример запроса:
+        ///
+        ///     GET /api/tasks
+        ///
+        /// </remarks>
+        /// <response code="200">Успешное выполнение</response>
+        /// <response code="401">Неавторизованный пользователь</response>
+        /// <response code="403">Пользователь без прав на это действие</response>
+        [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<TaskDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.Forbidden)]
+        [Authorize(Roles = "Projecter")]
+        public async Task<IActionResult> GetTasksForProjecter()
+        {
+            return Ok(await _taskService.GetTaskForProjecterAsync());
         }
     }
 }

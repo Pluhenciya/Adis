@@ -75,7 +75,7 @@ namespace Adis.Bll.Services
             return _mapper.Map<IEnumerable<UserDto>>(await _userRepository.GetUsersWithRoleAsync());
         }
 
-        public async Task<UserDto> GetUserByIdAsync(int id)
+        public async Task<UserDto?> GetUserByIdAsync(int id)
         {
             return _mapper.Map<UserDto>(await _userRepository.GetUserWithRoleByIdAsync(id));
         }

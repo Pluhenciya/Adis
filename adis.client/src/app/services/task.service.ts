@@ -2,7 +2,7 @@ import { Observable } from "rxjs";
 import { environment } from "../environments/environment";
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
-import { PostTaskDto, PutTaskDto, TaskDetailsDto, TaskDto } from "../models/task.model";
+import { PostTaskDto, PutTaskDto, TaskDetailsDto, TaskDto, TaskStatus } from "../models/task.model";
 
 
 @Injectable({
@@ -24,5 +24,13 @@ export class TaskService {
 
     addTask(taskData: PostTaskDto): Observable<TaskDetailsDto> {
       return this.http.post<TaskDetailsDto>(`${this.apiUrl}/tasks`, taskData);
+    }
+
+    getUserTasks(): Observable<TaskDto[]> {
+      return this.http.get<TaskDto[]>(`${this.apiUrl}/tasks`);
+    }
+
+    updateTaskStatus(idTask: number, status: TaskStatus){
+      return this.http.get<TaskDto[]>(`${this.apiUrl}/tasks`);
     }
 }
