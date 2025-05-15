@@ -105,7 +105,7 @@ namespace Adis.Bll.Services
             if (projectDto.StartDate != null && projectDto.StartDate > projectDto.EndDate)
                 throw new ArgumentException("Дата начала проектирования не может быть позже чем дата оканчания");
 
-            if (projectDto.IdWorkObject == 0 && projectDto.WorkObject == null)
+            if (projectDto.WorkObject == null)
                 throw new ArgumentException("Локация объекта работ обязательна");
 
             var user = _contextAccessor.HttpContext.User;
@@ -122,9 +122,6 @@ namespace Adis.Bll.Services
 
             if (projectDto.IdContractor != null)
                 projectDto.ContractorName = null!;
-
-            if (projectDto.IdWorkObject != 0)
-                projectDto.WorkObject = null!;
 
             if((projectDto.Status == ProjectStatus.InExecution
                 || projectDto.Status == ProjectStatus.Completed)

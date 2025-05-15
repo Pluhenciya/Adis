@@ -103,3 +103,47 @@ $status-colors: (
       }
     }
   }
+
+  .custom-actions {
+    margin-top: 16px;
+    border-top: 1px solid #eee;
+    padding-top: 12px;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+  
+    button {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+  
+      &[color='primary'] {
+        background: #FF6D00;
+        color: white;
+        
+        &:hover {
+          background: #FF9100;
+        }
+      }
+  
+      &[color='warn'] {
+        background: transparent;
+        color: #f44336;
+        border: 1px solid #f44336;
+        
+        &:hover {
+          background: rgba(244, 67, 54, 0.1);
+        }
+      }
+    }
+  }

@@ -30,7 +30,7 @@ export class TaskService {
       return this.http.get<TaskDto[]>(`${this.apiUrl}/tasks`);
     }
 
-    updateTaskStatus(idTask: number, status: TaskStatus){
-      return this.http.get<TaskDto[]>(`${this.apiUrl}/tasks`);
+    updateTaskStatus(idTask: number, status: TaskStatus): Observable<TaskDto>{
+      return this.http.get<TaskDto>(`${this.apiUrl}/tasks/${idTask}/${status}`);
     }
 }

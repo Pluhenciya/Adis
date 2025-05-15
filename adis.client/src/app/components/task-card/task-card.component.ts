@@ -36,7 +36,9 @@ export class TaskCardComponent {
       });
   
       dialogRef.afterClosed().subscribe(updatedTask => {
+        console.log(updatedTask)
         if (updatedTask) {
+          console.log(updatedTask)
           this.taskUpdated.emit(updatedTask);
         }
       });

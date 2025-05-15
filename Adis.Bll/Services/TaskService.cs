@@ -92,5 +92,14 @@ namespace Adis.Bll.Services
 
             return _mapper.Map<IEnumerable<TaskDto>>(await _taskRepository.GetTasksByIdUserAsync(idUser));
         }
+
+        public async Task<TaskDto> UpdateTaskStatusAsync(int id, string status)
+        {
+            if(!Status.TryParse(typeof(Status), status, out var verifedStatus))
+                new ArgumentException("Такого статуса нету");
+            var task = await _taskRepository.GetByIdAsync(id);
+            task.Status = (Status)verifedStatus!;
+            return _mapper.Map<TaskDto>(await _taskRepository.UpdateAsync(task));
+        }
     }
 }

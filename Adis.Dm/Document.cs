@@ -18,6 +18,8 @@ namespace Adis.Dm
 
         public virtual User? User { get; set; }
 
-        public virtual IEnumerable<ProjectTask> Tasks { get; set; } = null!;
+        public int? IdTask { get; set; }
+
+        public virtual ProjectTask? Task { get; set; } = null!;
     }
 }

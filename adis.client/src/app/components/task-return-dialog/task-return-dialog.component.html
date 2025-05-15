@@ -1,0 +1,11 @@
+<h2 mat-dialog-title>Возврат задачи</h2>
+    <div mat-dialog-content>
+      <mat-form-field appearance="outline" class="full-width">
+        <textarea matInput [(ngModel)]="comment" 
+                  placeholder="Укажите причину возврата"></textarea>
+      </mat-form-field>
+    </div>
+    <div mat-dialog-actions>
+      <button mat-button (click)="onCancel()">Отмена</button>
+      <button mat-raised-button color="warn" (click)="onReturn()">Вернуть</button>
+    </div>

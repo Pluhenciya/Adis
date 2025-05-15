@@ -2,7 +2,6 @@
 using Adis.Bll.Dtos.Task;
 using Adis.Bll.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -36,7 +35,7 @@ namespace Adis.Api.Controllers
         public async Task<IActionResult> GetTaskDetailsById(int id)
         {
             var task = await _taskService.GetTaskDetailsByIdAsync(id);
-            if(task == null)
+            if (task == null)
                 return NotFound("Задача с таким id не найдена");
             return Ok(task);
         }
@@ -130,5 +129,21 @@ namespace Adis.Api.Controllers
         {
             return Ok(await _taskService.GetTaskForProjecterAsync());
         }
+
+        [HttpGet("{id}/{status}")]
+        [Authorize(Roles = "Projecter, Admin")]
+        public async Task<IActionResult> UpdateTaskStatus(int id, string status)
+        {
+            try
+            {
+                return Ok(await _taskService.UpdateTaskStatusAsync(id, status));
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
     }
 }

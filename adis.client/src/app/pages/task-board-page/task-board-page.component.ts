@@ -10,6 +10,8 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { DatePipe, NgForOf } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { TaskCardComponent } from '../../components/task-card/task-card.component';
+import { TaskResultDialogComponent } from '../../components/task-result-dialog/task-result-dialog.component';
+import { TaskReturnDialogComponent } from '../../components/task-return-dialog/task-return-dialog.component';
 
 @Component({
   selector: 'app-task-board-page',
@@ -25,29 +27,39 @@ import { TaskCardComponent } from '../../components/task-card/task-card.componen
 })
 export class TaskBoardPageComponent implements OnInit {
   allTasks: TaskDto[] = [];
-  pendingReviewTasks: TaskDto[] = [];
-  
-  get todoTasks(): TaskDto[] {
-    return this.allTasks.filter(t => t.status === TaskStatus.ToDo);
+  currentUserId: number;
+
+  // Задачи где пользователь исполнитель и задача не принята
+  get assignedTasks(): TaskDto[] {
+    return this.allTasks.filter(t => 
+      t.performers.some(p => p.id === this.currentUserId) &&
+      t.status === TaskStatus.ToDo
+    );
   }
 
-  get doingTasks(): TaskDto[] {
-    return this.allTasks.filter(t => t.status === TaskStatus.Doing);
+  // Принятые задачи в работе
+  get acceptedTasks(): TaskDto[] {
+    return this.allTasks.filter(t => 
+      t.performers.some(p => p.id === this.currentUserId) &&
+      t.status === TaskStatus.Doing
+    );
   }
 
-  get checkingTasks(): TaskDto[] {
-    return this.allTasks.filter(t => t.status === TaskStatus.Checking);
-  }
-
-  get completedTasks(): TaskDto[] {
-    return this.allTasks.filter(t => t.status === TaskStatus.Completed);
+  // Задачи на проверке где пользователь проверяющий
+  get reviewTasks(): TaskDto[] {
+    return this.allTasks.filter(t => 
+      t.checkers.some(c => c.id === this.currentUserId) &&
+      t.status === TaskStatus.Checking
+    );
   }
 
   constructor(
     private taskService: TaskService,
     private authState: AuthStateService,
     private dialog: MatDialog
-  ) {}
+  ) {
+    this.currentUserId = Number(this.authState.currentUserId);
+  }
 
   ngOnInit(): void {
     this.loadTasks();
@@ -59,47 +71,7 @@ export class TaskBoardPageComponent implements OnInit {
     });
   }
 
-  getStatusLabel(status: TaskStatus): string {
-    switch(status) {
-      case TaskStatus.ToDo: return 'К выполнению';
-      case TaskStatus.Doing: return 'В работе';
-      case TaskStatus.Checking: return 'На проверке';
-      case TaskStatus.Completed: return 'Завершена';
-      default: return '';
-    }
-  }
-
-  openTaskDetails(task: TaskDto): void {
-    this.dialog.open(TaskDetailsDialogComponent, {
-      width: '800px',
-      data: { task, projectStatus: 'InExecution' }
-    });
-  }
-
-  submitForReview(task: TaskDto): void {
-    this.taskService.updateTaskStatus(task.idTask, TaskStatus.Checking)
-      .subscribe(() => this.loadTasks());
-  }
-
-  rejectTask(task: TaskDto): void {
-    this.taskService.updateTaskStatus(task.idTask, TaskStatus.Doing)
-      .subscribe(() => this.loadTasks());
-  }
-
-  approveTask(task: TaskDto): void {
-    this.taskService.updateTaskStatus(task.idTask, TaskStatus.Completed)
-      .subscribe(() => this.loadTasks());
-  }
-
   handleTaskUpdate(updatedTask: TaskDto): void {
-    const index = this.allTasks.findIndex(t => t.idTask === updatedTask.idTask);
-    if (index !== -1) {
-      this.allTasks[index] = updatedTask;
-    }
-  }
-
-  acceptTask(task: TaskDto): void {
-    this.taskService.updateTaskStatus(task.idTask, TaskStatus.Doing)
-      .subscribe(() => this.loadTasks());
+    this.loadTasks();
   }
 }

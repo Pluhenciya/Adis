@@ -1,10 +1,10 @@
 import { AsyncPipe, DatePipe, NgForOf, NgIf } from '@angular/common';
 import { Component, Inject, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import {MatListModule} from '@angular/material/list';
-import { PostTaskDto, PutTaskDto, TaskDetailsDto, TaskStatus } from '../../models/task.model';
+import { PostTaskDto, PutTaskDto, TaskDetailsDto, TaskDto, TaskStatus } from '../../models/task.model';
 import { MatButtonModule } from '@angular/material/button';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TaskService } from '../../services/task.service';
@@ -23,6 +23,8 @@ import { AuthService } from '../../services/auth.service';
 import { AuthStateService } from '../../services/auth-state.service';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatSelectModule } from '@angular/material/select';
+import { TaskResultDialogComponent } from '../task-result-dialog/task-result-dialog.component';
+import { TaskReturnDialogComponent } from '../task-return-dialog/task-return-dialog.component';
 
 export interface TaskDialogData {
   task: TaskDetailsDto;
@@ -65,6 +67,9 @@ export class TaskDetailsDialogComponent implements OnInit {
   allUsers: UserDto[] = [];
   commentControl = new FormControl('', [Validators.required, Validators.maxLength(1000)]);
   taskStatuses = Object.values(TaskStatus);
+  currentUserId: number;
+  isPerformer = false;
+  isChecker = false;
 
   constructor(
     private fb: FormBuilder,
@@ -74,6 +79,7 @@ export class TaskDetailsDialogComponent implements OnInit {
     private commentService: CommentService,
     private snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<TaskDetailsDialogComponent>,
+    private dialog: MatDialog,
     @Inject(MAT_DIALOG_DATA) public data: TaskDialogData
   ) {
     this.taskForm = this.fb.group({
@@ -83,6 +89,61 @@ export class TaskDetailsDialogComponent implements OnInit {
       checkers: [data.task.checkers, [Validators.required]],
       endDate: [data.task.endDate, [Validators.required]],
       status: [data.task.status]
+    });
+    this.currentUserId = Number(this.authService.currentUserId);
+    this.checkRoles();
+  }
+
+  private checkRoles() {
+    this.isPerformer = this.data.task.performers?.some(p => p.id === this.currentUserId);
+    this.isChecker = this.data.task.checkers?.some(c => c.id === this.currentUserId);
+  }
+
+  acceptTask() {
+     this.taskService.updateTaskStatus(this.data.task.idTask, TaskStatus.Doing)
+       .subscribe(updatedTask => this.dialogRef.close(updatedTask));
+  }
+
+  approveTask() {
+     this.taskService.updateTaskStatus(this.data.task.idTask, TaskStatus.Completed)
+       .subscribe(updatedTask => this.dialogRef.close(updatedTask));
+  }
+
+  submitTaskResult(task: TaskDto, result: string): void {
+    // this.taskService.submitTaskResult(task.idTask, result)
+   //    .subscribe(() => this.loadTasks());
+   }
+ 
+   returnTask(task: TaskDto, comment: string): void {
+    // this.taskService.returnTask(task.idTask, comment)
+    //   .subscribe(() => this.loadTasks());
+   }
+
+  openResultDialog(task: TaskDto): void {
+    const dialogRef = this.dialog.open(TaskResultDialogComponent, {
+      width: '600px',
+      maxWidth: '600px',
+      data: { task }
+    });
+  
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.submitTaskResult(task, result);
+      }
+    });
+  }
+  
+  openReturnDialog(task: TaskDto): void {
+    const dialogRef = this.dialog.open(TaskReturnDialogComponent, {
+      width: '500px',
+      maxWidth: '500px',
+      data: { task }
+    });
+  
+    dialogRef.afterClosed().subscribe(comment => {
+      if (comment) {
+        this.returnTask(task, comment);
+      }
     });
   }
 
