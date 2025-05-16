@@ -114,9 +114,8 @@
       <mat-card-title class="header-container">
         <div class="header-content">
           <span class="tasks-title">Задачи проекта</span>
-          <button mat-stroked-button color="primary" class="add-task-btn" 
-            (click)="openAddTaskDialog()" 
-            *appHasRole="['admin', 'projectManager']" 
+          <button mat-stroked-button color="primary" class="add-task-btn" (click)="openAddTaskDialog()"
+            *appHasRole="['admin', 'projectManager']"
             [style.display]="(project.status === 'Designing' || authService.isAdmin()) ? 'flex' : 'none'">
             <mat-icon>add</mat-icon>
             Добавить задачу
@@ -124,7 +123,7 @@
         </div>
       </mat-card-title>
     </mat-card-header>
-  
+
     <div class="tasks-container">
       <div class="task-column" *ngFor="let column of taskColumns">
         <div class="column-header">
@@ -132,10 +131,7 @@
           <span class="count-badge">{{ column.count }}</span>
         </div>
         <div class="task-list">
-          <app-task-card 
-            *ngFor="let task of column.tasks" 
-            [task]="task"
-            [projectStatus]="project.status"
+          <app-task-card *ngFor="let task of column.tasks" [task]="task" [projectStatus]="project.status"
             (taskUpdated)="onTaskUpdated($event)">
           </app-task-card>
         </div>

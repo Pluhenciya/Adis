@@ -50,7 +50,7 @@ export class TaskResultDialogComponent {
   onSubmit(): void {
     const result = {
       text: this.result,
-      files: this.selectedFiles // Изменено на передачу массива
+      files: this.selectedFiles
     };
     this.dialogRef.close(result);
   }

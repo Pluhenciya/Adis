@@ -144,6 +144,11 @@ namespace Adis.Api.Controllers
             }
         }
 
+        //[HttpPost]
+        //[Authorize(Roles = "Projecter, Admin")]
+        //public async Task<IActionResult> UpdateTaskResult(int idTask, [FromBody] string result)
+        //{
 
+        //}
     }
 }
