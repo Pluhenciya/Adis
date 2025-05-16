@@ -17,11 +17,10 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MapService } from '../../services/map.service';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { TaskService } from '../../services/task.service';
-import { TaskDetailsDialogComponent } from '../../components/task-details-dialog/task-details-dialog.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { AddTaskDialogComponent } from '../../components/add-task-dialog/add-task-dialog.component';
 import { AuthStateService } from '../../services/auth-state.service';
+import { TaskCardComponent } from '../../components/task-card/task-card.component';
 
 interface TaskColumn {
   title: string;
@@ -46,7 +45,8 @@ interface TaskColumn {
     MatProgressBarModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
-    MatDialogModule
+    MatDialogModule,
+    TaskCardComponent
   ],
   templateUrl: './project-details-page.component.html',
   styleUrl: './project-details-page.component.scss'
@@ -90,7 +90,6 @@ export class ProjectDetailsPageComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private dialog: MatDialog,
     private projectService: ProjectService,
-    private taskService: TaskService,
     public authService: AuthStateService
     ){}
 
@@ -111,26 +110,6 @@ export class ProjectDetailsPageComponent implements OnInit, OnDestroy {
       if (this.showMap) {
         this.mapService.destroyMap();
       }
-    }
-
-    openTaskDetails(task: TaskDto) {
-      this.taskService.getTaskDetails(task.idTask).subscribe(fullTask => {
-        const dialogRef = this.dialog.open(TaskDetailsDialogComponent, {
-          maxWidth: '900px',
-          data: {task: fullTask, projectStatus: this.project.status},
-          panelClass: 'task-details-dialog'
-        });
-    
-        dialogRef.afterClosed().subscribe(updatedTask => {
-          if (updatedTask) {
-            const index = this.project.tasks.findIndex(t => t.idTask === updatedTask.idTask);
-            if (index !== -1) {
-              this.project.tasks[index] = updatedTask;
-              this.updateTaskColumns();
-            }
-          }
-        });
-      });
     }
 
     private checkGeoData() {
@@ -242,5 +221,13 @@ export class ProjectDetailsPageComponent implements OnInit, OnDestroy {
         this.updateTaskColumns();
       }
     });
+  }
+
+  onTaskUpdated(updatedTask: TaskDto) {
+    const index = this.project.tasks.findIndex(t => t.idTask === updatedTask.idTask);
+    if (index !== -1) {
+      this.project.tasks[index] = updatedTask;
+      this.updateTaskColumns();
+    }
   }
 }

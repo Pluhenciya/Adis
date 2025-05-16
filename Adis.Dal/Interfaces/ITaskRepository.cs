@@ -10,5 +10,7 @@ namespace Adis.Dal.Interfaces
     public interface ITaskRepository : IRepository<ProjectTask>
     {
         public Task<ProjectTask?> GetTaskDetailsByIdAsync(int id);
+
+        public Task<IEnumerable<ProjectTask>> GetTasksByIdUserAsync(int idUser);
     }
 }

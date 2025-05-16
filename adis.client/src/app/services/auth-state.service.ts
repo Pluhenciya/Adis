@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
-import { BehaviorSubject, Observable, catchError, filter, map, of, switchMap, take, tap } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, delay, filter, map, of, shareReplay, switchMap, take, tap, throwError, timeout } from 'rxjs';
 import { AuthService } from './auth.service';
 import { RefreshTokenRequest } from '../models/auth.model';
 
@@ -17,7 +17,8 @@ export class AuthStateService {
   private roleSubject = new BehaviorSubject<string | null>(null);
   private emailSubject = new BehaviorSubject<string | null>(null);
   private userIdSubject = new BehaviorSubject<string | null>(null);
-  private isRefreshing = false;
+  private refreshTokenRequest: Observable<boolean> | null = null;
+  private readonly REFRESH_TIMEOUT = 5000; // 5 seconds timeout
   
   public role$ = this.roleSubject.asObservable();
   public email$ = this.emailSubject.asObservable();
@@ -65,8 +66,8 @@ export class AuthStateService {
     if (!this.accessToken) return of(false);
 
     if (this.isTokenExpired()) {
-      if (this.isRefreshing) {
-        return this.role$.pipe(switchMap(() => of(!!this.accessToken)));
+      if (this.refreshTokenRequest) {
+        return this.refreshTokenRequest;
       }
       return this.handleTokenRefresh();
     }
@@ -79,42 +80,39 @@ export class AuthStateService {
       this.clearAuthData();
       return of(false);
     }
-  
-    if (this.isRefreshing) {
-      return this.role$.pipe(
-        filter(role => role !== null),
-        take(1),
-        switchMap(() => of(!!this.accessToken))
-      );
-    }
-  
-    this.isRefreshing = true;
-  
+
     const request: RefreshTokenRequest = {
       refreshToken: this.refreshToken,
       accessToken: this.accessToken
     };
-  
-    return this.authService.refreshToken(request).pipe(
+
+    this.refreshTokenRequest = this.authService.refreshToken(request).pipe(
+      timeout(this.REFRESH_TIMEOUT),
       tap({
         next: (response) => {
           this.login(response.accessToken, response.refreshToken);
-          this.isRefreshing = false;
+          this.refreshTokenRequest = null;
         },
         error: (err) => {
           console.error('Refresh token failed:', err);
-          if (err.status === 401 || err.status === 400) {
+          this.refreshTokenRequest = null;
+          if (err.name !== 'TimeoutError') {
             this.clearAuthData();
           }
-          this.isRefreshing = false;
         }
       }),
       map(() => true),
-      catchError(() => {
-        this.isRefreshing = false;
-        return of(false);
-      })
+      catchError((err) => {
+        if (err.name === 'TimeoutError') {
+          console.error('Refresh token timed out');
+          return of(false).pipe(delay(1000)); 
+        }
+        return throwError(() => err);
+      }),
+      shareReplay(1) 
     );
+
+    return this.refreshTokenRequest;
   }
 
 

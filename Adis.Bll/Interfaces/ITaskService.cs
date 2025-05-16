@@ -17,5 +17,11 @@ namespace Adis.Bll.Interfaces
         public Task<TaskDetailsDto> UpdateTaskAsync(PutTaskDto taskDto);
 
         public Task<bool> TaskExistAsync(int id);
+
+        public Task<IEnumerable<TaskDto>> GetTaskForProjecterAsync();
+
+        public Task<TaskDto> UpdateTaskStatusAsync(int idTask, string status);
+
+        public Task<TaskDto> UpdateTaskResultAsync(int idTask, string result);
     }
 }

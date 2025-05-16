@@ -97,7 +97,8 @@
       </div>
 
       <!-- Действия -->
-      <div class="actions" *appHasRole="['admin', 'projectManager']" [style.display]="(project.status === 'Designing' || authService.isAdmin()) ? 'flex' : 'none'">
+      <div class="actions" *appHasRole="['admin', 'projectManager']"
+        [style.display]="(project.status === 'Designing' || authService.isAdmin()) ? 'flex' : 'none'">
         <button mat-mini-fab class="edit-btn" (click)="openProjectForm(project)">
           <mat-icon>edit</mat-icon>
         </button>
@@ -113,8 +114,9 @@
       <mat-card-title class="header-container">
         <div class="header-content">
           <span class="tasks-title">Задачи проекта</span>
-          <button mat-stroked-button color="primary" class="add-task-btn" 
-          (click)="openAddTaskDialog()" *appHasRole="['admin', 'projectManager']" [style.display]="(project.status === 'Designing' || authService.isAdmin()) ? 'flex' : 'none'">
+          <button mat-stroked-button color="primary" class="add-task-btn" (click)="openAddTaskDialog()"
+            *appHasRole="['admin', 'projectManager']"
+            [style.display]="(project.status === 'Designing' || authService.isAdmin()) ? 'flex' : 'none'">
             <mat-icon>add</mat-icon>
             Добавить задачу
           </button>
@@ -129,48 +131,9 @@
           <span class="count-badge">{{ column.count }}</span>
         </div>
         <div class="task-list">
-          <!-- Внутри mat-card с классом task-item -->
-          <mat-card class="task-item" *ngFor="let task of column.tasks" (click)="openTaskDetails(task)">
-            <h4>{{ task.name }}</h4>
-
-            <!-- Статус задачи -->
-            <div class="task-status" [class]="task.status">
-            </div>
-
-            <!-- Исполнители -->
-            <div class="task-meta">
-              <div class="meta-group">
-                <mat-icon class="meta-icon">person_outline</mat-icon>
-                <div class="meta-content">
-                  <span class="meta-label">Исполнители</span>
-                  <div class="user-list">
-                    <span class="user-item" *ngFor="let user of task.performers">
-                      {{ user.fullName || user.email }}
-                    </span>
-                    <span *ngIf="!task.performers?.length" class="empty-state">
-                      Не назначены
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Проверяющие -->
-              <div class="meta-group">
-                <mat-icon class="meta-icon">verified_user</mat-icon>
-                <div class="meta-content">
-                  <span class="meta-label">Проверяющие</span>
-                  <div class="user-list">
-                    <span class="user-item" *ngFor="let user of task.checkers">
-                      {{ user.fullName || user.email }}
-                    </span>
-                    <span *ngIf="!task.checkers?.length" class="empty-state">
-                      Не назначены
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </mat-card>
+          <app-task-card *ngFor="let task of column.tasks" [task]="task" [projectStatus]="project.status"
+            (taskUpdated)="onTaskUpdated($event)">
+          </app-task-card>
         </div>
       </div>
     </div>

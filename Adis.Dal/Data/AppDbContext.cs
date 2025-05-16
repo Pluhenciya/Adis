@@ -254,24 +254,10 @@ namespace Adis.Dal.Data
                     });
 
                 entity.HasMany(t => t.Documents)
-                    .WithMany(d => d.Tasks)
-                    .UsingEntity<Dictionary<string, object>>(
-                    "tasks_has_documents",
-                    j => j
-                        .HasOne<Document>()
-                        .WithMany()
-                        .HasForeignKey("id_document")
-                        .HasConstraintName("fk_document_tasks"),
-                    j => j
-                        .HasOne<ProjectTask>()
-                        .WithMany()
-                        .HasForeignKey("id_task")
-                        .HasConstraintName("fk_task_documents"),
-                    j =>
-                    {
-                        j.Property("id_document").HasColumnName("id_document");
-                        j.Property("id_task").HasColumnName("id_task");
-                    });
+                    .WithOne(d => d.Task)
+                    .HasForeignKey(t => t.IdTask)
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .HasConstraintName("fk_documents_task");
             });
 
             modelBuilder.Entity<Document>(entity =>
@@ -296,6 +282,9 @@ namespace Adis.Dal.Data
 
                 entity.Property(d => d.IdUser)
                     .HasColumnName("id_user");
+
+                entity.Property(d => d.IdTask)
+                    .HasColumnName("id_task");
 
                 entity.HasOne(d => d.User)
                     .WithMany(u => u.Documents)

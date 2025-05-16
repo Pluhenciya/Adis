@@ -22,5 +22,11 @@ namespace Adis.Dal.Repositories
 
             return (await GetAsync(spec)).FirstOrDefault();
         }
+
+        public async Task<IEnumerable<ProjectTask>> GetTasksByIdUserAsync(int idUser)
+        {
+            TaskByIdUserSpecification spec = new(idUser);
+            return await GetAsync(spec);
+        }
     }
 }

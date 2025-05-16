@@ -1,0 +1,57 @@
+<div class="dialog-container">
+    <h2 mat-dialog-title class="dialog-header">
+      <mat-icon class="header-icon">assignment_add</mat-icon>
+      Добавление результата
+    </h2>
+  
+    <mat-dialog-content class="dialog-content">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Описание результата</mat-label>
+        <textarea matInput 
+                  [(ngModel)]="result" 
+                  rows="4"
+                  cdkTextareaAutosize
+                  #autosize="cdkTextareaAutosize"
+                  cdkAutosizeMinRows="4"
+                  cdkAutosizeMaxRows="8"></textarea>
+      </mat-form-field>
+  
+      <div class="file-upload-container">
+        <label class="file-upload-label">
+          <input type="file" 
+                 (change)="onFileSelected($event)"
+                 class="file-input"
+                 multiple >
+          <mat-icon class="upload-icon">cloud_upload</mat-icon>
+          <span class="upload-text">
+            {{ selectedFiles.length > 0 ? ('Выбрано файлов: ' + selectedFiles.length) : 'Прикрепить файлы' }}
+          </span>
+        </label>
+        
+        <!-- Добавьте блок для отображения списка файлов -->
+        <div class="file-list" *ngIf="selectedFiles.length > 0">
+          <div class="file-item" *ngFor="let file of selectedFiles">
+            <mat-icon class="file-icon">insert_drive_file</mat-icon>
+            <span class="file-name">{{ file.name }}</span>
+            <mat-icon class="remove-icon" (click)="removeFile(file)">close</mat-icon>
+          </div>
+        </div>
+      </div>
+    </mat-dialog-content>
+  
+    <mat-dialog-actions class="dialog-actions">
+      <button mat-stroked-button 
+              color="primary" 
+              (click)="onCancel()"
+              class="action-button">
+        Отмена
+      </button>
+      <button mat-raised-button 
+              color="primary" 
+              (click)="onSubmit()"
+              class="action-button"
+              [disabled]="!result && selectedFiles.length === 0">
+        Сохранить
+      </button>
+    </mat-dialog-actions>
+  </div>

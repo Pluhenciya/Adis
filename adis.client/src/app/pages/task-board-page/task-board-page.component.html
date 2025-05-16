@@ -1,0 +1,52 @@
+<div class="task-board-container">
+  <div class="board-header">
+    <h1>Мои задачи</h1>
+  </div>
+
+  <div class="status-columns">
+    <!-- Назначенные задачи -->
+    <div class="column assigned-column">
+      <div class="column-header">
+        <h2>Назначенные</h2>
+        <span class="count-badge">{{ assignedTasks.length }}</span>
+      </div>
+      <div class="tasks-list">
+        <app-task-card 
+          *ngFor="let task of assignedTasks" 
+          [task]="task"
+          (taskUpdated)="handleTaskUpdate($event)">
+        </app-task-card>
+      </div>
+    </div>
+
+    <!-- В работе -->
+    <div class="column in-progress-column">
+      <div class="column-header">
+        <h2>В работе</h2>
+        <span class="count-badge">{{ acceptedTasks.length }}</span>
+      </div>
+      <div class="tasks-list">
+        <app-task-card 
+          *ngFor="let task of acceptedTasks" 
+          [task]="task"
+          (taskUpdated)="handleTaskUpdate($event)">
+        </app-task-card>
+      </div>
+    </div>
+
+    <!-- На проверке -->
+    <div class="column review-column">
+      <div class="column-header">
+        <h2>Ожидают проверки</h2>
+        <span class="count-badge">{{ reviewTasks.length }}</span>
+      </div>
+      <div class="tasks-list">
+        <app-task-card 
+          *ngFor="let task of reviewTasks" 
+          [task]="task"
+          (taskUpdated)="handleTaskUpdate($event)">
+        </app-task-card>
+      </div>
+    </div>
+  </div>
+</div>

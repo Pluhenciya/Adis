@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Adis.Bll.Dtos.Project
 {
     /// <summary>
-    /// DTO для проектов
+    /// DTO для получения проектов
     /// </summary>
     public class PostProjectDto
     {
@@ -47,17 +47,30 @@ namespace Adis.Bll.Dtos.Project
         /// </summary>
         public int IdUser { get; set; }
 
-        public int IdWorkObject { get; set; }
-
+        /// <summary>
+        /// Объект работ
+        /// </summary>
         public WorkObjectDto WorkObject { get; set; } = null!;
 
+        /// <summary>
+        /// Наименование подрядчика
+        /// </summary>
         [StringLength(255)]
         public string? ContractorName { get; set; } = null!;
 
+        /// <summary>
+        /// Идентификатор подрядчика
+        /// </summary>
         public int? IdContractor { get; set; }
 
+        /// <summary>
+        /// Дата начала проведения работ
+        /// </summary>
         public DateOnly? StartExecutionDate { get; set; }
 
+        /// <summary>
+        /// Дата окончания проведения работ
+        /// </summary>
         public DateOnly? EndExecutionDate { get; set; }
     }
 }

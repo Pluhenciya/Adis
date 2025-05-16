@@ -86,6 +86,16 @@
              <response code="401">Неавторизованный пользователь</response>
              <response code="403">Пользователь без прав на это действие</response>
         </member>
+        <member name="T:Adis.Api.Controllers.DocumentsController">
+            <summary>
+            Позволяет управлять документами
+            </summary>
+        </member>
+        <member name="M:Adis.Api.Controllers.DocumentsController.#ctor(Adis.Bll.Interfaces.IDocumentService)">
+            <summary>
+            Позволяет управлять документами
+            </summary>
+        </member>
         <member name="T:Adis.Api.Controllers.ProjectsController">
             <summary>
             Позволяет управлять проектами
@@ -228,6 +238,97 @@
              <response code="200">Успешное выполнение</response>
              <response code="404">Проект с данным идентификатором не найден</response>
         </member>
+        <member name="T:Adis.Api.Controllers.TasksController">
+            <summary>
+            Позволяет управлять задачами
+            </summary>
+        </member>
+        <member name="M:Adis.Api.Controllers.TasksController.#ctor(Adis.Bll.Interfaces.ITaskService)">
+            <summary>
+            Позволяет управлять задачами
+            </summary>
+        </member>
+        <member name="F:Adis.Api.Controllers.TasksController._taskService">
+            <inheritdoc cref="T:Adis.Bll.Interfaces.ITaskService"/>
+        </member>
+        <member name="M:Adis.Api.Controllers.TasksController.GetTaskDetailsById(System.Int32)">
+             <summary>
+             Возвращает подробности о задачу по идентификатору
+             </summary>
+             <remarks>
+             Пример запроса:
+            
+                 GET /api/tasks/1
+            
+             </remarks>
+             <param name="id">Идентификатор задаси</param>
+             <response code="200">Успешное выполнение</response>
+             <response code="404">не найдена задача по идентификатору</response>
+        </member>
+        <member name="M:Adis.Api.Controllers.TasksController.AddTask(Adis.Bll.Dtos.Task.PostTaskDto)">
+             <summary>
+             Добавляет новую задачу
+             </summary>
+             <remarks>
+             Пример запроса:
+            
+                 POST /api/tasks
+                 {
+                     "name": "Разработка сметы проекта",
+                     "description": "Смета должна соответствовать гостам и выполнена в Гранд-Смете",
+                     "idPerformers": [45, 78],
+                     "idCheckers": [32],
+                     "endDate": "2025-11-30",
+                     "idProject": 15,
+                     "status": "ToDo"
+                 }
+            
+             </remarks>
+             <param name="taskDto">Данные новой задачи</param>
+             <response code="200">Успешное выполнение</response>
+             <response code="400">Ошибка валидации данных</response>
+             <response code="401">Неавторизованный пользователь</response>
+             <response code="403">Пользователь без прав на это действие</response>
+        </member>
+        <member name="M:Adis.Api.Controllers.TasksController.UpdateTask(Adis.Bll.Dtos.Task.PutTaskDto)">
+             <summary>
+             Изменяет данные задачи
+             </summary>
+             <remarks>
+             Пример запроса:
+            
+                 PUT /api/tasks
+                 {
+                     "name": "Разработка сметы проекта",
+                     "description": "Смета должна соответствовать гостам и выполнена в Гранд-Смете",
+                     "idPerformers": [45, 78],
+                     "idCheckers": [32],
+                     "endDate": "2025-11-30",
+                     "idProject": 15,
+                     "status": "ToDo"
+                 }
+            
+             </remarks>
+             <param name="taskDto">Новые данные задачи</param>
+             <response code="200">Успешное выполнение</response>
+             <response code="400">Ошибка валидации данных</response>
+             <response code="401">Неавторизованный пользователь</response>
+             <response code="403">Пользователь без прав на это действие</response>
+        </member>
+        <member name="M:Adis.Api.Controllers.TasksController.GetTasksForProjecter">
+             <summary>
+             Возвращает задачи для пользователя
+             </summary>
+             <remarks>
+             Пример запроса:
+            
+                 GET /api/tasks
+            
+             </remarks>
+             <response code="200">Успешное выполнение</response>
+             <response code="401">Неавторизованный пользователь</response>
+             <response code="403">Пользователь без прав на это действие</response>
+        </member>
         <member name="T:Adis.Api.Controllers.UsersController">
             <summary>
             Позволяет управлять пользователями
@@ -257,6 +358,8 @@
              <param name="user">Данные нового пользователя</param>
              <response code="200">Успешное выполнение</response>
              <response code="400">Ошибка валидации данных</response>
+             <response code="401">Неавторизованный пользователь</response>
+             <response code="403">Пользователь без прав на это действие</response>
         </member>
         <member name="M:Adis.Api.Controllers.UsersController.GetUsers">
              <summary>
@@ -269,6 +372,36 @@
             
              </remarks>
              <response code="200">Успешное выполнение</response>
+             <response code="401">Неавторизованный пользователь</response>
+             <response code="403">Пользователь без прав на это действие</response>
+        </member>
+        <member name="M:Adis.Api.Controllers.UsersController.GetUsersByPartialFullNameWithRole(System.String,System.String)">
+             <summary>
+             Возвращает список пользователей указанной роли и части его ФИО
+             </summary>
+             <remarks>
+             Пример запроса:
+            
+                 GET /api/users/projecter/Попо
+            
+             </remarks>
+             <response code="200">Успешное выполнение</response>
+             <response code="401">Неавторизованный пользователь</response>
+             <response code="403">Пользователь без прав на это действие</response>
+        </member>
+        <member name="M:Adis.Api.Controllers.UsersController.GetUserById(System.Int32)">
+             <summary>
+             Возвращает пользователя по идентификатору
+             </summary>
+             <remarks>
+             Пример запроса:
+            
+                 GET /api/users/1
+            
+             </remarks>
+             <response code="200">Успешное выполнение</response>
+             <response code="401">Неавторизованный пользователь</response>
+             <response code="403">Пользователь без прав на это действие</response>
         </member>
     </members>
 </doc>

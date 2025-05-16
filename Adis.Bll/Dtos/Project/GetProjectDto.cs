@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace Adis.Bll.Dtos.Project
 {
+    /// <summary>
+    /// DTO для возврата проекта
+    /// </summary>
     public class GetProjectDto
     {
         /// <summary>
@@ -40,16 +43,34 @@ namespace Adis.Bll.Dtos.Project
         /// </summary>
         public int IdUser { get; set; }
 
+        /// <summary>
+        /// ФИО ответственного лица
+        /// </summary>
         public string ResponsiblePerson { get; set; } = null!;
 
+        /// <summary>
+        /// Прогресс проетирования/выполнения проекта
+        /// </summary>
         public int Progress { get; set; }
 
+        /// <summary>
+        /// Объект выполнения работ
+        /// </summary>
         public WorkObjectDto WorkObject { get; set; } = null!;
 
+        /// <summary>
+        /// Наименование подрядчика
+        /// </summary>
         public string? ContractorName { get; set; } = null!;
 
+        /// <summary>
+        /// Дата начала выполнения работ
+        /// </summary>
         public DateOnly? StartExecutionDate { get; set; }
 
+        /// <summary>
+        /// Дата окончания выполнения работ
+        /// </summary>
         public DateOnly? EndExecutionDate { get; set; }
     }
 }

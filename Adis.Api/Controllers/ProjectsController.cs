@@ -231,7 +231,7 @@ namespace Adis.Api.Controllers
         /// <response code="200">Успешное выполнение</response>
         /// <response code="404">Проект с данным идентификатором не найден</response>
         [HttpGet("{id}")]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(GetProjectWithTasksDto),(int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> GetProjectDetailsById(int id)
         {
