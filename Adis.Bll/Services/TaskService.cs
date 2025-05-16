@@ -96,9 +96,20 @@ namespace Adis.Bll.Services
         public async Task<TaskDto> UpdateTaskStatusAsync(int id, string status)
         {
             if(!Status.TryParse(typeof(Status), status, out var verifedStatus))
-                new ArgumentException("Такого статуса нету");
+                throw new ArgumentException("Такого статуса нету");
             var task = await _taskRepository.GetByIdAsync(id);
+            if (task == null)
+                throw new KeyNotFoundException("Задача с таким id не найдена");
             task.Status = (Status)verifedStatus!;
+            return _mapper.Map<TaskDto>(await _taskRepository.UpdateAsync(task));
+        }
+
+        public async Task<TaskDto> UpdateTaskResultAsync(int idTask, string result)
+        {
+            var task = await _taskRepository.GetByIdAsync(idTask);
+            if (task == null)
+                throw new KeyNotFoundException("Задача с таким id не найдена");
+            task.TextResult = result;
             return _mapper.Map<TaskDto>(await _taskRepository.UpdateAsync(task));
         }
     }

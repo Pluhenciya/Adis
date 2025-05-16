@@ -86,6 +86,16 @@
              <response code="401">Неавторизованный пользователь</response>
              <response code="403">Пользователь без прав на это действие</response>
         </member>
+        <member name="T:Adis.Api.Controllers.DocumentsController">
+            <summary>
+            Позволяет управлять документами
+            </summary>
+        </member>
+        <member name="M:Adis.Api.Controllers.DocumentsController.#ctor(Adis.Bll.Interfaces.IDocumentService)">
+            <summary>
+            Позволяет управлять документами
+            </summary>
+        </member>
         <member name="T:Adis.Api.Controllers.ProjectsController">
             <summary>
             Позволяет управлять проектами

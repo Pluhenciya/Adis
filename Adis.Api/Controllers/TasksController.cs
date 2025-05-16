@@ -1,6 +1,7 @@
 ﻿using Adis.Bll.Dtos.Project;
 using Adis.Bll.Dtos.Task;
 using Adis.Bll.Interfaces;
+using Adis.Dm;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -142,13 +143,24 @@ namespace Adis.Api.Controllers
             {
                 return BadRequest(ex.Message);
             }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
-        //[HttpPost]
-        //[Authorize(Roles = "Projecter, Admin")]
-        //public async Task<IActionResult> UpdateTaskResult(int idTask, [FromBody] string result)
-        //{
-
-        //}
+        [HttpPut("{idTask}")]
+        [Authorize(Roles = "Projecter, Admin")]
+        public async Task<IActionResult> UpdateTaskResult(int idTask, [FromBody] TaskResultDto dto)
+        {
+            try
+            {
+                return Ok(await _taskService.UpdateTaskResultAsync(idTask, dto.Result));
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
     }
 }

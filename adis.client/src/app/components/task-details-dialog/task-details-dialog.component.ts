@@ -14,7 +14,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { UserDto } from '../../models/user.model';
-import { Observable, debounceTime, distinctUntilChanged, map, of, switchMap } from 'rxjs';
+import { Observable, catchError, combineLatest, debounceTime, distinctUntilChanged, finalize, last, lastValueFrom, map, of, switchMap } from 'rxjs';
 import { UserService } from '../../services/user.service';
 import { CommentService } from '../../services/comment.service';
 import { CommentDto, PostCommentDto } from '../../models/comment.model';
@@ -25,6 +25,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatSelectModule } from '@angular/material/select';
 import { TaskResultDialogComponent } from '../task-result-dialog/task-result-dialog.component';
 import { TaskReturnDialogComponent } from '../task-return-dialog/task-return-dialog.component';
+import { DocumentService } from '../../services/document.service';
+import { environment } from '../../environments/environment';
 
 export interface TaskDialogData {
   task: TaskDetailsDto;
@@ -80,6 +82,7 @@ export class TaskDetailsDialogComponent implements OnInit {
     private snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<TaskDetailsDialogComponent>,
     private dialog: MatDialog,
+    private documentService: DocumentService,
     @Inject(MAT_DIALOG_DATA) public data: TaskDialogData
   ) {
     this.taskForm = this.fb.group({
@@ -92,6 +95,7 @@ export class TaskDetailsDialogComponent implements OnInit {
     });
     this.currentUserId = Number(this.authService.currentUserId);
     this.checkRoles();
+    console.log(data.task)
   }
 
   private checkRoles() {
@@ -110,33 +114,104 @@ export class TaskDetailsDialogComponent implements OnInit {
   }
 
   submitTaskResult(task: TaskDto, result: string): void {
-    // this.taskService.submitTaskResult(task.idTask, result)
-   //    .subscribe(() => this.loadTasks());
+     this.taskService.submitTaskResult(task.idTask, result).subscribe();
    }
  
    returnTask(task: TaskDto, comment: string): void {
-    // this.taskService.returnTask(task.idTask, comment)
-    //   .subscribe(() => this.loadTasks());
+    const commentDto: PostCommentDto = {
+      idTask: task.idTask,
+      text: comment
+    };
+    this.commentService.addComment(commentDto).subscribe()
+    this.taskService.updateTaskStatus(this.data.task.idTask, TaskStatus.ToDo)
+       .subscribe(updatedTask => this.dialogRef.close(updatedTask));
    }
 
-  openResultDialog(task: TaskDto): void {
+   openResultDialog(task: TaskDto): void {
     const dialogRef = this.dialog.open(TaskResultDialogComponent, {
       width: '600px',
-      maxWidth: '600px',
       data: { task }
     });
   
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.submitTaskResult(task, result);
+    dialogRef.afterClosed().subscribe(async (result: { text?: string; files?: File[] }) => {
+      if (result?.files?.length || result?.text) {
+        try {
+          // Обновляем статус задачи независимо от наличия текста
+          const updateStatus$ = this.taskService.updateTaskStatus(task.idTask, TaskStatus.Checking);
+          
+          // Загрузка файлов если есть
+          const uploadFiles$ = result.files?.length 
+            ? this.uploadFiles(result.files, task.idTask)
+            : of([]);
+  
+          // Отправка текста если есть
+          const submitText$ = result.text 
+            ? this.taskService.submitTaskResult(task.idTask, result.text)
+            : of(null);
+  
+          await lastValueFrom(
+            combineLatest([uploadFiles$, submitText$, updateStatus$]).pipe(
+              finalize(() => {
+                this.dialogRef.close(true); // Закрываем главный диалог
+                this.snackBar.open('Результат сохранен', 'Закрыть', { duration: 3000 });
+              })
+            )
+          );
+        } catch (error) {
+          this.snackBar.open('Ошибка сохранения', 'Закрыть');
+        }
       }
     });
+  }
+
+  getDocumentUrl(documentId: number): string {
+    return `${environment.apiUrl}/documents/${documentId}/download`;
+  }
+  
+  getFileType(filename: string): string {
+    const ext = filename.split('.').pop()?.toLowerCase();
+    switch(ext) {
+      case 'pdf': return 'PDF Документ';
+      case 'doc':
+      case 'docx': return 'Word Документ';
+      case 'xls':
+      case 'xlsx': return 'Excel Документ';
+      case 'jpg':
+      case 'jpeg':
+      case 'png': return 'Картинка';
+      default: return 'Файл';
+    }
+  }
+  
+  private async uploadFiles(files: File[], taskId: number): Promise<{success: boolean, file?: File, error?: any}[]> {
+    const uploadPromises = files.map(file => 
+      lastValueFrom(
+        this.documentService.uploadDocument(file, taskId).pipe(
+          last(),
+          map(() => ({ success: true, file })),
+          catchError(error => of({ success: false, file, error }))
+        )
+      )
+    );
+    
+    return await Promise.all(uploadPromises);
+  }
+  
+  private handleUploadErrors(uploadResults: any[]): void {
+    const failedFiles = uploadResults
+      .filter(r => !r.success)
+      .map(r => r.file.name);
+      
+    this.snackBar.open(
+      `Ошибка загрузки файлов: ${failedFiles.join(', ')}`,
+      'Закрыть',
+      { duration: 5000 }
+    );
   }
   
   openReturnDialog(task: TaskDto): void {
     const dialogRef = this.dialog.open(TaskReturnDialogComponent, {
-      width: '500px',
-      maxWidth: '500px',
+      maxWidth: '600px',
       data: { task }
     });
   

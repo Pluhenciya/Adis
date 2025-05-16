@@ -5,6 +5,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 
 @Component({
   selector: 'app-task-return-dialog',
@@ -13,10 +15,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     FormsModule, 
     MatInputModule,
     MatDialogModule,
-    MatFormFieldModule
+    MatFormFieldModule,
+    MatIconModule,
+    CdkTextareaAutosize
   ],
   templateUrl: './task-return-dialog.component.html',
-  styleUrl: './task-return-dialog.component.css'
+  styleUrl: './task-return-dialog.component.scss'
 })
 export class TaskReturnDialogComponent {
   comment = '';

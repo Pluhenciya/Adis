@@ -163,6 +163,30 @@
           </div>
         </div>
 
+        <div *ngIf="data.task.documents?.length" class="documents-section">
+          <div class="documents-header">
+            <h3>Прикрепленные файлы ({{ data.task.documents.length }})</h3>
+            <mat-icon class="section-icon">attach_file</mat-icon>
+          </div>
+        
+          <mat-divider></mat-divider>
+        
+          <div class="documents-list">
+            <div *ngFor="let doc of data.task.documents" class="document-item">
+              <mat-icon class="file-icon">insert_drive_file</mat-icon>
+              <div class="document-info">
+                <a class="document-name" 
+                   [href]="getDocumentUrl(doc.idDocument)" 
+                   target="_blank"
+                   rel="noopener">
+                  {{ doc.fileName }}
+                </a>
+                <span class="document-type">{{ getFileType(doc.fileName) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
       <!-- Комментарии -->
       <div class="comments-section" *appHasRole="['admin', 'projectManager', 'projecter']">
         <div class="comments-header">
