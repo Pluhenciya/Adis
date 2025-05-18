@@ -399,4 +399,11 @@ export class ProjectListPageComponent implements OnInit, OnDestroy, AfterViewIni
         }
       });
     }
+
+    get filteredProjects(): GetProjectDto[] {
+      return this.projects.filter(project => 
+        project.status !== ProjectStatus.Designing || 
+        this.authService.currentRole === "ProjectManager" || this.authService.currentRole === "Projecter"
+      );
+    }
 }

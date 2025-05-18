@@ -205,5 +205,15 @@ namespace Adis.Bll.Services
 
             return (await GetProjectDetailsByIdAsync(id))!;
         }
+
+        public async Task<GetProjectWithTasksDto> CompleteProjectExecutionAsync(int id)
+        {
+            var project = await _projectRepository.GetByIdAsync(id);
+            project.Status = ProjectStatus.Completed;
+
+            await _projectRepository.UpdateAsync(project);
+
+            return (await GetProjectDetailsByIdAsync(id))!;
+        }
     }
 }

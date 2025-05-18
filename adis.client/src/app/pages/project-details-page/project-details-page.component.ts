@@ -31,6 +31,7 @@ import { DocumentDto } from '../../models/document.model';
 import { environment } from '../../environments/environment';
 import { WorkObjectSectionDto } from '../../models/work-object-section.model';
 import { CompleteContractorSearchDialogComponent } from '../../components/complete-contractor-search-dialog/complete-contractor-search-dialog.component';
+import { CompleteExecutionDialogComponent } from '../../components/complete-execution-dialog/complete-execution-dialog.component';
 
 interface TaskColumn {
   title: string;
@@ -356,5 +357,53 @@ export class ProjectDetailsPageComponent implements OnInit, OnDestroy {
           this.snackBar.open('Ошибка завершения проекта', 'Закрыть');
         }
       });
+  }
+
+  onExecutionTaskToggle(task: ExecutionTaskDto): void {
+    this.projectService.updateExecutionTaskStatus(task.idExecutionTask, task.isCompleted)
+      .subscribe({
+        next: (updatedTask) => {
+          
+          // Обновляем задачу в локальном массиве
+          const index = this.project.executionTasks.findIndex(t => 
+            t.idExecutionTask === updatedTask.idExecutionTask
+          );
+          if (index !== -1) {
+            this.project.executionTasks[index].isCompleted = true;
+            console.log(this.project)
+          }
+          this.snackBar.open('Статус задачи обновлен', 'Закрыть', { duration: 2000 });
+        },
+        error: () => {
+          // Возвращаем предыдущее состояние при ошибке
+          task.isCompleted = !task.isCompleted;
+          this.snackBar.open('Ошибка обновления', 'Закрыть');
+        }
+      });
+  }
+
+  completeProjectExecution(): void {
+    const dialogRef = this.dialog.open(CompleteExecutionDialogComponent, {
+      data: { projectName: this.project.name }
+    });
+  
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.projectService.completeProjectExecution(this.project.idProject)
+          .subscribe({
+            next: (updatedProject) => {
+              this.project = updatedProject;
+              this.snackBar.open('Проект успешно завершен', 'Закрыть', { duration: 3000 });
+            },
+            error: () => {
+              this.snackBar.open('Ошибка завершения проекта', 'Закрыть');
+            }
+          });
+      }
+    });
+  }
+
+  allExecutionTasksCompleted(): boolean {
+    return this.project?.executionTasks?.every(t => t.isCompleted);
   }
 }

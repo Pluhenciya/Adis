@@ -504,3 +504,12 @@ $status-colors: (
     background: #673AB7 !important;
   }
 }
+
+.complete-execution-btn {
+  background: rgba(#52CD2C, 0.1);
+  color: #52CD2C;
+
+  &:hover {
+    background: #52CD2C !important;
+  }
+}

@@ -135,6 +135,15 @@
             <mat-icon>assignment_turned_in</mat-icon>
           </button>
         </ng-container>
+
+        <ng-container *appHasRole="['inspector', 'admin']">
+          <button mat-mini-fab class="complete-execution-btn"
+                  *ngIf="project.status === ProjectStatus.InExecution && allExecutionTasksCompleted()" 
+                  (click)="completeProjectExecution()" 
+                  matTooltip="Завершить выполнение проекта">
+            <mat-icon>check_circle</mat-icon>
+          </button>
+        </ng-container>
       </div>
     </div>
   </div>
@@ -211,7 +220,7 @@
         <div class="work-section" *ngFor="let section of workSections">
           <h3 class="section-title">{{ section.name }}</h3>
           <div class="checklist-item" *ngFor="let task of getSectionTasks(section.idWorkObjectSection)">
-            <mat-checkbox [(ngModel)]="task.isCompleted" color="primary">
+            <mat-checkbox [(ngModel)]="task.isCompleted" color="primary" (change)="onExecutionTaskToggle(task)">
               <div class="task-content">
                 <span class="task-title">{{ task.name }}</span>
               </div>

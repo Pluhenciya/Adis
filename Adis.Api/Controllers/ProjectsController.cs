@@ -242,6 +242,7 @@ namespace Adis.Api.Controllers
         }
 
         [HttpGet("{id}/complete/{idEstimate}")]
+        [Authorize(Roles = "Admin,ProjectManager")]
         public async Task<IActionResult> CompleteDesigningProject(int id, int idEstimate)
         {
             return Ok(await _projectService.CompleteDesigningProjectAsync(id, idEstimate));
@@ -252,6 +253,13 @@ namespace Adis.Api.Controllers
         public async Task<IActionResult> CompleteContractorSearch(int id, [FromBody] CompleteContractorSearchDto dto)
         {
             return Ok(await _projectService.CompleteContractorSearchAsync(id, dto));
+        }
+
+        [HttpPatch("{id}/complete-execution")]
+        [Authorize(Roles = "Admin, Inspector")]
+        public async Task<IActionResult> CompleteProjectExecution(int id)
+        {
+            return Ok(await _projectService.CompleteProjectExecutionAsync(id));
         }
     }
 }

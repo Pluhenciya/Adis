@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { GetProjectDto, GetProjectWithTasksDto, PostProjectDto, ProjectStatus } from '../models/project.model';
 import { environment } from '../environments/environment';
 import { formatISO } from 'date-fns';
+import { ExecutionTaskDto } from '../models/task.model';
 
 interface ProjectsResponse {
   projects: GetProjectDto[];
@@ -97,6 +98,20 @@ export class ProjectService {
         startDate: startDate ? this.formatDate(startDate) : null,
         endDate: endDate ? this.formatDate(endDate) : null 
       }
+    );
+  }
+
+  completeProjectExecution(projectId: number): Observable<GetProjectWithTasksDto> {
+    return this.http.patch<GetProjectWithTasksDto>(
+      `${environment.apiUrl}/projects/${projectId}/complete-execution`,
+      {}
+    );
+  }
+
+  updateExecutionTaskStatus(taskId: number, isCompleted: boolean): Observable<ExecutionTaskDto> {
+    return this.http.patch<ExecutionTaskDto>(
+      `${environment.apiUrl}/executionTasks/${taskId}/status`,
+      { isCompleted }
     );
   }
 }

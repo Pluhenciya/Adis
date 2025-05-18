@@ -55,7 +55,7 @@ export interface TaskDto {
   }
 
   export interface ExecutionTaskDto {
-    idTask: number;
+    idExecutionTask: number;
     name: string;
     isCompleted: boolean; 
     documents: DocumentDto[];

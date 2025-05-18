@@ -17,7 +17,7 @@
 
     <div class="projects-list">
       <div class="list-controls">
-        <h2 class="title">Текущие проекты ({{totalCount}})</h2>
+        <h2 class="title">Текущие проекты ({{filteredProjects.length}})</h2>
         <div class="control-buttons">
           <!-- Фильтры -->
           <button mat-icon-button 
@@ -62,8 +62,10 @@
       </div>
 
       <div *ngIf="viewMode === 'list'" class="project-cards">
-        <div class="project-card" *ngFor="let project of projects" [class]="project.status"
-          [style.--progress]="project.progress">
+        <div class="project-card" 
+     *ngFor="let project of filteredProjects" 
+     [class]="project.status"
+     [style.--progress]="project.progress">
           <div class="actions" 
           *appHasRole="['admin', 'projectManager']"
           [style.display]="(project.status === 'Designing' || authService.isAdmin()) ? 'flex' : 'none'">
