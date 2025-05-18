@@ -231,7 +231,7 @@ namespace Adis.Api.Controllers
         /// <response code="200">Успешное выполнение</response>
         /// <response code="404">Проект с данным идентификатором не найден</response>
         [HttpGet("{id}")]
-        [ProducesResponseType(typeof(GetProjectWithTasksDto),(int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(GetProjectWithTasksDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> GetProjectDetailsById(int id)
         {
@@ -239,6 +239,27 @@ namespace Adis.Api.Controllers
             if (project == null)
                 return NotFound("Проект с таким id не найден");
             return Ok(project);
+        }
+
+        [HttpGet("{id}/complete/{idEstimate}")]
+        [Authorize(Roles = "Admin,ProjectManager")]
+        public async Task<IActionResult> CompleteDesigningProject(int id, int idEstimate)
+        {
+            return Ok(await _projectService.CompleteDesigningProjectAsync(id, idEstimate));
+        }
+
+        [HttpPatch("{id}/complete-contractor-search")]
+        [Authorize(Roles = "Admin,ProjectManager")]
+        public async Task<IActionResult> CompleteContractorSearch(int id, [FromBody] CompleteContractorSearchDto dto)
+        {
+            return Ok(await _projectService.CompleteContractorSearchAsync(id, dto));
+        }
+
+        [HttpPatch("{id}/complete-execution")]
+        [Authorize(Roles = "Admin, Inspector")]
+        public async Task<IActionResult> CompleteProjectExecution(int id)
+        {
+            return Ok(await _projectService.CompleteProjectExecutionAsync(id));
         }
     }
 }

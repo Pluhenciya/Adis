@@ -97,19 +97,87 @@
       </div>
 
       <!-- Действия -->
-      <div class="actions" *appHasRole="['admin', 'projectManager']"
-        [style.display]="(project.status === 'Designing' || authService.isAdmin()) ? 'flex' : 'none'">
-        <button mat-mini-fab class="edit-btn" (click)="openProjectForm(project)">
+      <div class="actions">
+        <!-- Кнопка редактирования -->
+        <ng-container *appHasRole="['projectManager', 'admin']">
+        <button mat-mini-fab class="edit-btn" 
+                *ngIf="project.status === 'Designing' || authService.isAdmin()"
+                (click)="openProjectForm(project)">
           <mat-icon>edit</mat-icon>
         </button>
-        <button mat-mini-fab class="delete-btn" (click)="deleteProject(project)">
+      </ng-container>
+      
+        <!-- Кнопка удаления -->
+        <ng-container *appHasRole="['projectManager', 'admin']">
+        <button mat-mini-fab class="delete-btn" 
+        *ngIf="project.status === 'Designing' || authService.isAdmin()"
+                (click)="deleteProject(project)">
           <mat-icon>delete</mat-icon>
         </button>
+      </ng-container>
+      
+        <!-- Кнопка завершения проектирования -->
+        <ng-container *appHasRole="['projectManager', 'admin']">
+        <button mat-mini-fab class="complete-btn" 
+                *ngIf="project.status === 'Designing' && allTasksCompleted()" 
+                (click)="openCompleteProjectDialog()" 
+                matTooltip="Завершить проектирование">
+          <mat-icon>check_circle</mat-icon>
+        </button>
+      </ng-container>
+      
+        <!-- Кнопка завершения поиска подрядчика -->
+        <ng-container *appHasRole="['projectManager', 'admin']">
+          <button mat-mini-fab class="contract-btn"
+                  *ngIf="project.status === 'ContractorSearch'"
+                  (click)="completeContractorSearch()" 
+                  matTooltip="Завершить поиск подрядчика">
+            <mat-icon>assignment_turned_in</mat-icon>
+          </button>
+        </ng-container>
+
+        <ng-container *appHasRole="['inspector', 'admin']">
+          <button mat-mini-fab class="complete-execution-btn"
+                  *ngIf="project.status === ProjectStatus.InExecution && allExecutionTasksCompleted()" 
+                  (click)="completeProjectExecution()" 
+                  matTooltip="Завершить выполнение проекта">
+            <mat-icon>check_circle</mat-icon>
+          </button>
+        </ng-container>
       </div>
     </div>
   </div>
 
-  <mat-card class="tasks-card">
+  <mat-card class="documents-card" *ngIf="project.status !== ProjectStatus.Designing">
+    <mat-card-header>
+      <mat-card-title>Документы проекта</mat-card-title>
+      <div class="documents-actions">
+        <button mat-stroked-button color="primary" (click)="toggleSelectAll()">
+          <mat-icon>{{ isAllSelected ? 'deselect' : 'select_all' }}</mat-icon>
+          {{ isAllSelected ? 'Снять все' : 'Выбрать все' }}
+        </button>
+        <button mat-stroked-button color="primary" (click)="downloadSelectedDocuments()"
+          [disabled]="selectedDocuments.length === 0">
+          <mat-icon>download</mat-icon>
+          Скачать ({{selectedDocuments.length}})
+        </button>
+      </div>
+    </mat-card-header>
+
+    <mat-selection-list [(ngModel)]="selectedDocuments">
+      <mat-list-option *ngFor="let doc of documents" [value]="doc.idDocument" checkboxPosition="before">
+        <mat-icon matListItemIcon>description</mat-icon>
+        <div matListItemTitle>{{ doc.fileName }}</div>
+        <div matListItemLine class="document-actions">
+          <button mat-icon-button (click)="downloadDocument(doc); $event.stopPropagation()">
+            <mat-icon>download</mat-icon>
+          </button>
+        </div>
+      </mat-list-option>
+    </mat-selection-list>
+  </mat-card>
+
+  <mat-card class="tasks-card" *ngIf="project.status === 'Designing'">
     <mat-card-header>
       <mat-card-title class="header-container">
         <div class="header-content">
@@ -136,6 +204,44 @@
           </app-task-card>
         </div>
       </div>
+    </div>
+  </mat-card>
+
+  <mat-card class="execution-tasks-card" *ngIf="project.status !== ProjectStatus.Designing">
+    <mat-card-header>
+      <mat-card-title>
+        Задачи выполнения
+        <span *appHasRole="'Inspector'" class="inspector-badge">Режим инспектора</span>
+      </mat-card-title>
+    </mat-card-header>
+
+    <div class="execution-tasks-container">
+      <ng-container *ngIf="authService.currentRole === 'Inspector'; else defaultView">
+        <div class="work-section" *ngFor="let section of workSections">
+          <h3 class="section-title">{{ section.name }}</h3>
+          <div class="checklist-item" *ngFor="let task of getSectionTasks(section.idWorkObjectSection)">
+            <mat-checkbox [(ngModel)]="task.isCompleted" color="primary" (change)="onExecutionTaskToggle(task)">
+              <div class="task-content">
+                <span class="task-title">{{ task.name }}</span>
+              </div>
+            </mat-checkbox>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-template #defaultView>
+        <div class="work-section" *ngFor="let section of workSections">
+          <h3 class="section-title">{{ section.name }}</h3>
+          <mat-list>
+            <mat-list-item *ngFor="let task of getSectionTasks(section.idWorkObjectSection)" class="task-list-item">
+              <mat-icon matListItemIcon>
+                {{ task.isCompleted ? 'check_circle' : 'radio_button_unchecked' }}
+              </mat-icon>
+              <div matListItemTitle>{{ task.name }}</div>
+            </mat-list-item>
+          </mat-list>
+        </div>
+      </ng-template>
     </div>
   </mat-card>
 </div>

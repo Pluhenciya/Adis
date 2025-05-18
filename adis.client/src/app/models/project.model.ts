@@ -1,4 +1,4 @@
-import { TaskDto } from "./task.model";
+import { ExecutionTaskDto, TaskDto } from "./task.model";
 
 export enum ProjectStatus {
   Designing = 'Designing',
@@ -67,4 +67,5 @@ export interface GetProjectWithTasksDto {
   endExecutionDate?: Date;  
   progress: number;
   tasks: TaskDto[];
+  executionTasks: ExecutionTaskDto[]
 }

@@ -399,3 +399,117 @@ $status-colors: (
     height: 400px;
   }
 }
+
+.execution-tasks-card {
+  margin-top: 2rem;
+  padding: 1.5rem;
+
+  .inspector-badge {
+    background: #ffd740;
+    color: #000;
+    padding: 4px 8px;
+    border-radius: 16px;
+    font-size: 0.8rem;
+    margin-left: 1rem;
+  }
+
+  .checklist-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+
+    .task-content {
+      margin-left: 1rem;
+      flex-grow: 1;
+
+      .task-title {
+        font-weight: 500;
+      }
+
+      .task-due {
+        color: #666;
+        font-size: 0.9rem;
+      }
+    }
+
+    &:hover {
+      background: #f5f5f5;
+    }
+  }
+
+  .task-list-item {
+    .mat-icon {
+      color: #4caf50;
+    }
+
+    &:hover {
+      background: #fafafa;
+    }
+  }
+}
+
+.documents-card {
+  .documents-actions {
+    display: flex;
+    gap: 1rem;
+    margin-left: auto;
+    align-items: center;
+  }
+
+  .document-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 8px;
+  }
+
+  mat-list-option {
+    padding: 12px 16px;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background: #f5f5f5;
+    }
+  }
+}
+
+.work-section {
+  margin-bottom: 2rem;
+  
+  .section-title {
+    color: $text-primary;
+    border-bottom: 2px solid $primary;
+    padding-bottom: 0.5rem;
+    margin: 1rem 0;
+  }
+}
+
+.execution-tasks-card {
+  .checklist-item {
+    padding: 0.5rem 1rem;
+    margin-left: 1rem;
+  }
+  
+  .task-list-item {
+    padding-left: 1rem;
+  }
+}
+
+.contract-btn {
+  background: rgba(#673AB7, 0.1);
+  color: #673AB7;
+
+  &:hover {
+    background: #673AB7 !important;
+  }
+}
+
+.complete-execution-btn {
+  background: rgba(#52CD2C, 0.1);
+  color: #52CD2C;
+
+  &:hover {
+    background: #52CD2C !important;
+  }
+}

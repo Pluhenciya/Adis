@@ -74,6 +74,12 @@ namespace Adis.Dal.Migrations
                             Id = 3,
                             Name = "ProjectManager",
                             NormalizedName = "PROJECTMANAGER"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Inspector",
+                            NormalizedName = "INSPECTOR"
                         });
                 });
 
@@ -172,6 +178,43 @@ namespace Adis.Dal.Migrations
                     b.HasIndex("IdUser");
 
                     b.ToTable("documents", (string)null);
+                });
+
+            modelBuilder.Entity("Adis.Dm.ExecutionTask", b =>
+                {
+                    b.Property<int>("IdExecutionTask")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id_execution_task");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("IdExecutionTask"));
+
+                    b.Property<int>("IdProject")
+                        .HasColumnType("int")
+                        .HasColumnName("id_project");
+
+                    b.Property<int>("IdWorkObjectSection")
+                        .HasColumnType("int")
+                        .HasColumnName("id_work_object_section");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_completed");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("name");
+
+                    b.HasKey("IdExecutionTask")
+                        .HasName("PRIMARY");
+
+                    b.HasIndex("IdProject");
+
+                    b.HasIndex("IdWorkObjectSection");
+
+                    b.ToTable("execution_task", (string)null);
                 });
 
             modelBuilder.Entity("Adis.Dm.Project", b =>
@@ -496,6 +539,27 @@ namespace Adis.Dal.Migrations
                     b.ToTable("work_objects", (string)null);
                 });
 
+            modelBuilder.Entity("Adis.Dm.WorkObjectSection", b =>
+                {
+                    b.Property<int>("IdWorkObjectSection")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id_work_object_section");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("IdWorkObjectSection"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("name");
+
+                    b.HasKey("IdWorkObjectSection")
+                        .HasName("PRIMARY");
+
+                    b.ToTable("work_object_section", (string)null);
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.Property<int>("Id")
@@ -691,6 +755,27 @@ namespace Adis.Dal.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Adis.Dm.ExecutionTask", b =>
+                {
+                    b.HasOne("Adis.Dm.Project", "Project")
+                        .WithMany("ExecutionTasks")
+                        .HasForeignKey("IdProject")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired()
+                        .HasConstraintName("fk_project_execution_tasks");
+
+                    b.HasOne("Adis.Dm.WorkObjectSection", "WorkObjectSection")
+                        .WithMany("ExecutionTasks")
+                        .HasForeignKey("IdWorkObjectSection")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired()
+                        .HasConstraintName("fk_work_object_section_execution_tasks");
+
+                    b.Navigation("Project");
+
+                    b.Navigation("WorkObjectSection");
+                });
+
             modelBuilder.Entity("Adis.Dm.Project", b =>
                 {
                     b.HasOne("Adis.Dm.Contractor", "Contractor")
@@ -834,6 +919,8 @@ namespace Adis.Dal.Migrations
 
             modelBuilder.Entity("Adis.Dm.Project", b =>
                 {
+                    b.Navigation("ExecutionTasks");
+
                     b.Navigation("Tasks");
                 });
 
@@ -858,6 +945,11 @@ namespace Adis.Dal.Migrations
             modelBuilder.Entity("Adis.Dm.WorkObject", b =>
                 {
                     b.Navigation("Projects");
+                });
+
+            modelBuilder.Entity("Adis.Dm.WorkObjectSection", b =>
+                {
+                    b.Navigation("ExecutionTasks");
                 });
 #pragma warning restore 612, 618
         }

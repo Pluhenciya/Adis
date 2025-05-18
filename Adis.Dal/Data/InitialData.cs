@@ -14,6 +14,7 @@ namespace Adis.Dal.Data
            new AppRole { Id = 1, Name = Role.Admin.ToString(), NormalizedName = Role.Admin.ToString().ToUpper()},
            new AppRole { Id = 2, Name = Role.Projecter.ToString(), NormalizedName = Role.Projecter.ToString().ToUpper() },
            new AppRole { Id = 3, Name = Role.ProjectManager.ToString(), NormalizedName = Role.ProjectManager.ToString().ToUpper() },
+           new AppRole { Id = 4, Name = Role.Inspector.ToString(), NormalizedName = Role.Inspector.ToString().ToUpper() },
         };
     }
 }

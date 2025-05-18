@@ -55,5 +55,11 @@ namespace Adis.Bll.Interfaces
         public Task DeleteProjectAsync(int id);
 
         public Task<GetProjectWithTasksDto?> GetProjectDetailsByIdAsync(int id);
+
+        public Task<GetProjectWithTasksDto> CompleteDesigningProjectAsync(int id, int idEstimate);
+
+        public Task<GetProjectWithTasksDto> CompleteContractorSearchAsync(int id, CompleteContractorSearchDto dto);
+
+        public Task<GetProjectWithTasksDto> CompleteProjectExecutionAsync(int id);
     }
 }

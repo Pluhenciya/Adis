@@ -1,4 +1,5 @@
 ﻿using Adis.Bll.Dtos;
+using Adis.Dm;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -14,5 +15,11 @@ namespace Adis.Bll.Interfaces
         public Task<DocumentDto> UploadDocumentAsync(IFormFile file, int? idTask = null);
 
         public Task<FileStreamResult> DownloadDocumentAsync(int idDocument);
+
+        public Task<IEnumerable<ExecutionTask>> SelectEstimateFromProjectAsync(int idDocument, int idProject);
+
+        public Task<IEnumerable<DocumentDto>> GetDocumentsAsyncByIdProjectAsync(int idProject);
+
+        public Task<FileStreamResult> DownloadZipDocumentsAsync(string documentIds);
     }
 }

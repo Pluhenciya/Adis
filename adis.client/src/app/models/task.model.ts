@@ -1,6 +1,7 @@
 import { CommentDto } from "./comment.model";
 import { DocumentDto } from "./document.model";
 import { UserDto } from "./user.model";
+import { WorkObjectSectionDto } from "./work-object-section.model";
 
 export enum TaskStatus {
     ToDo = 'ToDo',
@@ -51,4 +52,12 @@ export interface TaskDto {
     idCheckers: number[];
     endDate: string;
     status?: TaskStatus;
+  }
+
+  export interface ExecutionTaskDto {
+    idExecutionTask: number;
+    name: string;
+    isCompleted: boolean; 
+    documents: DocumentDto[];
+    workObjectSection: WorkObjectSectionDto
   }

@@ -34,6 +34,8 @@ namespace Adis.Dal.Data
         /// </summary>
         public virtual DbSet<ProjectTask> Tasks { get; set; }
 
+        public virtual DbSet<Document> Documents { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -329,6 +331,57 @@ namespace Adis.Dal.Data
                     .HasForeignKey(c => c.IdTask)
                     .OnDelete(DeleteBehavior.NoAction)
                     .HasConstraintName("fk_task_comments");
+            });
+
+            modelBuilder.Entity<ExecutionTask>(entity =>
+            {
+                entity.ToTable("execution_task");
+
+                entity.HasKey(t => t.IdExecutionTask)
+                    .HasName("PRIMARY");
+
+                entity.Property(t => t.IdExecutionTask)
+                    .HasColumnName("id_execution_task");
+
+                entity.Property(t => t.Name)
+                    .HasColumnName("name")
+                    .HasMaxLength(255);
+
+                entity.Property(t => t.IsCompleted)
+                    .HasColumnName("is_completed");
+
+                entity.Property(t => t.IdProject)
+                    .HasColumnName("id_project");
+
+                entity.Property(t => t.IdWorkObjectSection)
+                    .HasColumnName("id_work_object_section");
+
+                entity.HasOne(t => t.Project)
+                    .WithMany(t => t.ExecutionTasks)
+                    .HasForeignKey(t => t.IdProject)
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .HasConstraintName("fk_project_execution_tasks");
+            });
+
+            modelBuilder.Entity<WorkObjectSection>(entity =>
+            {
+                entity.ToTable("work_object_section");
+
+                entity.HasKey(t => t.IdWorkObjectSection)
+                    .HasName("PRIMARY");
+
+                entity.Property(t => t.IdWorkObjectSection)
+                    .HasColumnName("id_work_object_section");
+
+                entity.Property(t => t.Name)
+                    .HasColumnName("name")
+                    .HasMaxLength(255);
+
+                entity.HasMany(t => t.ExecutionTasks)
+                    .WithOne(t => t.WorkObjectSection)
+                    .HasForeignKey(t => t.IdWorkObjectSection)
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .HasConstraintName("fk_work_object_section_execution_tasks");
             });
 
             modelBuilder.Entity<User>(entity =>
