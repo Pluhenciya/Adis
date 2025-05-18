@@ -90,6 +90,12 @@ builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IDocumentService, DocumentService>();
 builder.Services.AddScoped<IDocumentRepository, DocumentRepository>();
 
+builder.Services.AddScoped<IExecutionTaskService, ExecutionTaskService>();
+builder.Services.AddScoped<IExecutionTaskRepository, ExecutionTaskRepository>();
+
+builder.Services.AddScoped<IWorkObjectSectionService, WorkObjectSectionService>();
+builder.Services.AddScoped<IWorkObjectSectionRepository, WorkObjectSectionRepository>();
+
 builder.Services.AddSwaggerGen(options =>
 {
     var basePath = AppContext.BaseDirectory;
@@ -131,7 +137,7 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     var dbContext = services.GetRequiredService<AppDbContext>();
 
-    if (!dbContext.Database.IsInMemory()) // Чтобы в тестах это не срабатывало
+    if (!dbContext.Database.IsInMemory())
     {
         dbContext.Database.Migrate();
 

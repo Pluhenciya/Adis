@@ -197,18 +197,6 @@ export class TaskDetailsDialogComponent implements OnInit {
     return await Promise.all(uploadPromises);
   }
   
-  private handleUploadErrors(uploadResults: any[]): void {
-    const failedFiles = uploadResults
-      .filter(r => !r.success)
-      .map(r => r.file.name);
-      
-    this.snackBar.open(
-      `Ошибка загрузки файлов: ${failedFiles.join(', ')}`,
-      'Закрыть',
-      { duration: 5000 }
-    );
-  }
-  
   openReturnDialog(task: TaskDto): void {
     const dialogRef = this.dialog.open(TaskReturnDialogComponent, {
       maxWidth: '600px',

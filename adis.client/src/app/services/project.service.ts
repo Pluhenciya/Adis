@@ -77,5 +77,27 @@ export class ProjectService {
   getProjectDetails(id : number): Observable<GetProjectWithTasksDto>  {
     return this.http.get<GetProjectWithTasksDto>(`${this.apiUrl}/projects/${id}`);
   }
+  
+  completeDesigningProject(projectId: number, estimateId: number): Observable<GetProjectWithTasksDto> {
+    return this.http.get<GetProjectWithTasksDto>(
+      `${this.apiUrl}/projects/${projectId}/complete/${estimateId}`
+    );
+  }
+
+  completeContractorSearch(
+    projectId: number,
+    contractor: string,
+    startDate: Date,
+    endDate: Date
+  ): Observable<GetProjectWithTasksDto> {
+    return this.http.patch<GetProjectWithTasksDto>(
+      `${this.apiUrl}/projects/${projectId}/complete-contractor-search`,
+      { 
+        contractor, 
+        startDate: startDate ? this.formatDate(startDate) : null,
+        endDate: endDate ? this.formatDate(endDate) : null 
+      }
+    );
+  }
 }
 

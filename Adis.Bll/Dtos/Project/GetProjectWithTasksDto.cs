@@ -77,5 +77,7 @@ namespace Adis.Bll.Dtos.Project
         /// Задачи проекта
         /// </summary>
         public IEnumerable<TaskDto> Tasks { get; set; } = null!;
+
+        public IEnumerable<ExecutionTaskDto> ExecutionTasks { get; set; } = null!;
     }
 }

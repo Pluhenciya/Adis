@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../environments/environment';
 import { HttpClient, HttpEvent, HttpEventType, HttpParams, HttpRequest } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
+import { DocumentDto } from '../models/document.model';
 
 @Injectable({
   providedIn: 'root'
@@ -10,6 +11,10 @@ export class DocumentService {
   private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) { }
+
+  getDocumentsByIdProject(idProject: number) : Observable<DocumentDto[]>{
+    return this.http.get<DocumentDto[]>(`${this.apiUrl}/documents/${idProject}`);
+  }
 
   uploadDocument(file: File, taskId?: number): Observable<{progress: number, result?: any}> {
     const formData = new FormData();

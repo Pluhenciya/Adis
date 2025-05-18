@@ -1,0 +1,47 @@
+<!-- complete-project-dialog.component.html -->
+<div class="dialog-container">
+  <h2 mat-dialog-title class="dialog-header">
+    <mat-icon class="header-icon">assignment_turned_in</mat-icon>
+    Завершение проекта
+  </h2>
+
+  <mat-dialog-content class="dialog-content">
+    <div class="document-list" *ngIf="documents.length > 0; else noDocuments">
+      <mat-selection-list [(ngModel)]="selectedDocument">
+        <mat-list-option 
+          *ngFor="let doc of documents" 
+          [value]="doc.idDocument"
+          class="document-item">
+          <div class="document-info">
+            <mat-icon class="file-icon">{{getFileIcon(doc.fileName)}}</mat-icon>
+            <div class="file-details">
+              <span class="file-name">{{ doc.fileName }}</span>
+              <div class="file-meta">
+                <span class="file-type">{{ getFileType(doc.fileName) }}</span>
+              </div>
+            </div>
+          </div>
+        </mat-list-option>
+      </mat-selection-list>
+    </div>
+
+    <ng-template #noDocuments>
+      <div class="no-documents">
+        <mat-icon>error_outline</mat-icon>
+        <p>В проекте нет загруженных документов</p>
+      </div>
+    </ng-template>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="dialog-actions">
+    <button mat-stroked-button color="primary" (click)="onCancel()">
+      Отмена
+    </button>
+    <button mat-raised-button 
+            color="primary" 
+            (click)="onSubmit()"
+            [disabled]="selectedDocument.length === 0">
+      Завершить
+    </button>
+  </mat-dialog-actions>
+</div>

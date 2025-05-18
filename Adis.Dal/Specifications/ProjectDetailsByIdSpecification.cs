@@ -16,6 +16,8 @@ namespace Adis.Dal.Specifications
             AddInclude(p => p.User);
             AddInclude(p => p.Tasks);
             AddInclude(p => p.Contractor!);
+            AddInclude(p => p.ExecutionTasks);
+            AddInclude($"{nameof(Project.ExecutionTasks)}.{nameof(ExecutionTask.WorkObjectSection)}");
             AddInclude($"{nameof(Project.Tasks)}.{nameof(ProjectTask.Checkers)}");
             AddInclude($"{nameof(Project.Tasks)}.{nameof(ProjectTask.Performers)}");
         }

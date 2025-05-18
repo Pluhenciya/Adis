@@ -8,7 +8,7 @@ import { GetProjectDto, GetProjectWithTasksDto, ProjectStatus } from '../../mode
 import { HasRoleDirective } from '../../directives/has-role.directive';
 import { ProjectFormComponent } from '../../components/project-form/project-form.component';
 import { MatDialog } from '@angular/material/dialog';
-import { TaskDto, TaskStatus } from '../../models/task.model';
+import { ExecutionTaskDto, TaskDto, TaskStatus } from '../../models/task.model';
 import { ConfirmationDialogComponent } from '../../components/confirmation-dialog/confirmation-dialog.component';
 import { ProjectService } from '../../services/project.service';
 import { ActivatedRoute, RouterModule } from '@angular/router';
@@ -21,6 +21,16 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { AddTaskDialogComponent } from '../../components/add-task-dialog/add-task-dialog.component';
 import { AuthStateService } from '../../services/auth-state.service';
 import { TaskCardComponent } from '../../components/task-card/task-card.component';
+import { CompleteProjectDialogComponent } from '../../components/complete-project-dialog/complete-project-dialog.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatListModule } from '@angular/material/list';
+import {MatCheckboxModule} from '@angular/material/checkbox';
+import { FormsModule } from '@angular/forms';
+import { DocumentService } from '../../services/document.service';
+import { DocumentDto } from '../../models/document.model';
+import { environment } from '../../environments/environment';
+import { WorkObjectSectionDto } from '../../models/work-object-section.model';
+import { CompleteContractorSearchDialogComponent } from '../../components/complete-contractor-search-dialog/complete-contractor-search-dialog.component';
 
 interface TaskColumn {
   title: string;
@@ -46,7 +56,10 @@ interface TaskColumn {
     MatProgressSpinnerModule,
     MatTooltipModule,
     MatDialogModule,
-    TaskCardComponent
+    TaskCardComponent,
+    MatListModule,
+    MatCheckboxModule,
+    FormsModule
   ],
   templateUrl: './project-details-page.component.html',
   styleUrl: './project-details-page.component.scss'
@@ -56,8 +69,11 @@ export class ProjectDetailsPageComponent implements OnInit, OnDestroy {
   showMap = false;
   hasGeoData = false;
   @ViewChild('projectMapRef', { static: false }) projectMapRef!: ElementRef;
-
+  documents: DocumentDto[] = [];
   ProjectStatus = ProjectStatus;
+  selectedDocuments: number[] = [];
+  workSections: WorkObjectSectionDto[] = [];
+  isAllSelected = false;
 
   taskColumns: TaskColumn[] = [
     {
@@ -90,7 +106,9 @@ export class ProjectDetailsPageComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private dialog: MatDialog,
     private projectService: ProjectService,
-    public authService: AuthStateService
+    public authService: AuthStateService,
+    private documentService: DocumentService,
+    private snackBar: MatSnackBar,
     ){}
 
     ngOnInit() {
@@ -103,7 +121,85 @@ export class ProjectDetailsPageComponent implements OnInit, OnDestroy {
         this.project = project;
         this.updateTaskColumns();
         this.checkGeoData();
+        if (this.project.status !== ProjectStatus.Designing) {
+          this.loadDocuments();
+        }
+        this.loadWorkSections();
       });
+      
+    }
+
+    toggleSelectAll() {
+      this.isAllSelected = !this.isAllSelected;
+      if (this.isAllSelected) {
+        this.selectedDocuments = this.documents.map(d => d.idDocument);
+      } else {
+        this.selectedDocuments = [];
+      }
+    }
+
+    private loadWorkSections() {
+      const sectionsMap = new Map<number, WorkObjectSectionDto>();
+
+      this.project.executionTasks.forEach(task => {
+        if (task.workObjectSection) {
+          sectionsMap.set(task.workObjectSection.idWorkObjectSection, task.workObjectSection);
+        }
+      });
+      this.workSections = Array.from(sectionsMap.values());
+    }
+    
+    getSectionTasks(sectionId: number): ExecutionTaskDto[] {
+      return this.project.executionTasks.filter(
+        t => t.workObjectSection?.idWorkObjectSection === sectionId
+      );
+    }
+    
+    downloadSelectedDocuments() {
+      if (this.selectedDocuments.length === 1) {
+        const doc = this.documents.find(d => d.idDocument === this.selectedDocuments[0]);
+        if (doc) this.downloadDocument(doc);
+      } else {
+        const docIds = this.selectedDocuments;
+        window.open(
+          `${environment.apiUrl}/documents/download-zip?ids=${docIds.join(',')}`,
+          '_blank'
+        );
+      }
+    }
+
+    completeContractorSearch(): void {
+      const dialogRef = this.dialog.open(CompleteContractorSearchDialogComponent, {
+        maxWidth: '800px',
+        maxHeight: '800px',
+      });
+    
+      dialogRef.afterClosed().subscribe(result => {
+        console.log(result)
+        if (result) {
+          this.projectService.completeContractorSearch(
+            this.project.idProject,
+            result.contractor,
+            result.startDate,
+            result.endDate
+          ).subscribe({
+            next: (updatedProject) => {
+              this.project = updatedProject;
+              this.snackBar.open('Контракт успешно заключен', 'Закрыть', { duration: 3000 });
+            },
+            error: () => this.snackBar.open('Ошибка сохранения', 'Закрыть')
+          });
+        }
+      });
+    }
+
+    downloadDocument(doc: DocumentDto) {
+      window.open(`${environment.apiUrl}/documents/${doc.idDocument}/download`, '_blank');
+    }
+
+    private loadDocuments() {
+      this.documentService.getDocumentsByIdProject(this.project.idProject)
+        .subscribe(docs => this.documents = docs);
     }
 
     ngOnDestroy() {
@@ -145,6 +241,10 @@ export class ProjectDetailsPageComponent implements OnInit, OnDestroy {
         console.error('Ошибка инициализации карты:', error);
         this.hasGeoData = false;
       }
+    }
+    
+    allTasksCompleted(): boolean {
+      return this.project?.tasks?.every(t => t.status === TaskStatus.Completed);
     }
 
     private updateTaskColumns() {
@@ -229,5 +329,32 @@ export class ProjectDetailsPageComponent implements OnInit, OnDestroy {
       this.project.tasks[index] = updatedTask;
       this.updateTaskColumns();
     }
+  }
+
+  openCompleteProjectDialog(): void {
+    const dialogRef = this.dialog.open(CompleteProjectDialogComponent, {
+      width: '600px',
+      maxWidth: '600px',
+      data: { projectId: this.project.idProject }
+    });
+  
+    dialogRef.afterClosed().subscribe(result => {
+      if (result?.documentId) {
+        this.completeProject(result.documentId);
+      }
+    });
+  }
+  
+  private completeProject(estimateId: number): void {
+    this.projectService.completeDesigningProject(this.project.idProject, estimateId)
+      .subscribe({
+        next: (updatedProject) => {
+          this.project = updatedProject;
+          this.snackBar.open('Проект успешно завершен', 'Закрыть', { duration: 3000 });
+        },
+        error: (err) => {
+          this.snackBar.open('Ошибка завершения проекта', 'Закрыть');
+        }
+      });
   }
 }

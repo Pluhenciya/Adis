@@ -1,0 +1,49 @@
+<!-- HTML -->
+<div class="dialog-container">
+<h2 mat-dialog-title class="dialog-header">
+    <mat-icon class="header-icon">handshake</mat-icon>
+    <span>Завершение выбора подрядчика</span>
+  </h2>
+  
+  <mat-dialog-content class="dialog-content">
+    <form [formGroup]="contractForm" class="contract-form">
+      <mat-form-field appearance="fill" class="form-field">
+        <mat-label>Компания-подрядчик</mat-label>
+        <input matInput formControlName="contractor" required>
+        <mat-icon matPrefix class="form-icon">business</mat-icon>
+        <mat-error>Обязательное поле</mat-error>
+      </mat-form-field>
+  
+      <div class="date-row">
+        <mat-form-field appearance="fill" class="date-field">
+          <mat-label>Начало работ</mat-label>
+          <input matInput [matDatepicker]="startPicker" formControlName="startDate" required>
+          <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+          <mat-datepicker #startPicker></mat-datepicker>
+          <mat-icon matPrefix class="form-icon">date_range</mat-icon>
+          <mat-error>Неверная дата</mat-error>
+        </mat-form-field>
+  
+        <mat-form-field appearance="fill" class="date-field">
+          <mat-label>Окончание работ</mat-label>
+          <input matInput [matDatepicker]="endPicker" formControlName="endDate" required>
+          <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+          <mat-datepicker #endPicker></mat-datepicker>
+          <mat-icon matPrefix class="form-icon">event_available</mat-icon>
+          <mat-error>Неверная дата</mat-error>
+        </mat-form-field>
+      </div>
+    </form>
+  </mat-dialog-content>
+  
+  <mat-dialog-actions class="dialog-actions">
+    <button mat-stroked-button mat-dialog-close class="cancel-btn">
+      <mat-icon>close</mat-icon>
+      Отмена
+    </button>
+    <button mat-raised-button color="primary" [disabled]="contractForm.invalid" class="submit-btn" (click)="onSubmit()">
+      <mat-icon>check_circle</mat-icon>
+      Подтвердить выбор
+    </button>
+  </mat-dialog-actions>
+</div>
