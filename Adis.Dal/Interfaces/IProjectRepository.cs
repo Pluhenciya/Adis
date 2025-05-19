@@ -35,5 +35,7 @@ namespace Adis.Dal.Interfaces
         string sortOrder = "desc",
         int page = 1,
         int pageSize = 10);
+
+        public Task<Project?> GetProjectDetailsByIdAsync(int id);
     }
 }

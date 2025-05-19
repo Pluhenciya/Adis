@@ -1,0 +1,139 @@
+$primary: #FF6D00;
+$primary-hover: #FF9100;
+$surface: #FFFFFF;
+$text-primary: #2D3038;
+$text-secondary: #6C757D;
+
+mat-dialog-container {
+  width: 700px;
+}
+
+.dialog-container {
+  padding: 24px;
+  min-width: 500px;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 2px solid rgba($primary, 0.1);
+
+  .dialog-header {
+    display: flex;
+    align-items: center;
+    padding: 20px 24px;
+    background: rgba($primary, 0.05);
+    border-bottom: 2px solid $primary;
+    margin: -24px -24px 24px;
+
+    .header-icon {
+      color: $primary;
+      margin-right: 12px;
+      font-size: 32px;
+      width: 32px;
+      height: 32px;
+    }
+
+    span {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: $text-primary;
+      letter-spacing: 0.25px;
+    }
+  }
+
+  .dialog-content {
+    padding: 0 24px;
+
+    .contract-form {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+  }
+
+  .form-field {
+    width: 100%;
+
+    .mat-form-field-flex {
+      background: rgba($primary, 0.03);
+      border-radius: 8px;
+      padding: 0 12px;
+    }
+
+    .mat-form-field-label {
+      color: $text-secondary;
+      font-weight: 500;
+    }
+
+    .mat-input-element {
+      color: $text-primary;
+      font-size: 1rem;
+      padding: 8px 0;
+    }
+
+    .form-icon {
+      color: rgba($text-primary, 0.6);
+      margin-right: 12px;
+    }
+  }
+
+  .date-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+
+    @media (max-width: 600px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .dialog-actions {
+    padding: 24px;
+    margin: 0 -24px -24px;
+    border-top: 1px solid rgba($text-secondary, 0.12);
+    display: flex;
+    justify-content: space-between;
+
+    button {
+      border-radius: 8px;
+      padding: 8px 24px;
+      font-weight: 500;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+      mat-icon {
+        margin-right: 8px;
+      }
+    }
+  }
+
+  .cancel-btn {
+    color: $text-secondary;
+    border-color: rgba($text-secondary, 0.2);
+
+    &:hover {
+      background: rgba($text-secondary, 0.05);
+      color: $primary;
+    }
+  }
+
+  .submit-btn {
+    background: $primary;
+    color: white;
+    box-shadow: 0 3px 6px rgba($primary, 0.16);
+
+    &:hover {
+      background: $primary-hover;
+      transform: translateY(-1px);
+      box-shadow: 0 5px 12px rgba($primary, 0.25);
+    }
+
+    &:disabled {
+      background: rgba($primary, 0.4);
+      box-shadow: none;
+    }
+  }
+
+  .mat-error {
+    font-size: 0.85rem;
+    margin-top: 4px;
+    color: #d32f2f;
+  }
+}

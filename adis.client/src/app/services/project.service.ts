@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { GetProjectDto, PostProjectDto, ProjectStatus } from '../models/project.model';
+import { GetProjectDto, GetProjectWithTasksDto, PostProjectDto, ProjectStatus } from '../models/project.model';
 import { environment } from '../environments/environment';
 import { formatISO } from 'date-fns';
+import { ExecutionTaskDto } from '../models/task.model';
 
 interface ProjectsResponse {
   projects: GetProjectDto[];
@@ -72,6 +73,46 @@ export class ProjectService {
 
   deleteProject(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/projects/${id}`);
+  }
+
+  getProjectDetails(id : number): Observable<GetProjectWithTasksDto>  {
+    return this.http.get<GetProjectWithTasksDto>(`${this.apiUrl}/projects/${id}`);
+  }
+  
+  completeDesigningProject(projectId: number, estimateId: number): Observable<GetProjectWithTasksDto> {
+    return this.http.get<GetProjectWithTasksDto>(
+      `${this.apiUrl}/projects/${projectId}/complete/${estimateId}`
+    );
+  }
+
+  completeContractorSearch(
+    projectId: number,
+    contractor: string,
+    startDate: Date,
+    endDate: Date
+  ): Observable<GetProjectWithTasksDto> {
+    return this.http.patch<GetProjectWithTasksDto>(
+      `${this.apiUrl}/projects/${projectId}/complete-contractor-search`,
+      { 
+        contractor, 
+        startDate: startDate ? this.formatDate(startDate) : null,
+        endDate: endDate ? this.formatDate(endDate) : null 
+      }
+    );
+  }
+
+  completeProjectExecution(projectId: number): Observable<GetProjectWithTasksDto> {
+    return this.http.patch<GetProjectWithTasksDto>(
+      `${environment.apiUrl}/projects/${projectId}/complete-execution`,
+      {}
+    );
+  }
+
+  updateExecutionTaskStatus(taskId: number, isCompleted: boolean): Observable<ExecutionTaskDto> {
+    return this.http.patch<ExecutionTaskDto>(
+      `${environment.apiUrl}/executionTasks/${taskId}/status`,
+      { isCompleted }
+    );
   }
 }
 

@@ -28,6 +28,12 @@ namespace Adis.Dal.Specifications
         public int Take { get; private set; }
         public int Skip { get; private set; }
         public bool IsPagingEnabled { get; private set; }
+        public List<string> IncludeStrings { get; } = new();
+
+        protected void AddInclude(string includeString)
+        {
+            IncludeStrings.Add(includeString);
+        }
 
         /// <summary>
         /// Добавляет связанную таблицу

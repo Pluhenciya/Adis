@@ -15,6 +15,7 @@ import { HasRoleDirective } from './directives/has-role.directive';
 import {MatMenuModule} from '@angular/material/menu';
 import {MatDividerModule} from '@angular/material/divider';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatChipsModule } from '@angular/material/chips';
 
 @NgModule({
   declarations: [
@@ -31,7 +32,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
     MatFormFieldModule,
     MatMenuModule,
     MatDividerModule,
-    HasRoleDirective
+    HasRoleDirective,
+    MatChipsModule
   ],
   providers: [
     AuthService,

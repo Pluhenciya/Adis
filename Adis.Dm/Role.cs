@@ -12,6 +12,7 @@ namespace Adis.Dm
     {
         Admin,
         Projecter,
-        ProjectManager
+        ProjectManager,
+        Inspector
     }
 }

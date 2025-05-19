@@ -139,6 +139,8 @@ jobs:
           echo "MYSQL_DATABASE=${{ secrets.PROD_MYSQL_DATABASE }}" >> environment/mysql.env
           echo "MYSQL_USER=${{ secrets.PROD_MYSQL_USER }}" >> environment/mysql.env
           echo "MYSQL_PASSWORD=${{ secrets.PROD_MYSQL_PASSWORD }}" >> environment/mysql.env
+
+          echo "YANDEX_MAPS_API_KEY=${{ secrets.YANDEX_MAPS_API_KEY }}" > environment/frontend.env
           
           docker compose -f docker-compose.yml down
           docker compose -f docker-compose.yml pull

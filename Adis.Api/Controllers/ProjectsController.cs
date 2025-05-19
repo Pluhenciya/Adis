@@ -11,12 +11,11 @@ namespace Adis.Api.Controllers
     /// <summary>
     /// Позволяет управлять проектами
     /// </summary>
-    /// <param name="projectService"></param>
     [Route("api/[controller]")]
     [ApiController]
-    
     public class ProjectsController(IProjectService projectService) : ControllerBase
     {
+        /// <inheritdoc cref="IProjectService"/>
         private readonly IProjectService _projectService = projectService;
 
         /// <summary>
@@ -27,22 +26,39 @@ namespace Adis.Api.Controllers
         ///
         ///     POST /api/projects
         ///     {
-        ///         "name": "​Капитальный ремонт автомобильной дороги Красноборск – Хмелевская на участке км 0+000 – км 2+757 (устройство электроосвещения) в Красноборском районе Архангельской области. 1 пусковой комплекс",
-        ///         "budget": 49041762.00,
-        ///         "startDate": "2024-01-01",
-        ///         "endDate": "2024-12-31",
-        ///         "status": "draft",
+        ///         "name": "Реконструкция автодороги М-5",
+        ///         "startDate": "2025-03-01",
+        ///         "endDate": "2026-12-31",
+        ///         "status": "Completed",
         ///         "idUser": 1
+        ///         "workObject": {
+        ///             "idLocation": 10,
+        ///             "geometry": {
+        ///                 "type": "LineString",             
+        ///                 "coordinates": [                    
+        ///                     [55.796127, 49.106414],           
+        ///                     [55.802345, 49.115200]            
+        ///                 ]
+        ///             },
+        ///             "name": "Участок автодороги М-5 (Казань)"
+        ///         },
+        ///         "contractorName": "Дорстройэксперт",
+        ///         "startExecutionDate": "2026-04-01",
+        ///         "endExecutionDate": "2027-11-30"
         ///     }
         ///
         /// </remarks>
         /// <param name="project">Данные нового проекта</param>
         /// <response code="200">Успешное выполнение</response>
         /// <response code="400">Ошибка валидации данных</response>
+        /// <response code="401">Неавторизованный пользователь</response>
+        /// <response code="403">Пользователь без прав на это действие</response>
         [Authorize(Roles = "Admin, ProjectManager")]
         [HttpPost]
         [ProducesResponseType(typeof(GetProjectDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.Forbidden)]
         public async Task<IActionResult> AddProject(PostProjectDto project)
         {
             try
@@ -61,10 +77,10 @@ namespace Adis.Api.Controllers
         /// <remarks>
         /// Примеры запросов:
         ///
-        ///     GET /api/projects?status=1
+        ///     GET /api/projects?status=Designing
         ///     GET /api/projects?targetDate=2024-05-15
         ///     GET /api/projects?startDateFrom=2024-01-01&amp;startDateTo=2024-06-30
-        ///     GET /api/projects?status=2&amp;targetDate=2024-07-01
+        ///     GET /api/projects?status=Designing&amp;targetDate=2024-07-01
         ///     
         /// </remarks>
         /// <param name="status">Статус отфильтрованных проектов</param>
@@ -72,13 +88,14 @@ namespace Adis.Api.Controllers
         /// <param name="startDateFrom">Начальная дата диапазона (yyyy-MM-dd)</param>
         /// <param name="startDateTo">Конечная дата диапазона (yyyy-MM-dd)</param>
         /// <param name="search">Часть имени наименования проекта для поиска</param>
+        /// <param name="idUser">Пользователь, которому принадлежит проект</param>
         /// <param name="page">Номер страницы для пагинации</param>
         /// <param name="pageSize">Количество записей на страницы</param>
         /// <param name="sortField">Свойство, по которому сортировать</param>
         /// <param name="sortOrder">Сортировать по возрастанию или по убыванию</param>
         /// <response code="200">Успешное выполнение</response>
         [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<PostProjectDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ProjectsResponseDto), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetProjects(
             [FromQuery] ProjectStatus? status,
             [FromQuery] string? targetDate,
@@ -123,23 +140,39 @@ namespace Adis.Api.Controllers
         ///
         ///     PUT /api/projects
         ///     {
-        ///         "idProduct": 1,
-        ///         "name": "​Капитальный ремонт автомобильной дороги Красноборск – Хмелевская на участке км 0+000 – км 2+757 (устройство электроосвещения) в Красноборском районе Архангельской области. 1 пусковой комплекс",
-        ///         "budget": 49041762.00,
-        ///         "startDate": "2024-01-01",
-        ///         "endDate": "2024-12-31",
-        ///         "status": "draft",
+        ///         "name": "Реконструкция автодороги М-5",
+        ///         "startDate": "2025-03-01",
+        ///         "endDate": "2026-12-31",
+        ///         "status": "Completed",
         ///         "idUser": 1
+        ///         "workObject": {
+        ///             "idLocation": 10,
+        ///             "geometry": {
+        ///                 "type": "LineString",             
+        ///                 "coordinates": [                    
+        ///                     [55.796127, 49.106414],           
+        ///                     [55.802345, 49.115200]            
+        ///                 ]
+        ///             },
+        ///             "name": "Участок автодороги М-5 (Казань)"
+        ///         },
+        ///         "contractorName": "Дорстройэксперт",
+        ///         "startExecutionDate": "2026-04-01",
+        ///         "endExecutionDate": "2027-11-30"
         ///     }
         ///
         /// </remarks>
         /// <param name="project">Новые данные проекта</param>
         /// <response code="200">Успешное выполнение</response>
         /// <response code="400">Ошибка валидации данных</response>
+        /// <response code="401">Неавторизованный пользователь</response>
+        /// <response code="403">Пользователь без прав на это действие</response>
         [Authorize(Roles = "Admin, ProjectManager")]
         [HttpPut]
         [ProducesResponseType(typeof(GetProjectDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.Forbidden)]
         public async Task<IActionResult> UpdateProject(PostProjectDto project)
         {
             try
@@ -152,11 +185,81 @@ namespace Adis.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Удаляет проект по идентификатору
+        /// </summary>
+        /// <remarks>
+        /// Пример запроса:
+        ///
+        ///     DELETE /api/projects/1
+        ///     
+        /// </remarks>
+        /// <param name="id">Идентификатор удаляемого проекта</param>
+        /// <response code="200">Успешное выполнение</response>
+        /// <response code="404">Проект с данным идентификатором не найден</response>
+        /// <response code="401">Неавторизованный пользователь</response>
+        /// <response code="403">Пользователь без прав на это действие</response>
+        [Authorize(Roles = "Admin, ProjectManager")]
         [HttpDelete("{id}")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.Forbidden)]
         public async Task<IActionResult> DeleteProject(int id)
         {
-            await _projectService.DeleteProjectAsync(id);
-            return Ok();
+            try
+            {
+                await _projectService.DeleteProjectAsync(id);
+                return Ok();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Возвращает проект по идентификатору
+        /// </summary>
+        /// <remarks>
+        /// Пример запроса:
+        ///
+        ///     GET /api/projects/1
+        ///     
+        /// </remarks>
+        /// <param name="id">Идентификатор искомого проекта</param>
+        /// <response code="200">Успешное выполнение</response>
+        /// <response code="404">Проект с данным идентификатором не найден</response>
+        [HttpGet("{id}")]
+        [ProducesResponseType(typeof(GetProjectWithTasksDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> GetProjectDetailsById(int id)
+        {
+            var project = await _projectService.GetProjectDetailsByIdAsync(id);
+            if (project == null)
+                return NotFound("Проект с таким id не найден");
+            return Ok(project);
+        }
+
+        [HttpGet("{id}/complete/{idEstimate}")]
+        [Authorize(Roles = "Admin,ProjectManager")]
+        public async Task<IActionResult> CompleteDesigningProject(int id, int idEstimate)
+        {
+            return Ok(await _projectService.CompleteDesigningProjectAsync(id, idEstimate));
+        }
+
+        [HttpPatch("{id}/complete-contractor-search")]
+        [Authorize(Roles = "Admin,ProjectManager")]
+        public async Task<IActionResult> CompleteContractorSearch(int id, [FromBody] CompleteContractorSearchDto dto)
+        {
+            return Ok(await _projectService.CompleteContractorSearchAsync(id, dto));
+        }
+
+        [HttpPatch("{id}/complete-execution")]
+        [Authorize(Roles = "Admin, Inspector")]
+        public async Task<IActionResult> CompleteProjectExecution(int id)
+        {
+            return Ok(await _projectService.CompleteProjectExecutionAsync(id));
         }
     }
 }

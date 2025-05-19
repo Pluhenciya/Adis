@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using System.Text.RegularExpressions;
 
 namespace Adis.Dal.Data
 {
@@ -32,6 +33,9 @@ namespace Adis.Dal.Data
         /// Задачи
         /// </summary>
         public virtual DbSet<ProjectTask> Tasks { get; set; }
+
+        public virtual DbSet<Document> Documents { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -192,6 +196,14 @@ namespace Adis.Dal.Data
                     .HasColumnType("enum('toDo', 'doing', 'checking', 'completed')")
                     .IsRequired();
 
+                entity.Property(t => t.TextResult)
+                    .HasColumnName("text_result")
+                    .HasColumnType("text");
+
+                entity.Property(t => t.EndDate)
+                    .HasColumnName("end_date")
+                    .HasColumnType("date");
+
                 // Indexes
                 entity.HasIndex(t => t.IdProject)
                     .HasDatabaseName("ix_id_project");
@@ -202,6 +214,174 @@ namespace Adis.Dal.Data
                     .HasForeignKey(t => t.IdProject)
                     .OnDelete(DeleteBehavior.NoAction)
                     .HasConstraintName("fk_project_tasks");
+
+                entity.HasMany(t => t.Performers)
+                    .WithMany(u => u.PerformedTasks)
+                        .UsingEntity<Dictionary<string, object>>(
+                        "users_execute_tasks",
+                        j => j
+                            .HasOne<User>()
+                            .WithMany()
+                            .HasForeignKey("id_user")
+                            .HasConstraintName("fk_user_execute_tasks"),
+                        j => j
+                            .HasOne<ProjectTask>()
+                            .WithMany()
+                            .HasForeignKey("id_task")
+                            .HasConstraintName("fk_task_execute_tasks"),
+                        j =>
+                        {
+                            j.Property("id_user").HasColumnName("id_user");
+                            j.Property("id_task").HasColumnName("id_task");
+                        });
+
+                entity.HasMany(t => t.Checkers)
+                    .WithMany(u => u.CheckingTasks)
+                    .UsingEntity<Dictionary<string, object>>(
+                    "users_check_tasks",
+                    j => j
+                        .HasOne<User>()
+                        .WithMany()
+                        .HasForeignKey("id_user")
+                        .HasConstraintName("fk_user_check_tasks"),
+                    j => j
+                        .HasOne<ProjectTask>()
+                        .WithMany()
+                        .HasForeignKey("id_task")
+                        .HasConstraintName("fk_task_check_tasks"),
+                    j =>
+                    {
+                        j.Property("id_user").HasColumnName("id_user");
+                        j.Property("id_task").HasColumnName("id_task");
+                    });
+
+                entity.HasMany(t => t.Documents)
+                    .WithOne(d => d.Task)
+                    .HasForeignKey(t => t.IdTask)
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .HasConstraintName("fk_documents_task");
+            });
+
+            modelBuilder.Entity<Document>(entity =>
+            {
+                entity.ToTable("documents");
+
+                entity.HasKey(d => d.IdDocument)
+                    .HasName("PRIMARY");
+
+                entity.Property(d => d.IdDocument)
+                    .HasColumnName("id_document");
+
+                entity.Property(d => d.FileName)
+                    .HasColumnName("filename")
+                    .HasMaxLength(255);
+                
+                entity.Property(d => d.DocumentType)
+                    .HasColumnName("type")
+                    .HasConversion(new EnumToStringConverter<DocumentType>())
+                    .HasColumnType("enum('estimate', 'other')")
+                    .IsRequired();
+
+                entity.Property(d => d.IdUser)
+                    .HasColumnName("id_user");
+
+                entity.Property(d => d.IdTask)
+                    .HasColumnName("id_task");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(u => u.Documents)
+                    .HasForeignKey(d => d.IdUser)
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .HasConstraintName("fk_user_documents");
+            });
+
+            modelBuilder.Entity<Comment>(entity =>
+            {
+                entity.ToTable("comments");
+
+                entity.HasKey(c => c.IdComment)
+                    .HasName("PRIMARY");
+
+                entity.Property(c => c.IdComment)
+                    .HasColumnName("id_document");
+
+                entity.Property(c => c.Text)
+                    .HasColumnName("filename")
+                    .HasColumnType("text");
+
+                entity.Property(c => c.IdSender)
+                    .HasColumnName("id_sender");
+
+                entity.Property(c => c.IdTask)
+                    .HasColumnName("id_task");
+
+                entity.Property(c => c.CreatedAt)
+                    .HasColumnName("created_at")
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                entity.HasOne(c => c.Sender)
+                    .WithMany(u => u.Comments)
+                    .HasForeignKey(c => c.IdSender)
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .HasConstraintName("fk_user_comments");
+
+                entity.HasOne(c => c.Task)
+                    .WithMany(t => t.Comments)
+                    .HasForeignKey(c => c.IdTask)
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .HasConstraintName("fk_task_comments");
+            });
+
+            modelBuilder.Entity<ExecutionTask>(entity =>
+            {
+                entity.ToTable("execution_task");
+
+                entity.HasKey(t => t.IdExecutionTask)
+                    .HasName("PRIMARY");
+
+                entity.Property(t => t.IdExecutionTask)
+                    .HasColumnName("id_execution_task");
+
+                entity.Property(t => t.Name)
+                    .HasColumnName("name")
+                    .HasMaxLength(255);
+
+                entity.Property(t => t.IsCompleted)
+                    .HasColumnName("is_completed");
+
+                entity.Property(t => t.IdProject)
+                    .HasColumnName("id_project");
+
+                entity.Property(t => t.IdWorkObjectSection)
+                    .HasColumnName("id_work_object_section");
+
+                entity.HasOne(t => t.Project)
+                    .WithMany(t => t.ExecutionTasks)
+                    .HasForeignKey(t => t.IdProject)
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .HasConstraintName("fk_project_execution_tasks");
+            });
+
+            modelBuilder.Entity<WorkObjectSection>(entity =>
+            {
+                entity.ToTable("work_object_section");
+
+                entity.HasKey(t => t.IdWorkObjectSection)
+                    .HasName("PRIMARY");
+
+                entity.Property(t => t.IdWorkObjectSection)
+                    .HasColumnName("id_work_object_section");
+
+                entity.Property(t => t.Name)
+                    .HasColumnName("name")
+                    .HasMaxLength(255);
+
+                entity.HasMany(t => t.ExecutionTasks)
+                    .WithOne(t => t.WorkObjectSection)
+                    .HasForeignKey(t => t.IdWorkObjectSection)
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .HasConstraintName("fk_work_object_section_execution_tasks");
             });
 
             modelBuilder.Entity<User>(entity =>

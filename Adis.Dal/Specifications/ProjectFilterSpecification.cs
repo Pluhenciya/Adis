@@ -78,6 +78,7 @@ namespace Adis.Dal.Specifications
             AddInclude(p => p.User);
             AddInclude(p => p.Tasks);
             AddInclude(p => p.Contractor!);
+            AddInclude(p => p.ExecutionTasks);
         }
 
         /// <summary>

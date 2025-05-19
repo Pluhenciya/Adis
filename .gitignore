@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 /Adis.Api/appsettings.json
 *.env
+/Adis.Api/documents

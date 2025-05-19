@@ -1,0 +1,40 @@
+<mat-card class="task-item" (click)="handleClick()">
+    <h4>{{ task.name }}</h4>
+  
+    <div class="task-status" [class]="task.status"></div>
+  
+    <div class="task-meta">
+      <div class="meta-group">
+        <mat-icon class="meta-icon">person_outline</mat-icon>
+        <div class="meta-content">
+          <span class="meta-label">Исполнители</span>
+          <div class="user-list">
+            <span class="user-item" *ngFor="let user of task.performers">
+              {{ user.fullName || user.email }}
+            </span>
+            <span *ngIf="!task.performers?.length" class="empty-state">
+              Не назначены
+            </span>
+          </div>
+        </div>
+      </div>
+  
+      <div class="meta-group">
+        <mat-icon class="meta-icon">verified_user</mat-icon>
+        <div class="meta-content">
+          <span class="meta-label">Проверяющие</span>
+          <div class="user-list">
+            <span class="user-item" *ngFor="let user of task.checkers">
+              {{ user.fullName || user.email }}
+            </span>
+            <span *ngIf="!task.checkers?.length" class="empty-state">
+              Не назначены
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="custom-actions">
+        <ng-content></ng-content>
+      </div>
+  </mat-card>

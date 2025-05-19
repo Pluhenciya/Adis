@@ -1,0 +1,112 @@
+.dialog-container {
+    padding: 24px;
+    min-width: 500px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  
+    .dialog-header {
+      display: flex;
+      align-items: center;
+      margin: -24px -24px 20px -24px;
+      padding: 20px 24px;
+      background: #fff3e0;
+      border-bottom: 1px solid #ffe0b2;
+      border-radius: 12px 12px 0 0;
+  
+      .header-icon {
+        margin-right: 12px;
+        color: #FF6D00;
+        font-size: 28px;
+        width: 28px;
+        height: 28px;
+      }
+  
+      .mat-dialog-title {
+        font-weight: 600;
+        color: #BF360C;
+        margin: 0;
+      }
+    }
+  
+    .dialog-content {
+      padding: 16px 0;
+  
+      mat-form-field {
+        .mat-form-field-outline {
+          background: #fff8f0;
+          border-radius: 8px;
+        }
+  
+        textarea {
+          font-size: 1rem;
+          line-height: 1.6;
+          padding: 12px;
+        }
+      }
+    }
+  
+    .dialog-actions {
+      justify-content: flex-end;
+      margin: 20px -24px -24px -24px;
+      padding: 16px 24px;
+      border-top: 1px solid #eeeeee;
+  
+      .action-button {
+        margin-left: 12px;
+        padding: 8px 24px;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+  
+        &[color="warn"] {
+          background: linear-gradient(135deg, #FF6D00 0%, #BF360C 100%);
+          color: white;
+  
+          &:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(255, 109, 0, 0.3);
+          }
+        }
+  
+        &[color="primary"] {
+          border-color: #FF6D00;
+          color: #BF360C;
+  
+          &:hover {
+            background: #fff3e0;
+          }
+        }
+      }
+    }
+  }
+  
+  // Адаптивность
+  @media (max-width: 600px) {
+    .dialog-container {
+      min-width: unset;
+      width: 90vw;
+    }
+  
+    .dialog-header {
+      padding: 16px;
+      
+      .mat-dialog-title {
+        font-size: 1.2rem;
+      }
+    }
+  }
+  
+  @keyframes slideIn {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  
+  .dialog-container {
+    animation: slideIn 0.3s ease-out;
+  }
+  
+  mat-form-field{
+    padding-top: 5px;
+    width: 100%;
+  }

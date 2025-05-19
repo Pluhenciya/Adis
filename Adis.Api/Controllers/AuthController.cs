@@ -12,6 +12,7 @@ namespace Adis.Api.Controllers
     [ApiController]
     public class AuthController(IAuthService authService) : ControllerBase
     {
+        /// <inheritdoc cref="IAuthService"/>
         private readonly IAuthService _authService = authService;
 
         /// <summary>
@@ -48,7 +49,7 @@ namespace Adis.Api.Controllers
         /// <remarks>
         /// Пример запроса:
         ///
-        ///     POST /api/auth/login
+        ///     POST /api/auth/refresh-token
         ///     {
         ///         "accessToken": "access_token",
         ///         "refreshToken": "refresh_token"
@@ -57,8 +58,10 @@ namespace Adis.Api.Controllers
         /// </remarks>
         /// <param name="request">Токены для обновления</param>
         /// <response code="200">Успешное выполнение</response>
+        /// <response code="400">Ошибка валидации данных</response>
         [HttpPost("refresh-token")]
         [ProducesResponseType(typeof(AuthResponse), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
         {
             var result = await _authService.RefreshTokenAsync(request.AccessToken, request.RefreshToken);

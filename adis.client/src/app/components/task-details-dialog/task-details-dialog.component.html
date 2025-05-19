@@ -1,0 +1,280 @@
+<div class="task-dialog-container">
+  <form [formGroup]="taskForm" (ngSubmit)="onSave()" class="task-form">
+    <div class="dialog-header">
+      <div class="title-container">
+        <div *ngIf="!isEditing" class="title-view">
+          <h2 class="task-title">{{ taskForm.value.name }}</h2>
+          <ng-container *appHasRole="['admin', 'projectManager']">
+            <button *ngIf="isEditAllowed" type="button" mat-icon-button (click)="toggleEdit()" 
+                    class="edit-button">
+              <mat-icon>edit</mat-icon>
+            </button>
+          </ng-container>
+        </div>
+        <mat-form-field *ngIf="isEditing" appearance="outline" class="title-edit">
+          <input matInput formControlName="name">
+        </mat-form-field>
+      </div>
+      <div class="header-actions">
+        <button mat-icon-button (click)="onClose()" class="close-button" type="button">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <div class="dialog-content">
+      <div class="main-info">
+        <div class="task-meta-grid">
+          <!-- Исполнители -->
+          <div class="meta-card">
+            <mat-icon class="meta-icon accent">group</mat-icon>
+            <div class="meta-content">
+              <h3 class="meta-title">Исполнители</h3>
+              <div class="user-chips" *ngIf="!isEditing; else editPerformers">
+                <mat-chip-listbox>
+                  <mat-chip *ngFor="let user of taskForm.value.performers" class="user-chip">
+                    <mat-icon matChipAvatar>person</mat-icon>
+                    {{ user.fullName || user.email }}
+                  </mat-chip>
+                </mat-chip-listbox>
+              </div>
+              <ng-template #editPerformers>
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Добавить исполнителя</mat-label>
+                  <input type="text" matInput [formControl]="performersControl" [matAutocomplete]="autoPerformers">
+                  <mat-autocomplete #autoPerformers="matAutocomplete"
+                    (optionSelected)="addPerformer($event.option.value)">
+                    <mat-option *ngFor="let user of filteredPerformers | async" [value]="user">
+                      <div class="user-option">
+                        <mat-icon>person</mat-icon>
+                        {{ user.fullName || user.email }}
+                      </div>
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field>
+                <mat-chip-listbox>
+                  <mat-chip *ngFor="let user of taskForm.value.performers" removable
+                    (removed)="removePerformer(user.id)">
+                    {{ user.fullName || user.email }}
+                    <mat-icon matChipRemove>cancel</mat-icon>
+                  </mat-chip>
+                </mat-chip-listbox>
+              </ng-template>
+            </div>
+          </div>
+
+          <!-- Проверяющие -->
+          <div class="meta-card">
+            <mat-icon class="meta-icon accent">verified_user</mat-icon>
+            <div class="meta-content">
+              <h3 class="meta-title">Проверяющие</h3>
+              <div class="user-chips" *ngIf="!isEditing; else editCheckers">
+                <mat-chip-listbox>
+                  <mat-chip *ngFor="let user of taskForm.value.checkers" class="user-chip">
+                    <mat-icon matChipAvatar>security</mat-icon>
+                    {{ user.fullName || user.email }}
+                  </mat-chip>
+                </mat-chip-listbox>
+              </div>
+              <ng-template #editCheckers>
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Добавить проверяющего</mat-label>
+                  <input type="text" matInput [formControl]="checkersControl" [matAutocomplete]="autoCheckers">
+                  <mat-autocomplete #autoCheckers="matAutocomplete" (optionSelected)="addChecker($event.option.value)">
+                    <mat-option *ngFor="let user of filteredCheckers | async" [value]="user">
+                      <div class="user-option">
+                        <mat-icon>verified_user</mat-icon>
+                        {{ user.fullName || user.email }}
+                      </div>
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field>
+                <mat-chip-listbox>
+                  <mat-chip *ngFor="let user of taskForm.value.checkers" removable (removed)="removeChecker(user.id)">
+                    {{ user.fullName || user.email }}
+                    <mat-icon matChipRemove>cancel</mat-icon>
+                  </mat-chip>
+                </mat-chip-listbox>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+
+        <!-- Описание задачи -->
+        <div class="description-card">
+          <div class="description-header">
+            <h3>Описание задачи</h3>
+          </div>
+
+          <div *ngIf="!isEditing" class="description-view">
+            {{ data.task.description }}
+          </div>
+
+          <mat-form-field *ngIf="isEditing" appearance="outline" class="full-width">
+            <textarea matInput formControlName="description" placeholder="Описание задачи"></textarea>
+          </mat-form-field>
+        </div>
+
+        <div class="date-card">
+          <div class="date-header">
+            <mat-icon class="date-icon">event</mat-icon>
+            <h3>Дата окончания</h3>
+          </div>
+          <div *ngIf="!isEditing" class="date-view">
+            {{ data.task.endDate ? (data.task.endDate | date:'dd.MM.yyyy') : 'Дата не указана' }}
+          </div>
+          <mat-form-field *ngIf="isEditing" appearance="outline">
+            <input matInput [matDatepicker]="picker" formControlName="endDate">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+        </div>
+
+        <div class="status-card" *ngIf="authService.isAdmin()">
+          <div class="status-header">
+            <mat-icon class="status-icon">swap_vert</mat-icon>
+            <h3>Статус задачи</h3>
+          </div>
+          
+          <mat-form-field *ngIf="isEditing" appearance="outline" class="status-select">
+            <mat-label>Выберите статус</mat-label>
+            <mat-select formControlName="status">
+              <mat-option *ngFor="let status of taskStatuses" [value]="status">
+                {{ getStatusLabel(status) }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        
+          <div *ngIf="!isEditing" class="current-status">
+            <span class="status-badge" [class]="taskForm.value.status">
+              {{ getStatusLabel(taskForm.value.status) }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Результат выполнения -->
+        <div *ngIf="data.task.textResult" class="result-card">
+          <div class="result-header">
+            <mat-icon class="result-icon">task_alt</mat-icon>
+            <h3>Результат выполнения</h3>
+          </div>
+          <div class="result-content">
+            <p class="result-text">{{ data.task.textResult }}</p>
+          </div>
+        </div>
+
+        <div *ngIf="data.task.documents?.length" class="documents-section">
+          <div class="documents-header">
+            <h3>Прикрепленные файлы ({{ data.task.documents.length }})</h3>
+            <mat-icon class="section-icon">attach_file</mat-icon>
+          </div>
+        
+          <mat-divider></mat-divider>
+        
+          <div class="documents-list">
+            <div *ngFor="let doc of data.task.documents" class="document-item">
+              <mat-icon class="file-icon">insert_drive_file</mat-icon>
+              <div class="document-info">
+                <a class="document-name" 
+                   [href]="getDocumentUrl(doc.idDocument)" 
+                   target="_blank"
+                   rel="noopener">
+                  {{ doc.fileName }}
+                </a>
+                <span class="document-type">{{ getFileType(doc.fileName) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      <!-- Комментарии -->
+      <div class="comments-section" *appHasRole="['admin', 'projectManager', 'projecter']">
+        <div class="comments-header">
+          <h3>Комментарии ({{ data.task.comments?.length || 0 }})</h3>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="comments-list">
+          <div *ngFor="let comment of sortedComments" class="comment-item">
+            <div class="comment-avatar">
+              <mat-icon>account_circle</mat-icon>
+            </div>
+            <div class="comment-body">
+              <div class="comment-header">
+                <span class="author">{{ comment.fullNameSender }}</span>
+                <span class="comment-time">{{ comment.createdAt | date:'dd.MM.yyyy HH:mm' }}</span>
+              </div>
+              <p class="comment-text">{{ comment.text }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="comment-input-container" *appHasRole="['projectManager', 'projecter']">
+          <form (submit)="addComment()" class="comment-form">
+            <mat-form-field appearance="outline" class="comment-field">
+              <input 
+                matInput 
+                placeholder="Написать комментарий..." 
+                [formControl]="commentControl"
+                (keydown.enter)="$event.preventDefault(); addComment()"
+              >
+              <button 
+                mat-icon-button 
+                matSuffix 
+                type="submit" 
+                [disabled]="commentControl.invalid"
+                class="send-button"
+              >
+                <mat-icon>send</mat-icon>
+              </button>
+            </mat-form-field>
+          </form>
+        </div>
+
+      <!-- Кнопки сохранения -->
+      <div *ngIf="isEditing" class="form-actions">
+        <button type="button" mat-stroked-button (click)="toggleEdit()">Отмена</button>
+        <button type="submit" mat-raised-button color="primary" [disabled]="taskForm.invalid">
+          <mat-icon>save</mat-icon>
+          Сохранить изменения
+        </button>
+      </div>
+      <div class="dialog-actions">
+      <!-- Для исполнителя -->
+      <ng-container *appHasRole="'projecter'">
+        <ng-container *ngIf="isPerformer">
+        <button mat-raised-button color="primary" 
+                *ngIf="data.task.status === 'ToDo'"
+                (click)="acceptTask()" type="button">
+          <mat-icon>check_circle</mat-icon>
+          Принять задачу
+        </button>
+
+        <button mat-raised-button color="primary" 
+                *ngIf="data.task.status === 'Doing'"
+                (click)="openResultDialog(data.task)" type="button">
+          <mat-icon>attach_file</mat-icon>
+          Добавить результат
+        </button>
+      </ng-container>
+
+      <!-- Для проверяющего -->
+      <ng-container *ngIf="isChecker">
+        <button mat-raised-button color="primary" 
+                *ngIf="data.task.status === 'Checking'"
+                (click)="approveTask()" type="button">
+          <mat-icon>check</mat-icon>
+          Утвердить
+        </button>
+        
+        <button mat-button color="warn" 
+                *ngIf="data.task.status === 'Checking'"
+                (click)="openReturnDialog(data.task)" type="button">
+          <mat-icon>undo</mat-icon>
+          Вернуть
+        </button>
+      </ng-container>
+      </ng-container>
+    </div>
+    </div>

@@ -66,7 +66,7 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddCors();
 
-builder.Services.AddAutoMapper(typeof(ProjectProfile), typeof(UserProfile), typeof(WorkObjectProfile));
+builder.Services.AddAutoMapper(typeof(ProjectProfile), typeof(UserProfile), typeof(WorkObjectProfile), typeof(TaskProfile), typeof(DocumentProfile), typeof(CommentProfile));
 
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
@@ -80,6 +80,21 @@ builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
 builder.Services.Configure<AdminSettings>(builder.Configuration.GetSection("AdminSettings"));
 builder.Services.AddScoped<IAdminInitializer, AdminInitializer>();
+
+builder.Services.AddScoped<ITaskService, TaskService>();
+builder.Services.AddScoped<ITaskRepository, TaskRepository>();
+
+builder.Services.AddScoped<ICommentService, CommentService>();
+builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+
+builder.Services.AddScoped<IDocumentService, DocumentService>();
+builder.Services.AddScoped<IDocumentRepository, DocumentRepository>();
+
+builder.Services.AddScoped<IExecutionTaskService, ExecutionTaskService>();
+builder.Services.AddScoped<IExecutionTaskRepository, ExecutionTaskRepository>();
+
+builder.Services.AddScoped<IWorkObjectSectionService, WorkObjectSectionService>();
+builder.Services.AddScoped<IWorkObjectSectionRepository, WorkObjectSectionRepository>();
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -122,7 +137,7 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     var dbContext = services.GetRequiredService<AppDbContext>();
 
-    if (!dbContext.Database.IsInMemory()) // Чтобы в тестах это не срабатывало
+    if (!dbContext.Database.IsInMemory())
     {
         dbContext.Database.Migrate();
 

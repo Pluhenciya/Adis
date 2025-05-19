@@ -26,7 +26,7 @@ namespace Adis.Bll.Interfaces
         /// <returns>Список всех пользователей</returns>
         public Task<IEnumerable<UserDto>> GetUsersAsync();
 
-        public Task<UserDto> GetUserByIdAsync(int id);
+        public Task<UserDto?> GetUserByIdAsync(int id);
 
         public Task<IEnumerable<UserDto>> GetUsersByPartialFullNameWithRoleAsync(string partialFullName, string role);
     }

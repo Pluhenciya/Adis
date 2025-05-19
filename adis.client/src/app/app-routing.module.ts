@@ -6,6 +6,9 @@ import { UserListPageComponent } from './pages/user-list-page/user-list-page.com
 import { RoleGuard } from './core/guards/role.guard';
 import { AuthGuard } from './core/guards/user.guard';
 import { ForbiddenPageComponent } from './pages/forbidden-page/forbidden-page.component';
+import { ProjectDetailsPageComponent } from './pages/project-details-page/project-details-page.component';
+import { TaskBoardPageComponent } from './pages/task-board-page/task-board-page.component';
+import { RoleBasedRedirectGuard } from './core/guards/role-based-redirect.guard';
 
 const routes: Routes = [
   { 
@@ -31,9 +34,31 @@ const routes: Routes = [
     title: 'Ошибка 403'
   },
   {
+    path: 'projects',
+    children: [
+      {
+        path: '',
+        component: ProjectListPageComponent,
+        title: 'Проекты'
+      },
+      { 
+        path: ':id', 
+        component: ProjectDetailsPageComponent,
+        title: 'Проект'
+      }
+    ]
+  },
+  { 
+    path: 'tasks', 
+    component: TaskBoardPageComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { expectedRole: 'Projecter' },
+    title: 'Задачи'
+  },
+  {
     path: '',
-    component: ProjectListPageComponent,
-    title: 'Главная'
+    canActivate: [RoleBasedRedirectGuard],
+    children: [] // Пустой чилдрен для активации guard
   },
 ];
 

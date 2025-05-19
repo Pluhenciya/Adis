@@ -23,6 +23,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "80:80"
+    env_file:
+      - "./environment/frontend.env"
     depends_on:
       - backend
     networks:

@@ -1,0 +1,36 @@
+<div class="dialog-container">
+  <h2 mat-dialog-title class="dialog-header">
+    <mat-icon class="header-icon">assignment_return</mat-icon>
+    Возврат задачи
+  </h2>
+
+  <mat-dialog-content class="dialog-content">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Причина возврата</mat-label>
+      <textarea matInput 
+                [(ngModel)]="comment" 
+                rows="4"
+                cdkTextareaAutosize
+                #autosize="cdkTextareaAutosize"
+                cdkAutosizeMinRows="4"
+                cdkAutosizeMaxRows="8"
+                placeholder="Укажите подробные причины возврата..."></textarea>
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="dialog-actions">
+    <button mat-stroked-button 
+            color="primary" 
+            (click)="onCancel()"
+            class="action-button">
+      Отмена
+    </button>
+    <button mat-raised-button 
+            color="warn" 
+            (click)="onReturn()"
+            class="action-button"
+            [disabled]="!comment">
+      Вернуть
+    </button>
+  </mat-dialog-actions>
+</div>

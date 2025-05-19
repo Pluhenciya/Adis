@@ -26,6 +26,7 @@ import { MapService } from '../../services/map.service';
 import { ConfirmationDialogComponent } from '../../components/confirmation-dialog/confirmation-dialog.component';
 import { HasRoleDirective } from '../../directives/has-role.directive';
 import { AuthStateService } from '../../services/auth-state.service';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-project-list-page',
@@ -51,7 +52,8 @@ import { AuthStateService } from '../../services/auth-state.service';
     MatMenuModule,
     FilterMenuComponent,
     SortMenuComponent,
-    HasRoleDirective
+    HasRoleDirective,
+    RouterLink
   ],
   templateUrl: './project-list-page.component.html',
   styleUrls: ['./project-list-page.component.scss']
@@ -97,7 +99,7 @@ export class ProjectListPageComponent implements OnInit, OnDestroy, AfterViewIni
     private dialog: MatDialog,
     private projectService: ProjectService,
     private mapService: MapService,
-    private authService: AuthStateService
+    public authService: AuthStateService
   ) {
     this.searchSubject.pipe(
       debounceTime(300),
@@ -396,5 +398,12 @@ export class ProjectListPageComponent implements OnInit, OnDestroy, AfterViewIni
           }
         }
       });
+    }
+
+    get filteredProjects(): GetProjectDto[] {
+      return this.projects.filter(project => 
+        project.status !== ProjectStatus.Designing || 
+        this.authService.currentRole === "ProjectManager" || this.authService.currentRole === "Projecter"
+      );
     }
 }

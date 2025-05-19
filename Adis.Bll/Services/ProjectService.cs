@@ -6,6 +6,7 @@ using Adis.Dal.Repositories;
 using Adis.Dm;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 namespace Adis.Bll.Services
@@ -17,13 +18,17 @@ namespace Adis.Bll.Services
         private readonly IProjectRepository _projectRepository;
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly IUserService _userService;
+        private readonly IDocumentService _documentService;
+        private readonly IExecutionTaskService _executionTaskService;
 
-        public ProjectService(IMapper mapper, IProjectRepository projectRepository, IHttpContextAccessor httpContextAccessor, IUserService userService)
+        public ProjectService(IMapper mapper, IProjectRepository projectRepository, IHttpContextAccessor httpContextAccessor, IUserService userService, IDocumentService documentService, IExecutionTaskService executionTaskService)
         {
             _mapper = mapper;
             _projectRepository = projectRepository;
             _contextAccessor = httpContextAccessor;
             _userService = userService;
+            _documentService = documentService;
+            _executionTaskService = executionTaskService;
         }
 
         /// <inheritdoc/>
@@ -105,7 +110,7 @@ namespace Adis.Bll.Services
             if (projectDto.StartDate != null && projectDto.StartDate > projectDto.EndDate)
                 throw new ArgumentException("Дата начала проектирования не может быть позже чем дата оканчания");
 
-            if (projectDto.IdWorkObject == 0 && projectDto.WorkObject == null)
+            if (projectDto.WorkObject == null)
                 throw new ArgumentException("Локация объекта работ обязательна");
 
             var user = _contextAccessor.HttpContext.User;
@@ -122,9 +127,6 @@ namespace Adis.Bll.Services
 
             if (projectDto.IdContractor != null)
                 projectDto.ContractorName = null!;
-
-            if (projectDto.IdWorkObject != 0)
-                projectDto.WorkObject = null!;
 
             if((projectDto.Status == ProjectStatus.InExecution
                 || projectDto.Status == ProjectStatus.Completed)
@@ -170,6 +172,48 @@ namespace Adis.Bll.Services
                 project.IsDeleted = true;
                 await _projectRepository.UpdateAsync(project);
             }
+        }
+
+        public async Task<GetProjectWithTasksDto?> GetProjectDetailsByIdAsync(int id)
+        {
+            return _mapper.Map<GetProjectWithTasksDto>(await _projectRepository.GetProjectDetailsByIdAsync(id));
+        }
+
+        public async Task<GetProjectWithTasksDto> CompleteDesigningProjectAsync(int id, int idEstimate)
+        {
+            var project = await _projectRepository.GetByIdAsync(id);
+            project.Status = ProjectStatus.ContractorSearch;
+            await _projectRepository.UpdateAsync(project);
+            
+            var executionTasks = await _documentService.SelectEstimateFromProjectAsync(idEstimate, id);
+
+            await _executionTaskService.AddExecutionTasksAsync(executionTasks);
+
+            return (await GetProjectDetailsByIdAsync(id))!;
+        }
+
+        public async Task<GetProjectWithTasksDto> CompleteContractorSearchAsync(int id, CompleteContractorSearchDto dto)
+        {
+            var project = await _projectRepository.GetByIdAsync(id);
+
+            project.Contractor = new Contractor { Name = dto.Contractor };
+            project.StartExecutionDate = dto.StartDate;
+            project.EndExecutionDate = dto.EndDate;
+            project.Status = ProjectStatus.InExecution;
+
+            await _projectRepository.UpdateAsync(project);
+
+            return (await GetProjectDetailsByIdAsync(id))!;
+        }
+
+        public async Task<GetProjectWithTasksDto> CompleteProjectExecutionAsync(int id)
+        {
+            var project = await _projectRepository.GetByIdAsync(id);
+            project.Status = ProjectStatus.Completed;
+
+            await _projectRepository.UpdateAsync(project);
+
+            return (await GetProjectDetailsByIdAsync(id))!;
         }
     }
 }

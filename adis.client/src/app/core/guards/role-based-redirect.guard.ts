@@ -1,0 +1,37 @@
+import { Injectable } from '@angular/core';
+import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { AuthStateService } from '../../services/auth-state.service';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class RoleBasedRedirectGuard implements CanActivate {
+  constructor(
+    private authService: AuthStateService,
+    private router: Router
+  ) {}
+
+  canActivate(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+    var role = this.authService.currentRole;
+    if(!role)
+        return this.router.parseUrl('/login');
+
+    switch(role) {
+        case 'Admin':
+            return this.router.parseUrl('/admin/users');
+        case 'ProjectManager':
+            return this.router.parseUrl('/projects');
+        case 'Inspector':
+            return this.router.parseUrl('/projects');
+        case 'Projecter':
+            return this.router.parseUrl('/tasks');
+        default:
+            return this.router.parseUrl('/forbidden');
+    }
+  }
+}

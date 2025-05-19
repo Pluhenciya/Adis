@@ -64,5 +64,7 @@ namespace Adis.Dm
         /// Задачи проекта
         /// </summary>
         public virtual IEnumerable<ProjectTask> Tasks { get; set; } = null!;
+
+        public virtual IEnumerable<ExecutionTask> ExecutionTasks { get; set; } = null!;
     }
 }
