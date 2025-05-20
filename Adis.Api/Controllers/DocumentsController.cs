@@ -17,7 +17,7 @@ namespace Adis.Api.Controllers
 
         [HttpPost("upload")]
         [Authorize(Roles = "Admin, Projecter")]
-        public async Task<IActionResult> UploadDocument(IFormFile file, [FromQuery] int? idTask)
+        public async Task<IActionResult> UploadDocument(IFormFile file, [FromQuery] int? idTask = null)
         {
             return Ok(await _documentService.UploadDocumentAsync(file, idTask));
         }
@@ -45,6 +45,12 @@ namespace Adis.Api.Controllers
             {
                 return NotFound(ex.Message);
             }
+        }
+
+        [HttpGet("guide")]
+        public async Task<IActionResult> GetGuideDocuments()
+        {
+            return Ok(await _documentService.GetGuideDocumentsAsync());
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Adis.Bll.Dtos;
+﻿using Adis.Bll.Dtos.User;
 using Adis.Bll.Interfaces;
 using Adis.Dm;
 using Microsoft.AspNetCore.Authorization;
@@ -121,6 +121,19 @@ namespace Adis.Api.Controllers
             if (user == null)
                 return NotFound("Пользователь с таким id не найден");
             return Ok(user);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateUser(PutUserDto user)
+        {
+            return Ok(await _userService.UpdateUserAsync(user));
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteUser(int id)
+        {
+            await _userService.DeleteUserAsync(id);
+            return Ok();
         }
     }
 }

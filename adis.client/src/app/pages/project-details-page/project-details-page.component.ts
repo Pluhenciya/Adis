@@ -296,7 +296,7 @@ export class ProjectDetailsPageComponent implements OnInit, OnDestroy {
 
   async deleteProject(project: GetProjectDto) {
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-      data: { projectName: project.name }
+      data: { message: `Вы уверены что хотите удалить проект \"${project.name}\"`}
     });
   
     dialogRef.afterClosed().subscribe(async result => {

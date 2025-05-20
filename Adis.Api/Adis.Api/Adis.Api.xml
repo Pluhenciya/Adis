@@ -1,0 +1,407 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Adis.Api</name>
+    </assembly>
+    <members>
+        <member name="T:Adis.Api.Controllers.AuthController">
+            <summary>
+            Позволяет авторизовываться пользавателям
+            </summary>
+        </member>
+        <member name="M:Adis.Api.Controllers.AuthController.#ctor(Adis.Bll.Interfaces.IAuthService)">
+            <summary>
+            Позволяет авторизовываться пользавателям
+            </summary>
+        </member>
+        <member name="F:Adis.Api.Controllers.AuthController._authService">
+            <inheritdoc cref="T:Adis.Bll.Interfaces.IAuthService"/>
+        </member>
+        <member name="M:Adis.Api.Controllers.AuthController.Login(Adis.Bll.Dtos.Auth.LoginRequest)">
+             <summary>
+             Возврашает два токена для Bearer авторизации по данным для входа
+             </summary>
+             <remarks>
+             Пример запроса:
+            
+                 POST /api/auth/login
+                 {
+                     "email": "ivan.petrov@example.com",
+                     "password": "Ispp1234_"
+                 }
+            
+             </remarks>
+             <param name="request">Данные для авторизации(почта и пароль)</param>
+             <response code="200">Успешное выполнение</response>
+             <response code="401">Ошибка авторизации</response>
+        </member>
+        <member name="M:Adis.Api.Controllers.AuthController.RefreshToken(Adis.Bll.Dtos.Auth.RefreshTokenRequest)">
+             <summary>
+             Возврашает два токена для Bearer авторизации по токену обновления
+             </summary>
+             <remarks>
+             Пример запроса:
+            
+                 POST /api/auth/refresh-token
+                 {
+                     "accessToken": "access_token",
+                     "refreshToken": "refresh_token"
+                 }
+            
+             </remarks>
+             <param name="request">Токены для обновления</param>
+             <response code="200">Успешное выполнение</response>
+             <response code="400">Ошибка валидации данных</response>
+        </member>
+        <member name="T:Adis.Api.Controllers.CommentsController">
+            <summary>
+            Позволяет управлять комментариями
+            </summary>
+        </member>
+        <member name="M:Adis.Api.Controllers.CommentsController.#ctor(Adis.Bll.Interfaces.ICommentService)">
+            <summary>
+            Позволяет управлять комментариями
+            </summary>
+        </member>
+        <member name="F:Adis.Api.Controllers.CommentsController._commentService">
+            <inheritdoc cref="T:Adis.Bll.Interfaces.ICommentService"/>
+        </member>
+        <member name="M:Adis.Api.Controllers.CommentsController.AddComment(Adis.Bll.Dtos.Comment.PostCommentDto)">
+             <summary>
+             Создает новый комментарий
+             </summary>
+             <remarks>
+             Пример запроса:
+            
+                 POST /api/comments
+                 {
+                     "idTask": 123,
+                     "text": "Это пример текста комментария"
+                 }
+            
+             </remarks>
+             <param name="comment">Данные нового комментария</param>
+             <response code="200">Успешное выполнение</response>
+             <response code="400">Ошибка валидации данных</response>
+             <response code="401">Неавторизованный пользователь</response>
+             <response code="403">Пользователь без прав на это действие</response>
+        </member>
+        <member name="T:Adis.Api.Controllers.DocumentsController">
+            <summary>
+            Позволяет управлять документами
+            </summary>
+        </member>
+        <member name="M:Adis.Api.Controllers.DocumentsController.#ctor(Adis.Bll.Interfaces.IDocumentService)">
+            <summary>
+            Позволяет управлять документами
+            </summary>
+        </member>
+        <member name="T:Adis.Api.Controllers.ProjectsController">
+            <summary>
+            Позволяет управлять проектами
+            </summary>
+        </member>
+        <member name="M:Adis.Api.Controllers.ProjectsController.#ctor(Adis.Bll.Interfaces.IProjectService)">
+            <summary>
+            Позволяет управлять проектами
+            </summary>
+        </member>
+        <member name="F:Adis.Api.Controllers.ProjectsController._projectService">
+            <inheritdoc cref="T:Adis.Bll.Interfaces.IProjectService"/>
+        </member>
+        <member name="M:Adis.Api.Controllers.ProjectsController.AddProject(Adis.Bll.Dtos.Project.PostProjectDto)">
+             <summary>
+             Добавляет новый проект
+             </summary>
+             <remarks>
+             Пример запроса:
+            
+                 POST /api/projects
+                 {
+                     "name": "Реконструкция автодороги М-5",
+                     "startDate": "2025-03-01",
+                     "endDate": "2026-12-31",
+                     "status": "Completed",
+                     "idUser": 1
+                     "workObject": {
+                         "idLocation": 10,
+                         "geometry": {
+                             "type": "LineString",             
+                             "coordinates": [                    
+                                 [55.796127, 49.106414],           
+                                 [55.802345, 49.115200]            
+                             ]
+                         },
+                         "name": "Участок автодороги М-5 (Казань)"
+                     },
+                     "contractorName": "Дорстройэксперт",
+                     "startExecutionDate": "2026-04-01",
+                     "endExecutionDate": "2027-11-30"
+                 }
+            
+             </remarks>
+             <param name="project">Данные нового проекта</param>
+             <response code="200">Успешное выполнение</response>
+             <response code="400">Ошибка валидации данных</response>
+             <response code="401">Неавторизованный пользователь</response>
+             <response code="403">Пользователь без прав на это действие</response>
+        </member>
+        <member name="M:Adis.Api.Controllers.ProjectsController.GetProjects(System.Nullable{Adis.Dm.ProjectStatus},System.String,System.String,System.String,System.String,System.Nullable{System.Int32},System.String,System.String,System.Int32,System.Int32)">
+             <summary>
+             Возвращает список проектов с общим количеством и информации о страницах
+             </summary>
+             <remarks>
+             Примеры запросов:
+            
+                 GET /api/projects?status=Designing
+                 GET /api/projects?targetDate=2024-05-15
+                 GET /api/projects?startDateFrom=2024-01-01&amp;startDateTo=2024-06-30
+                 GET /api/projects?status=Designing&amp;targetDate=2024-07-01
+                 
+             </remarks>
+             <param name="status">Статус отфильтрованных проектов</param>
+             <param name="targetDate">Дата, в которую проект будет выполняться (yyyy-MM-dd)</param>
+             <param name="startDateFrom">Начальная дата диапазона (yyyy-MM-dd)</param>
+             <param name="startDateTo">Конечная дата диапазона (yyyy-MM-dd)</param>
+             <param name="search">Часть имени наименования проекта для поиска</param>
+             <param name="idUser">Пользователь, которому принадлежит проект</param>
+             <param name="page">Номер страницы для пагинации</param>
+             <param name="pageSize">Количество записей на страницы</param>
+             <param name="sortField">Свойство, по которому сортировать</param>
+             <param name="sortOrder">Сортировать по возрастанию или по убыванию</param>
+             <response code="200">Успешное выполнение</response>
+        </member>
+        <member name="M:Adis.Api.Controllers.ProjectsController.UpdateProject(Adis.Bll.Dtos.Project.PostProjectDto)">
+             <summary>
+             Обновляет данные проекта на новые
+             </summary>
+             <remarks>
+             Пример запроса:
+            
+                 PUT /api/projects
+                 {
+                     "name": "Реконструкция автодороги М-5",
+                     "startDate": "2025-03-01",
+                     "endDate": "2026-12-31",
+                     "status": "Completed",
+                     "idUser": 1
+                     "workObject": {
+                         "idLocation": 10,
+                         "geometry": {
+                             "type": "LineString",             
+                             "coordinates": [                    
+                                 [55.796127, 49.106414],           
+                                 [55.802345, 49.115200]            
+                             ]
+                         },
+                         "name": "Участок автодороги М-5 (Казань)"
+                     },
+                     "contractorName": "Дорстройэксперт",
+                     "startExecutionDate": "2026-04-01",
+                     "endExecutionDate": "2027-11-30"
+                 }
+            
+             </remarks>
+             <param name="project">Новые данные проекта</param>
+             <response code="200">Успешное выполнение</response>
+             <response code="400">Ошибка валидации данных</response>
+             <response code="401">Неавторизованный пользователь</response>
+             <response code="403">Пользователь без прав на это действие</response>
+        </member>
+        <member name="M:Adis.Api.Controllers.ProjectsController.DeleteProject(System.Int32)">
+             <summary>
+             Удаляет проект по идентификатору
+             </summary>
+             <remarks>
+             Пример запроса:
+            
+                 DELETE /api/projects/1
+                 
+             </remarks>
+             <param name="id">Идентификатор удаляемого проекта</param>
+             <response code="200">Успешное выполнение</response>
+             <response code="404">Проект с данным идентификатором не найден</response>
+             <response code="401">Неавторизованный пользователь</response>
+             <response code="403">Пользователь без прав на это действие</response>
+        </member>
+        <member name="M:Adis.Api.Controllers.ProjectsController.GetProjectDetailsById(System.Int32)">
+             <summary>
+             Возвращает проект по идентификатору
+             </summary>
+             <remarks>
+             Пример запроса:
+            
+                 GET /api/projects/1
+                 
+             </remarks>
+             <param name="id">Идентификатор искомого проекта</param>
+             <response code="200">Успешное выполнение</response>
+             <response code="404">Проект с данным идентификатором не найден</response>
+        </member>
+        <member name="T:Adis.Api.Controllers.TasksController">
+            <summary>
+            Позволяет управлять задачами
+            </summary>
+        </member>
+        <member name="M:Adis.Api.Controllers.TasksController.#ctor(Adis.Bll.Interfaces.ITaskService)">
+            <summary>
+            Позволяет управлять задачами
+            </summary>
+        </member>
+        <member name="F:Adis.Api.Controllers.TasksController._taskService">
+            <inheritdoc cref="T:Adis.Bll.Interfaces.ITaskService"/>
+        </member>
+        <member name="M:Adis.Api.Controllers.TasksController.GetTaskDetailsById(System.Int32)">
+             <summary>
+             Возвращает подробности о задачу по идентификатору
+             </summary>
+             <remarks>
+             Пример запроса:
+            
+                 GET /api/tasks/1
+            
+             </remarks>
+             <param name="id">Идентификатор задаси</param>
+             <response code="200">Успешное выполнение</response>
+             <response code="404">не найдена задача по идентификатору</response>
+        </member>
+        <member name="M:Adis.Api.Controllers.TasksController.AddTask(Adis.Bll.Dtos.Task.PostTaskDto)">
+             <summary>
+             Добавляет новую задачу
+             </summary>
+             <remarks>
+             Пример запроса:
+            
+                 POST /api/tasks
+                 {
+                     "name": "Разработка сметы проекта",
+                     "description": "Смета должна соответствовать гостам и выполнена в Гранд-Смете",
+                     "idPerformers": [45, 78],
+                     "idCheckers": [32],
+                     "endDate": "2025-11-30",
+                     "idProject": 15,
+                     "status": "ToDo"
+                 }
+            
+             </remarks>
+             <param name="taskDto">Данные новой задачи</param>
+             <response code="200">Успешное выполнение</response>
+             <response code="400">Ошибка валидации данных</response>
+             <response code="401">Неавторизованный пользователь</response>
+             <response code="403">Пользователь без прав на это действие</response>
+        </member>
+        <member name="M:Adis.Api.Controllers.TasksController.UpdateTask(Adis.Bll.Dtos.Task.PutTaskDto)">
+             <summary>
+             Изменяет данные задачи
+             </summary>
+             <remarks>
+             Пример запроса:
+            
+                 PUT /api/tasks
+                 {
+                     "name": "Разработка сметы проекта",
+                     "description": "Смета должна соответствовать гостам и выполнена в Гранд-Смете",
+                     "idPerformers": [45, 78],
+                     "idCheckers": [32],
+                     "endDate": "2025-11-30",
+                     "idProject": 15,
+                     "status": "ToDo"
+                 }
+            
+             </remarks>
+             <param name="taskDto">Новые данные задачи</param>
+             <response code="200">Успешное выполнение</response>
+             <response code="400">Ошибка валидации данных</response>
+             <response code="401">Неавторизованный пользователь</response>
+             <response code="403">Пользователь без прав на это действие</response>
+        </member>
+        <member name="M:Adis.Api.Controllers.TasksController.GetTasksForProjecter">
+             <summary>
+             Возвращает задачи для пользователя
+             </summary>
+             <remarks>
+             Пример запроса:
+            
+                 GET /api/tasks
+            
+             </remarks>
+             <response code="200">Успешное выполнение</response>
+             <response code="401">Неавторизованный пользователь</response>
+             <response code="403">Пользователь без прав на это действие</response>
+        </member>
+        <member name="T:Adis.Api.Controllers.UsersController">
+            <summary>
+            Позволяет управлять пользователями
+            </summary>
+        </member>
+        <member name="M:Adis.Api.Controllers.UsersController.#ctor(Adis.Bll.Interfaces.IUserService)">
+            <summary>
+            Позволяет управлять пользователями
+            </summary>
+        </member>
+        <member name="M:Adis.Api.Controllers.UsersController.AddUser(Adis.Bll.Dtos.User.UserDto)">
+             <summary>
+             Добавляет пользователя
+             </summary>
+             <remarks>
+             Пример запроса:
+            
+                 POST /api/users
+                 {
+                     "email": "ivan.petrov@example.com",
+                     "passwordHash": "1234",
+                     "role": "admin", 
+                     "fullName": "Петров Иван Сергеевич"
+                 }
+            
+             </remarks>
+             <param name="user">Данные нового пользователя</param>
+             <response code="200">Успешное выполнение</response>
+             <response code="400">Ошибка валидации данных</response>
+             <response code="401">Неавторизованный пользователь</response>
+             <response code="403">Пользователь без прав на это действие</response>
+        </member>
+        <member name="M:Adis.Api.Controllers.UsersController.GetUsers">
+             <summary>
+             Возвращает список пользователей
+             </summary>
+             <remarks>
+             Пример запроса:
+            
+                 GET /api/users
+            
+             </remarks>
+             <response code="200">Успешное выполнение</response>
+             <response code="401">Неавторизованный пользователь</response>
+             <response code="403">Пользователь без прав на это действие</response>
+        </member>
+        <member name="M:Adis.Api.Controllers.UsersController.GetUsersByPartialFullNameWithRole(System.String,System.String)">
+             <summary>
+             Возвращает список пользователей указанной роли и части его ФИО
+             </summary>
+             <remarks>
+             Пример запроса:
+            
+                 GET /api/users/projecter/Попо
+            
+             </remarks>
+             <response code="200">Успешное выполнение</response>
+             <response code="401">Неавторизованный пользователь</response>
+             <response code="403">Пользователь без прав на это действие</response>
+        </member>
+        <member name="M:Adis.Api.Controllers.UsersController.GetUserById(System.Int32)">
+             <summary>
+             Возвращает пользователя по идентификатору
+             </summary>
+             <remarks>
+             Пример запроса:
+            
+                 GET /api/users/1
+            
+             </remarks>
+             <response code="200">Успешное выполнение</response>
+             <response code="401">Неавторизованный пользователь</response>
+             <response code="403">Пользователь без прав на это действие</response>
+        </member>
+    </members>
+</doc>

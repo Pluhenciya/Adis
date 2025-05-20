@@ -21,5 +21,12 @@ namespace Adis.Dal.Interfaces
         public Task<User?> GetUserWithRoleByIdAsync(int id);
 
         public Task<IEnumerable<User>> GetUsersByPartialFullNameWithRoleAsync(string partialFullName, Role role);
+
+        public Task<User?> FindByEmailAsync(string email);
+        public Task CreateUserAsync(User user, string password);
+        public Task AddToRoleAsync(User user, string role);
+        public Task RemoveFromRoleAsync(User user, string role);
+        public Task UpdateUserAsync(User user, string? newPassword = null);
+        public Task DeleteUserAsync(User user);
     }
 }
