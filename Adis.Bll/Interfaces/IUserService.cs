@@ -1,4 +1,4 @@
-﻿using Adis.Bll.Dtos;
+﻿using Adis.Bll.Dtos.User;
 using Adis.Dm;
 using System;
 using System.Collections.Generic;
@@ -29,5 +29,9 @@ namespace Adis.Bll.Interfaces
         public Task<UserDto?> GetUserByIdAsync(int id);
 
         public Task<IEnumerable<UserDto>> GetUsersByPartialFullNameWithRoleAsync(string partialFullName, string role);
+
+        public Task<UserDto> UpdateUserAsync(PutUserDto userDto);
+
+        public Task DeleteUserAsync(int id);
     }
 }

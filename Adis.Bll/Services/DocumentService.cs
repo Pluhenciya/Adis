@@ -204,5 +204,10 @@ namespace Adis.Bll.Services
                 throw;
             }
         }
+
+        public async Task<IEnumerable<DocumentDto>> GetGuideDocumentsAsync()
+        {
+            return _mapper.Map<IEnumerable<DocumentDto>>(await _documentRepository.GetGuideDocumentsAsync());
+        }
     }
 }

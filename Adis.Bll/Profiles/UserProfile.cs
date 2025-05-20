@@ -1,6 +1,7 @@
-﻿using Adis.Bll.Dtos;
+﻿using Adis.Bll.Dtos.User;
 using Adis.Dm;
 using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,8 @@ namespace Adis.Bll.Profiles
         {
             CreateMap<User, UserDto>().ForMember(u => u.Role, opt => opt.MapFrom(u => u.Roles != null ? (Enum.Parse(typeof(Role), u.Roles.FirstOrDefault()!.Name!)) : null));
             CreateMap<UserDto, User>();
+            CreateMap<PutUserDto, User>();
+            CreateMap<PutUserDto, UserDto>();
         }
     }
 }

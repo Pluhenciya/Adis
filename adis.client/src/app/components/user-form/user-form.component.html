@@ -1,11 +1,13 @@
-<h2 mat-dialog-title>Добавить нового пользователя</h2>
+<h2 mat-dialog-title>
+  {{ isEditMode ? 'Редактирование пользователя' : 'Добавить нового пользователя' }}
+</h2>
 
 <mat-dialog-content>
   <form [formGroup]="userForm">
     <!-- Email Field -->
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Email</mat-label>
-      <input matInput formControlName="email" required>
+      <input matInput formControlName="email" required [readonly]="isEditMode">
       <mat-icon matSuffix>mail</mat-icon>
       
       <mat-error *ngIf="userForm.get('email')?.hasError('required')">
@@ -17,52 +19,38 @@
     </mat-form-field>
 
     <!-- Password Field -->
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Пароль</mat-label>
-      <input matInput 
-            [type]="showPassword ? 'text' : 'password'"
-            formControlName="password"
-            required>
-      <button mat-icon-button matSuffix 
-              (click)="togglePasswordVisibility()"
-              type="button">
-        <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
-      </button>
-    
-      <mat-hint>Минимум 8 символов, цифра, заглавная буква и спецсимвол</mat-hint>
+    <div *ngIf="!isEditMode || showPassword">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Пароль</mat-label>
+        <input matInput 
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="password"
+              [required]="!isEditMode">
+        <button mat-icon-button matSuffix 
+                (click)="togglePasswordVisibility()"
+                type="button">
+          <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
       
-      <mat-error *ngIf="userForm.get('password')?.hasError('required')">
-        Обязательное поле
-      </mat-error>
-      
-      <mat-error *ngIf="!userForm.get('password')?.hasError('required') 
-                && userForm.get('password')?.hasError('minlength')">
-        Минимум 8 символов
-      </mat-error>
-      
-      <mat-error *ngIf="!userForm.get('password')?.hasError('required') 
-                && !userForm.get('password')?.hasError('minlength')
-                && userForm.get('password')?.hasError('missingNumber')">
-        Добавьте хотя бы одну цифру
-      </mat-error>
-      
-      <mat-error *ngIf="!userForm.get('password')?.hasError('required') 
-                && !userForm.get('password')?.hasError('minlength')
-                && !userForm.get('password')?.hasError('missingNumber')
-                && userForm.get('password')?.hasError('missingUpper')">
-        Добавьте хотя бы одну заглавную букву
-      </mat-error>
-      
-      <mat-error *ngIf="!userForm.get('password')?.hasError('required') 
-                && !userForm.get('password')?.hasError('minlength')
-                && !userForm.get('password')?.hasError('missingNumber')
-                && !userForm.get('password')?.hasError('missingUpper')
-                && userForm.get('password')?.hasError('missingSpecial')">
-        Добавьте спецсимвол: `~!&#64;#$%^&*()-+=&#123;&#125;[]\|:;&quot;&apos;&lt;&gt;,.?/
-      </mat-error>
-    </mat-form-field>
+        <mat-hint *ngIf="!isEditMode">
+          Минимум 8 символов, цифра, заглавная и строчная латинские буквы и спецсимвол
+        </mat-hint>
+        <mat-hint *ngIf="isEditMode">
+          Оставьте пустым, если не хотите менять пароль
+        </mat-hint>
+        
+        <!-- Ошибки валидации... -->
+      </mat-form-field>
+    </div>
 
-    <!-- Role Field -->
+    <!-- Кнопка смены пароля в режиме редактирования -->
+    <div *ngIf="isEditMode && !showPassword" class="password-change">
+      <button mat-stroked-button type="button" (click)="showPassword = true">
+        <mat-icon>vpn_key</mat-icon>
+        Изменить пароль
+      </button>
+    </div>
+
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Роль</mat-label>
       <mat-select formControlName="role" required>
@@ -93,13 +81,14 @@
   </form>
 </mat-dialog-content>
 
+<!-- Действия диалога -->
 <mat-dialog-actions align="end">
   <button mat-button mat-dialog-close>Отмена</button>
   <button mat-raised-button 
           color="primary" 
           [disabled]="userForm.invalid"
           (click)="onSubmit()">
-    <mat-icon>save</mat-icon>
-    Сохранить
+    <mat-icon>{{ isEditMode ? 'save' : 'add' }}</mat-icon>
+    {{ isEditMode ? 'Сохранить изменения' : 'Создать пользователя' }}
   </button>
 </mat-dialog-actions>

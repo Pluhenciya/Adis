@@ -21,5 +21,7 @@ namespace Adis.Bll.Interfaces
         public Task<IEnumerable<DocumentDto>> GetDocumentsAsyncByIdProjectAsync(int idProject);
 
         public Task<FileStreamResult> DownloadZipDocumentsAsync(string documentIds);
+
+        public Task<IEnumerable<DocumentDto>> GetGuideDocumentsAsync();
     }
 }

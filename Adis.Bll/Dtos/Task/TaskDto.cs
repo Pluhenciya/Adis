@@ -1,4 +1,5 @@
-﻿using Adis.Dm;
+﻿using Adis.Bll.Dtos.User;
+using Adis.Dm;
 using System;
 using System.Collections.Generic;
 using System.Linq;

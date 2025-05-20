@@ -28,5 +28,11 @@ namespace Adis.Dal.Repositories
             DocumentsByIdsSpecification spec = new(IdsDocuments);
             return await GetAsync(spec);
         }
+
+        public async Task<IEnumerable<Document>> GetGuideDocumentsAsync()
+        {
+            DocumentsWithoutTaskSpecification spec = new();
+            return await GetAsync(spec);
+        }
     }
 }
