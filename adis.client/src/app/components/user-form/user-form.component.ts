@@ -51,18 +51,37 @@ export class UserFormComponent {
       fullName: ['']
     });
 
+    this.userForm.get('role')?.valueChanges.subscribe(role => {
+      this.updateFullNameValidation(role);
+    });
+
     if (this.isEditMode) {
       this.patchFormValues();
     }
   }
 
+   private updateFullNameValidation(role: string): void {
+    const fullNameControl = this.userForm.get('fullName');
+    
+    if (role !== 'Admin') {
+      fullNameControl?.setValidators([Validators.required]);
+    } else {
+      fullNameControl?.clearValidators();
+    }
+    
+    fullNameControl?.updateValueAndValidity();
+  }
+
   private patchFormValues(): void {
+    const userData = this.data.user;
     this.userForm.patchValue({
-      email: this.data.user.email,
-      role: this.data.user.role,
-      fullName: this.data.user.fullName
+      email: userData.email,
+      role: userData.role,
+      fullName: userData.fullName
     });
     
+    this.updateFullNameValidation(userData.role);
+
     // Очищаем пароль при редактировании
     this.userForm.get('password')?.setValue('');
     this.userForm.get('password')?.markAsUntouched();
@@ -74,15 +93,14 @@ export class UserFormComponent {
 
   onSubmit(): void {
     if (this.userForm.valid) {
-      const result = 
-      {
-        id : this.data.user.id,
-        ...this.userForm.value
-      };
-      // Если пароль пустой при редактировании - удаляем его из данных
+      const result = this.isEditMode 
+        ? { id: this.data.user.id, ...this.userForm.value }
+        : { ...this.userForm.value };
+  
       if (this.isEditMode && !result.password) {
         delete result.password;
       }
+      
       this.dialogRef.close(result);
     }
   }

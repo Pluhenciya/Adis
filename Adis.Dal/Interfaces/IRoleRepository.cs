@@ -1,0 +1,13 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Adis.Dal.Interfaces
+{
+    public interface IRoleRepository
+    {
+        public Task<bool> ExistsAsync(string role);
+    }
+}

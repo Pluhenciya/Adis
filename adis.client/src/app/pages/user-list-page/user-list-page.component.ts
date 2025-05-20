@@ -51,7 +51,8 @@ export class UserListPageComponent {
 
   openAddUserDialog(): void {
     const dialogRef = this.dialog.open(UserFormComponent, {
-      width: '500px'
+      width: '500px',
+      maxWidth: '500px'
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -67,6 +68,7 @@ export class UserListPageComponent {
   openEditUserDialog(user: UserDto): void {
     const dialogRef = this.dialog.open(UserFormComponent, {
       width: '500px',
+      maxWidth: '700px',
       data: { user }
     });
 

@@ -7,6 +7,7 @@ using Adis.Dal.Data;
 using Adis.Dal.Interfaces;
 using Adis.Dal.Repositories;
 using Adis.Dm;
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -70,6 +71,8 @@ builder.Services.AddAutoMapper(typeof(ProjectProfile), typeof(UserProfile), type
 
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
+
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();

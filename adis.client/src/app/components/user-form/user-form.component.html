@@ -1,9 +1,10 @@
-<h2 mat-dialog-title>
+<h2 mat-dialog-title class="dialog-header">
+  <mat-icon class="header-icon">{{ isEditMode ? 'edit' : 'person_add' }}</mat-icon>
   {{ isEditMode ? 'Редактирование пользователя' : 'Добавить нового пользователя' }}
 </h2>
 
-<mat-dialog-content>
-  <form [formGroup]="userForm">
+<mat-dialog-content class="dialog-content">
+  <form [formGroup]="userForm" class="form-container">
     <!-- Email Field -->
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Email</mat-label>
@@ -77,12 +78,15 @@
       <mat-label>ФИО</mat-label>
       <input matInput formControlName="fullName">
       <mat-icon matSuffix>person</mat-icon>
+      <mat-error *ngIf="userForm.get('fullName')?.hasError('required')">
+        ФИО обязательно для этой роли
+      </mat-error>
     </mat-form-field>
   </form>
 </mat-dialog-content>
 
 <!-- Действия диалога -->
-<mat-dialog-actions align="end">
+<mat-dialog-actions align="end" class="dialog-actions">
   <button mat-button mat-dialog-close>Отмена</button>
   <button mat-raised-button 
           color="primary" 

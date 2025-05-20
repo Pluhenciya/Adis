@@ -1,8 +1,21 @@
-<h2 mat-dialog-title>Подтверждение удаления</h2>
-    <mat-dialog-content>
-      {{ data.message }}
-    </mat-dialog-content>
-    <mat-dialog-actions align="end">
-      <button mat-button mat-dialog-close>Отмена</button>
-      <button mat-raised-button color="warn" [mat-dialog-close]="true">Удалить</button>
-    </mat-dialog-actions>
+<h2 mat-dialog-title class="dialog-header">
+  <mat-icon class="warning-icon">warning</mat-icon>
+  Подтверждение удаления
+</h2>
+
+<mat-dialog-content class="dialog-content">
+  <div class="message-container">
+    <p>{{ data.message }}</p>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="dialog-actions">
+  <button mat-stroked-button mat-dialog-close class="cancel-btn">
+    <mat-icon>cancel</mat-icon>
+    Отмена
+  </button>
+  <button mat-raised-button color="warn" [mat-dialog-close]="true" class="confirm-btn">
+    <mat-icon>delete_forever</mat-icon>
+    Удалить
+  </button>
+</mat-dialog-actions>

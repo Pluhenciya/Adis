@@ -17,21 +17,18 @@ namespace Adis.Bll.Services
     /// <inheritdoc cref="IUserService"/>
     public class UserService : IUserService
     {
-        private readonly UserManager<User> _userManager;
-        private readonly RoleManager<AppRole> _roleManager;
         private readonly IMapper _mapper;
         private readonly IUserRepository _userRepository;
+        private readonly IRoleRepository _roleRepository;
 
         public UserService(
-            UserManager<User> userManager,
-            RoleManager<AppRole> roleManager,
             IMapper mapper,
-            IUserRepository userRepository)
+            IUserRepository userRepository,
+            IRoleRepository roleRepository)
         {
-            _userManager = userManager;
-            _roleManager = roleManager;
             _mapper = mapper;
             _userRepository = userRepository;
+            _roleRepository = roleRepository;
         }
 
         /// <inheritdoc/>
@@ -40,38 +37,30 @@ namespace Adis.Bll.Services
         {
             await ValidateUserAsync(userDto);
 
-            // Проверка существования пользователя
-            var existingUser = await _userManager.FindByEmailAsync(userDto.Email);
+            var existingUser = await _userRepository.FindByEmailAsync(userDto.Email);
             if (existingUser != null)
                 throw new ArgumentException("Пользователь с таким email уже существует");
 
-            // Создание пользователя
             var user = _mapper.Map<User>(userDto);
-            user.UserName = userDto.Email; // Для Identity требуется UserName
+            user.UserName = userDto.Email;
 
-            var result = await _userManager.CreateAsync(user, userDto.Password);
-            if (!result.Succeeded)
-                throw new ArgumentException(string.Join(", ", result.Errors.Select(e => e.Description)));
-
-            // Назначение роли
-            var roleResult = await _userManager.AddToRoleAsync(user, userDto.Role.ToString());
-            if (!roleResult.Succeeded)
-                throw new ArgumentException("Ошибка назначения роли");
+            await _userRepository.CreateUserAsync(user, userDto.Password);
+            await _userRepository.AddToRoleAsync(user, userDto.Role.ToString());
 
             return (await GetUserByIdAsync(user.Id))!;
         }
 
         private async Task ValidateUserAsync(UserDto userDto)
         {
-            // Валидация входных данных
             if (!new EmailAddressAttribute().IsValid(userDto.Email))
                 throw new ArgumentException("Некорректный email");
 
-            if (string.IsNullOrWhiteSpace(userDto.Role.ToString()))
-                throw new ArgumentException("Роль обязательна для заполнения");
+            var roleName = userDto.Role.ToString();
+            if (!await _roleRepository.ExistsAsync(roleName))
+                throw new ArgumentException("Роль не существует");
 
             if (userDto.FullName == null && userDto.Role != Role.Admin)
-                throw new ArgumentException("Нельзя не указать у пользователя ФИО, если он не администратор");
+                throw new ArgumentException("ФИО обязательно для неадминистраторов");
         }
 
         public async Task<IEnumerable<UserDto>> GetUsersAsync()
@@ -94,38 +83,34 @@ namespace Adis.Bll.Services
         public async Task<UserDto> UpdateUserAsync(PutUserDto userDto)
         {
             await ValidateUserAsync(_mapper.Map<UserDto>(userDto));
-            var existingUser = await _userRepository.GetByIdAsync(userDto.Id);
 
-            if(existingUser.Email != userDto.Email)
+            var existingUser = await _userRepository.GetByIdAsync(userDto.Id);
+            if (existingUser.Email != userDto.Email)
             {
-                var existingByEmailUser = await _userManager.FindByEmailAsync(userDto.Email);
+                var existingByEmailUser = await _userRepository.FindByEmailAsync(userDto.Email);
                 if (existingByEmailUser != null)
                     throw new ArgumentException("Пользователь с таким email уже существует");
             }
 
             _mapper.Map(userDto, existingUser);
+            await _userRepository.UpdateUserAsync(existingUser, userDto.Password);
 
-            if(userDto.Password != null)
-                existingUser.PasswordHash = _userManager.PasswordHasher.HashPassword(existingUser, userDto.Password);
-
-            await _userManager.RemoveFromRoleAsync(existingUser, (await GetUserByIdAsync(userDto.Id))!.Role.ToString()!);
-
-            await _userManager.AddToRoleAsync(existingUser, userDto.Role.ToString()!);
-
-            await _userRepository.UpdateAsync(existingUser);
+            var currentRole = (await GetUserByIdAsync(userDto.Id))!.Role.ToString();
+            await _userRepository.RemoveFromRoleAsync(existingUser, currentRole!);
+            await _userRepository.AddToRoleAsync(existingUser, userDto.Role.ToString()!);
 
             return (await GetUserByIdAsync(existingUser.Id))!;
         }
 
         public async Task DeleteUserAsync(int id)
         {
-            var existingUser = await _userManager.FindByIdAsync(id.ToString());
+            var existingUser = await _userRepository.GetByIdAsync(id);
             if (existingUser == null)
                 throw new KeyNotFoundException($"Пользователь с id {id} не найден");
 
-            await _userManager.RemoveFromRoleAsync(existingUser, (await GetUserByIdAsync(id))!.Role.ToString()!);
-
-            await _userManager.DeleteAsync(existingUser);
+            var currentRole = (await GetUserByIdAsync(id))!.Role.ToString();
+            await _userRepository.RemoveFromRoleAsync(existingUser, currentRole!);
+            await _userRepository.DeleteUserAsync(existingUser);
         }
     }
 }
