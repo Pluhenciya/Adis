@@ -25,7 +25,7 @@ export class DocumentService {
       params = params.set('idTask', taskId.toString());
     }
     if (documentType) {
-      params = params.set('documentType', DocumentType[documentType])
+      params = params.set('documentType', documentType)
     }
 
     const req = new HttpRequest(
