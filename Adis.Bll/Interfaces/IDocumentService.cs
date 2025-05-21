@@ -12,7 +12,7 @@ namespace Adis.Bll.Interfaces
 {
     public interface IDocumentService
     {
-        public Task<DocumentDto> UploadDocumentAsync(IFormFile file, int? idTask = null);
+        public Task<DocumentDto> UploadDocumentAsync(IFormFile file, int? idTask = null, DocumentType? documentType = null);
 
         public Task<FileStreamResult> DownloadDocumentAsync(int idDocument);
 

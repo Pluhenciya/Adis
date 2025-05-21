@@ -1,0 +1,52 @@
+<div class="container">
+    <div class="header">
+      <h1>Справочник нормативных документов</h1>
+      
+      <button *ngIf="isAdmin" 
+              mat-flat-button 
+              color="primary"
+              (click)="openUploadDialog()">
+        <mat-icon>upload</mat-icon>
+        Загрузить новый документ
+      </button>
+    </div>
+  
+    <div class="filters">
+      <mat-form-field appearance="outline">
+        <mat-label>Поиск по названию</mat-label>
+        <input matInput [(ngModel)]="searchTerm" (input)="applyFilters()">
+      </mat-form-field>
+  
+      <mat-form-field appearance="outline">
+        <mat-label>Тип документа</mat-label>
+        <mat-select [(value)]="selectedType" (selectionChange)="applyFilters()">
+          <mat-option value="all">Все типы</mat-option>
+          <mat-option *ngFor="let type of documentTypes" [value]="type">
+            {{ type }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  
+    <mat-card *ngFor="let doc of filteredDocuments" class="document-card">
+      <mat-card-header>
+        <mat-card-title>{{ doc.fileName }}</mat-card-title>
+        <mat-card-subtitle>{{ doc.documentType }}</mat-card-subtitle>
+      </mat-card-header>
+  
+      <mat-card-actions align="end">
+        <button mat-button color="primary" (click)="downloadDocument(doc)">
+          <mat-icon>download</mat-icon>
+          Скачать
+        </button>
+        
+        <button *ngIf="isAdmin" 
+                mat-button 
+                color="warn"
+                (click)="deleteDocument(doc.idDocument)">
+          <mat-icon>delete</mat-icon>
+          Удалить
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>

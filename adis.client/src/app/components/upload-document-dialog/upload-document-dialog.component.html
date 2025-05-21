@@ -1,0 +1,40 @@
+<h2 mat-dialog-title>Загрузка нового документа</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="uploadForm">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Тип документа</mat-label>
+      <mat-select formControlName="documentType" required>
+        <mat-option *ngFor="let type of documentTypes" [value]="type">
+          {{ type }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <input type="file" 
+           (change)="onFileSelected($event)"
+           accept=".pdf"
+           hidden
+           #fileInput>
+    
+    <button mat-stroked-button 
+            type="button"
+            (click)="fileInput.click()"
+            class="file-button">
+      <mat-icon>attach_file</mat-icon>
+      {{ selectedFile?.name || 'Выберите файл' }}
+    </button>
+
+    <mat-error *ngIf="errorMessage">{{ errorMessage }}</mat-error>
+  </form>
+</mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close>Отмена</button>
+    <button mat-raised-button 
+            color="primary"
+            [disabled]="!uploadForm.valid || !selectedFile"
+            (click)="onSubmit()">
+      Загрузить
+    </button>
+  </mat-dialog-actions>

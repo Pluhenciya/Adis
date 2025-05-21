@@ -36,6 +36,14 @@
                 <span>Пользователи</span>
               </button>
               
+              <button mat-menu-item routerLink="/tasks" class="menu-item" *appHasRole="'projecter'">
+                <span>Задачи</span>
+              </button>
+
+              <button mat-menu-item routerLink="/documents" class="menu-item" *appHasRole="'admin'">
+                <span>База документов</span>
+              </button>
+              
               <mat-divider></mat-divider>
               
               <button mat-menu-item (click)="authService.logout()">

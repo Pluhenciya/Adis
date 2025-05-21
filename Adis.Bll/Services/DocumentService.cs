@@ -33,7 +33,7 @@ namespace Adis.Bll.Services
             _workObjectSectionService = workObjectSectionService;
         }
 
-        public async Task<DocumentDto> UploadDocumentAsync(IFormFile file, int? idTask)
+        public async Task<DocumentDto> UploadDocumentAsync(IFormFile file, int? idTask, DocumentType? documentType)
         {
             if (!Directory.Exists(DIRECTORY_PATH))
                 Directory.CreateDirectory(DIRECTORY_PATH);
@@ -41,7 +41,7 @@ namespace Adis.Bll.Services
             var document = new Document
             {
                 FileName = file.FileName,
-                DocumentType = DocumentType.Other,
+                DocumentType = documentType ?? DocumentType.Other,
             };
 
             var user = _contextAccessor.HttpContext.User;

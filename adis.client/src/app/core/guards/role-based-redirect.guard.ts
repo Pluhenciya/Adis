@@ -22,16 +22,10 @@ export class RoleBasedRedirectGuard implements CanActivate {
         return this.router.parseUrl('/login');
 
     switch(role) {
-        case 'Admin':
-            return this.router.parseUrl('/projects');
-        case 'ProjectManager':
-            return this.router.parseUrl('/projects');
-        case 'Inspector':
-            return this.router.parseUrl('/projects');
         case 'Projecter':
             return this.router.parseUrl('/tasks');
         default:
-            return this.router.parseUrl('/forbidden');
+            return this.router.parseUrl('/projects');
     }
   }
 }
