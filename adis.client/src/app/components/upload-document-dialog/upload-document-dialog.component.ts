@@ -25,7 +25,7 @@ import { DocumentType } from '../../models/document.model';
     NgIf
   ],
   templateUrl: './upload-document-dialog.component.html',
-  styleUrl: './upload-document-dialog.component.css'
+  styleUrl: './upload-document-dialog.component.scss'
 })
 export class UploadDocumentDialogComponent {
   uploadForm!: FormGroup;

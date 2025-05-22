@@ -1,0 +1,44 @@
+<div class="neuro-container">
+  <mat-card class="neuro-card">
+    <mat-card-header class="neuro-header">
+      <mat-card-title class="neuro-title">
+        <mat-icon class="neuro-icon">smart_toy</mat-icon>
+        <span>Нейросправочник</span>
+      </mat-card-title>
+      <mat-card-subtitle class="neuro-subtitle">AI-помощник по нормативной документации</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content class="chat-container">
+      <div class="messages-wrapper">
+        <div class="messages">
+          <div *ngFor="let message of messages" class="message" [class.user]="message.isUser"
+            [class.bot]="!message.isUser" >
+            <mat-icon class="message-icon">
+              {{ message.isUser ? 'person' : 'smart_toy' }}
+            </mat-icon>
+            <div class="message-content">
+              <div class="message-text" [innerHTML]="message.text" (click)="handleDocClick($event)"></div>
+            </div>
+          </div>
+
+          <div *ngIf="isLoading" class="loading-indicator">
+            <mat-spinner diameter="24"></mat-spinner>
+            <span class="loading-text">Формируем ответ...</span>
+          </div>
+        </div>
+      </div>
+
+      <form class="message-form" (submit)="sendMessage()">
+        <mat-form-field appearance="outline" class="neuro-input">
+          <input matInput [(ngModel)]="newMessage" name="message" placeholder="Введите ваш вопрос о документации...">
+          <mat-icon matSuffix>question_answer</mat-icon>
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" class="send-button" type="submit" [disabled]="!newMessage">
+          Отправить
+          <mat-icon>send</mat-icon>
+        </button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,4 +1,5 @@
-﻿using Adis.Bll.Interfaces;
+﻿using Adis.Bll.Dtos;
+using Adis.Bll.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,10 +16,12 @@ namespace Adis.Api.Controllers
             _neuralGuideService = neuralGuideService;
         }
 
-        [HttpGet("request")]
-        public async Task<IActionResult> SendRequest(string request)
+        [HttpPost()]
+        public async Task<IActionResult> SendRequest(NeuralRequest request)
         {
-            return Ok(await _neuralGuideService.SendRequestForGuideAsync(request));
+            return Ok(new { 
+                Answer = await _neuralGuideService.SendRequestForGuideAsync(request.Message)
+            });
         }
     }
 }

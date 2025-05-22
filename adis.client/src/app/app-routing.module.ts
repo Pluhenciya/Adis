@@ -10,6 +10,7 @@ import { ProjectDetailsPageComponent } from './pages/project-details-page/projec
 import { TaskBoardPageComponent } from './pages/task-board-page/task-board-page.component';
 import { RoleBasedRedirectGuard } from './core/guards/role-based-redirect.guard';
 import { DocumentListPageComponent } from './pages/document-list-page/document-list-page.component';
+import { NeuroGuidePageComponent } from './pages/neuro-guide-page/neuro-guide-page.component';
 
 const routes: Routes = [
   { 
@@ -68,6 +69,11 @@ const routes: Routes = [
     data: { expectedRole: 'Admin' },
     title: 'База документов'
   },
+  { 
+    path: 'neuro-guide', 
+    component: NeuroGuidePageComponent,
+    canActivate: [AuthGuard]
+  }
 ];
 
 @NgModule({

@@ -99,6 +99,10 @@ builder.Services.AddScoped<IExecutionTaskRepository, ExecutionTaskRepository>();
 builder.Services.AddScoped<IWorkObjectSectionService, WorkObjectSectionService>();
 builder.Services.AddScoped<IWorkObjectSectionRepository, WorkObjectSectionRepository>();
 
+builder.Services.AddScoped<INeuralGuideService, NeuralGuideService>();
+
+builder.Services.AddMemoryCache();
+
 builder.Services.AddSwaggerGen(options =>
 {
     var basePath = AppContext.BaseDirectory;

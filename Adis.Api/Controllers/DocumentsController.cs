@@ -53,5 +53,12 @@ namespace Adis.Api.Controllers
         {
             return Ok(await _documentService.GetGuideDocumentsAsync());
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteDocument(int id)
+        {
+            await _documentService.DeleteDocumentAsync(id);
+            return Ok();
+        }
     }
 }

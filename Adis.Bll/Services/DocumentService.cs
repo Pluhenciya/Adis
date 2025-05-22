@@ -5,6 +5,7 @@ using Adis.Dm;
 using AutoMapper;
 using ClosedXML.Excel;
 using DocumentFormat.OpenXml;
+using LinqKit;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -24,6 +25,7 @@ namespace Adis.Bll.Services
         private readonly IDocumentRepository _documentRepository;
         private readonly IMapper _mapper;
         private readonly IWorkObjectSectionService _workObjectSectionService;
+        private static int _documentsVersion = 0;
 
         public DocumentService(IHttpContextAccessor contextAccessor, IDocumentRepository documentRepository, IMapper mapper, IWorkObjectSectionService workObjectSectionService)
         {
@@ -32,6 +34,8 @@ namespace Adis.Bll.Services
             _mapper = mapper;
             _workObjectSectionService = workObjectSectionService;
         }
+
+        public int GetCurrentGuideDocumentsVersion() => _documentsVersion;
 
         public async Task<DocumentDto> UploadDocumentAsync(IFormFile file, int? idTask, DocumentType? documentType)
         {
@@ -52,6 +56,10 @@ namespace Adis.Bll.Services
             if (idTask.HasValue)
             {
                 document.IdTask = idTask.Value;
+            }
+            else
+            {
+                Interlocked.Increment(ref _documentsVersion);
             }
 
             var createdDocument = await _documentRepository.AddAsync(document);
@@ -146,6 +154,11 @@ namespace Adis.Bll.Services
             return executionTasks;
         }
 
+        public string GetFilePathByDocument(DocumentDto document)
+        {
+            return $"{DIRECTORY_PATH}/{document.IdDocument}{Path.GetExtension(document.FileName).ToLowerInvariant()}";
+        }
+
         public async Task<IEnumerable<DocumentDto>> GetDocumentsAsyncByIdProjectAsync(int idProject)
         {
             return _mapper.Map<IEnumerable<DocumentDto>>(await _documentRepository.GetDocumentsByIdProjectAsync(idProject));
@@ -203,6 +216,24 @@ namespace Adis.Bll.Services
                 }
                 throw;
             }
+        }
+
+        public async Task DeleteDocumentAsync(int id)
+        {
+            var document = await _documentRepository.GetByIdAsync(id);
+            if (document == null)
+                throw new KeyNotFoundException("Document not found");
+
+            var fileExtension = Path.GetExtension(document.FileName).ToLowerInvariant();
+            var fileName = $"{document.IdDocument}{fileExtension}";
+            var filePath = Path.Combine(DIRECTORY_PATH, fileName);
+
+            if (!File.Exists(filePath))
+                throw new FileNotFoundException("File not found on server");
+
+            File.Delete(filePath);
+
+            await _documentRepository.DeleteAsync(id);
         }
 
         public async Task<IEnumerable<DocumentDto>> GetGuideDocumentsAsync()

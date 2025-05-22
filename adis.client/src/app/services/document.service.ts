@@ -25,7 +25,12 @@ export class DocumentService {
       params = params.set('idTask', taskId.toString());
     }
     if (documentType) {
-      params = params.set('documentType', documentType)
+      const typeKey = getEnumKeyByValue(DocumentType, documentType);
+      params = params.set('documentType', typeKey!.toString())
+    }
+
+    function getEnumKeyByValue<T extends Record<string, string>>(enumObj: T, value: string): keyof T | undefined {
+      return Object.keys(enumObj).find(key => enumObj[key] === value) as keyof T;
     }
 
     const req = new HttpRequest(

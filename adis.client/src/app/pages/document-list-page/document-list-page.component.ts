@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { DocumentDto } from '../../models/document.model';
+import { DocumentDto, DocumentType } from '../../models/document.model';
 import { DocumentService } from '../../services/document.service';
 import { AuthStateService } from '../../services/auth-state.service';
 import { MatDialog } from '@angular/material/dialog';
@@ -28,7 +28,7 @@ import { UploadDocumentDialogComponent } from '../../components/upload-document-
     NgForOf
   ],
   templateUrl: './document-list-page.component.html',
-  styleUrl: './document-list-page.component.css'
+  styleUrl: './document-list-page.component.scss'
 })
 export class DocumentListPageComponent {
   documents: DocumentDto[] = [];
@@ -113,5 +113,20 @@ export class DocumentListPageComponent {
       },
       error: (err) => console.error('Error downloading document:', err)
     });
+  }
+
+  mapDocumentType(serverType: string): DocumentType {
+    const typeMap: { [key: string]: DocumentType } = {
+      'GOST': DocumentType.GOST,
+      'SNIP': DocumentType.SNIP,
+      'SP': DocumentType.SP,
+      'TU': DocumentType.TU,
+      'SanPin': DocumentType.SanPin,
+      'Estimate': DocumentType.Estimate,
+      'TechnicalRegulation': DocumentType.TechnicalRegulation,
+      'Other': DocumentType.Other
+    };
+  
+    return typeMap[serverType] || DocumentType.Other;
   }
 }
