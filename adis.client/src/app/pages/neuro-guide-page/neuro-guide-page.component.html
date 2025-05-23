@@ -10,7 +10,7 @@
 
     <mat-card-content class="chat-container">
       <div class="messages-wrapper">
-        <div class="messages">
+        <div class="messages" #messagesContainer>
           <div *ngFor="let message of messages" class="message" [class.user]="message.isUser"
             [class.bot]="!message.isUser" >
             <mat-icon class="message-icon">

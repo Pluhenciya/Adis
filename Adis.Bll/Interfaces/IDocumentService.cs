@@ -12,6 +12,8 @@ namespace Adis.Bll.Interfaces
 {
     public interface IDocumentService
     {
+        public string DirectoryPath { get;}
+
         public Task<DocumentDto> UploadDocumentAsync(IFormFile file, int? idTask = null, DocumentType? documentType = null);
 
         public Task<FileStreamResult> DownloadDocumentAsync(int idDocument);
@@ -23,10 +25,6 @@ namespace Adis.Bll.Interfaces
         public Task<FileStreamResult> DownloadZipDocumentsAsync(string documentIds);
 
         public Task<IEnumerable<DocumentDto>> GetGuideDocumentsAsync();
-
-        public string GetFilePathByDocument(DocumentDto document);
-
-        public int GetCurrentGuideDocumentsVersion();
 
         public Task DeleteDocumentAsync(int id);
     }

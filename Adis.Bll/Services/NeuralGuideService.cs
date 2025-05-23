@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Adis.Bll.Dtos;
 using Adis.Bll.Interfaces;
 using LangChain.Databases;
 using LangChain.Databases.InMemory;
@@ -18,7 +19,6 @@ namespace Adis.Bll.Services
 {
     public class NeuralGuideService : INeuralGuideService
     {
-        private readonly IDocumentService _documentService;
         private readonly InMemoryVectorDatabase _vectorDatabase;
         private readonly OllamaEmbeddingModel _embeddingModel;
         private readonly OllamaChatModel _llm;
@@ -26,21 +26,19 @@ namespace Adis.Bll.Services
         private IVectorCollection _collection;
         private readonly IMemoryCache _cache;
 
-        public NeuralGuideService(IDocumentService documentService, IMemoryCache cache)
+        public NeuralGuideService(IMemoryCache cache)
         {
-            _documentService = documentService;
             _cache = cache;
             var ollamaProvider = new OllamaProvider();
 
             _embeddingModel = new OllamaEmbeddingModel(ollamaProvider, "nomic-embed-text");
-            _llm = new OllamaChatModel(ollamaProvider, "gemma3");
+            _llm = new OllamaChatModel(ollamaProvider, "qwen3:4b");
             _vectorDatabase = new InMemoryVectorDatabase();
         }
 
-        private async Task InitializeAsync()
+        public async Task InitializeAsync(IEnumerable<DocumentDto>? documentsDtos = null, string? directoryPath = null)
         {
-            var currentVersion = _documentService.GetCurrentGuideDocumentsVersion();
-            var cacheKey = $"documents_{currentVersion}";
+            var cacheKey = $"documents";
 
             // Проверяем кэш для документов и векторной базы
             if (_cache.TryGetValue(cacheKey, out (List<Document> Docs, IVectorCollection Collection) cacheEntry))
@@ -50,12 +48,14 @@ namespace Adis.Bll.Services
                 return;
             }
 
-            var documentsDtos = await _documentService.GetGuideDocumentsAsync();
+            if (documentsDtos == null || directoryPath == null)
+                throw new ArgumentException("Документов нету");
+
             var documents = new List<Document>();
 
             foreach (var documentsDto in documentsDtos)
             {
-                var filePath = _documentService.GetFilePathByDocument(documentsDto);
+                var filePath = $"{directoryPath}/{documentsDto.IdDocument}{Path.GetExtension(documentsDto.FileName).ToLowerInvariant()}";
                 var loader = GetDocumentLoader(filePath);
                 var loaded = await loader.LoadAsync(DataSource.FromPath(filePath));
 
@@ -197,6 +197,7 @@ namespace Adis.Bll.Services
                 3. Если информации нет - явно укажи на это
                 4. Для ссылок используй только данные из поля "Источник"
                 5. Сохраняй структуру документа (заголовки, списки, код)
+                6. Источники обязательно оформляется в квадратных скобках как в контексте
 
                 Контекст:
                 {context}

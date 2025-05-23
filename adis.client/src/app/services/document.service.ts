@@ -70,8 +70,18 @@ export class DocumentService {
     return this.http.get<DocumentDto[]>(`${this.apiUrl}/documents/guide`);
   }
 
-  downloadDocument(id: number): Observable<Blob> {
-    return this.http.get<Blob>(`${this.apiUrl}/documents/${id}/download`);
+  downloadDocument(id: number): Observable<{ blob: Blob | null, filename: string }> {
+    return this.http.get(`${this.apiUrl}/documents/${id}/download`, {
+      responseType: 'blob',
+      observe: 'response'
+    }).pipe(
+      map(response => {
+        const contentDisposition = response.headers.get('Content-Disposition');
+        const filenameMatch = contentDisposition!.match(/filename="?(.+?)"?(;|$)/);
+        const filename = filenameMatch ? filenameMatch[1] : 'document';
+        return { blob: response.body, filename };
+      })
+    );
   }
 
   deleteDocument(id: number): Observable<void> {

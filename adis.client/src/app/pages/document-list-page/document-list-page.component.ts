@@ -13,6 +13,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { FormsModule } from '@angular/forms';
 import { UploadDocumentDialogComponent } from '../../components/upload-document-dialog/upload-document-dialog.component';
+import { ready } from 'yandex-maps';
 
 @Component({
   selector: 'app-document-list-page',
@@ -78,7 +79,7 @@ export class DocumentListPageComponent {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result) this.loadGuideDocuments();
+      if (result) setTimeout(() => this.loadGuideDocuments(), 1000);
     });
   }
 
@@ -101,17 +102,20 @@ export class DocumentListPageComponent {
   }
 
   downloadDocument(document: DocumentDto): void {
-    this.documentService.downloadDocument(document.idDocument).subscribe({
-      next: (file) => {
-        const blob = new Blob([file], { type: 'application/octet-stream' });
-        const url = window.URL.createObjectURL(blob);
+    this.documentService.downloadDocument(Number(document.idDocument)).subscribe({
+      next: ({ blob, filename }) => {
+        const url = window.URL.createObjectURL(blob!);
         const a = window.document.createElement('a');
         a.href = url;
-        a.download = document.fileName;
+        a.download = filename; // Use server-provided filename
+        window.document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
+        window.document.body.removeChild(a);
       },
-      error: (err) => console.error('Error downloading document:', err)
+      error: (err) => {
+        console.error('Error downloading document:', err);
+      }
     });
   }
 

@@ -49,12 +49,14 @@ namespace Adis.Api.Controllers
         }
 
         [HttpGet("guide")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetGuideDocuments()
         {
             return Ok(await _documentService.GetGuideDocumentsAsync());
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteDocument(int id)
         {
             await _documentService.DeleteDocumentAsync(id);

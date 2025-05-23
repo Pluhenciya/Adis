@@ -1,5 +1,6 @@
 ﻿using Adis.Bll.Dtos;
 using Adis.Bll.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,7 +17,8 @@ namespace Adis.Api.Controllers
             _neuralGuideService = neuralGuideService;
         }
 
-        [HttpPost()]
+        [HttpPost]
+        [Authorize]
         public async Task<IActionResult> SendRequest(NeuralRequest request)
         {
             return Ok(new { 

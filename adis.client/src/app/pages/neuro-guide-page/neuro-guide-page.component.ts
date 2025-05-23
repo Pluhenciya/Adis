@@ -1,5 +1,5 @@
 import { NgForOf, NgIf } from '@angular/common';
-import { Component, SecurityContext } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, SecurityContext, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -28,11 +28,12 @@ import { DocumentService } from '../../services/document.service';
   templateUrl: './neuro-guide-page.component.html',
   styleUrl: './neuro-guide-page.component.scss'
 })
-export class NeuroGuidePageComponent {
+export class NeuroGuidePageComponent implements AfterViewChecked  {
   messages: { text: SafeHtml, isUser: boolean }[];
   newMessage = '';
   isLoading = false;
   errorMessage = '';
+  @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
 
   constructor(private neuralService: NeuralGuideService, private sanitizer: DomSanitizer, private documentService: DocumentService) {
     this.messages = [
@@ -42,8 +43,27 @@ export class NeuroGuidePageComponent {
   ];
   }
 
+  ngAfterViewChecked() {
+    this.scrollToBottom();
+  }
+
+  private scrollToBottom(): void {
+    try {
+      this.messagesContainer.nativeElement.scrollTo({
+        top: this.messagesContainer.nativeElement.scrollHeight,
+        behavior: 'smooth'
+      });
+    } catch(err) {
+      console.error('Scroll error:', err);
+    }
+  }
+
   private async renderMarkdown(content: string): Promise<SafeHtml> {
-    const withLinks = content.replace(
+    const cleanedContent = content.replace(
+      /<think>[\s\S]*?<\/think>/g, 
+      '' // Заменяем на пустую строку
+    );
+    const withLinks = cleanedContent.replace(
       /\[Источник: (.+?)\|id:(\d+)\]/g, 
       (match, fileName, id) => 
         `<a class="source-link" href="#" data-doc-id="${id}">${fileName}</a>`
@@ -61,6 +81,7 @@ export class NeuroGuidePageComponent {
     this.newMessage = '';
     this.isLoading = true;
     this.errorMessage = '';
+    this.scrollToBottom()
 
     try {
       const response = await this.neuralService.sendMessage(userMessage).toPromise();
@@ -72,6 +93,7 @@ export class NeuroGuidePageComponent {
         text: renderedMessage,
         isUser: false
       });
+      setTimeout(() => this.scrollToBottom(), 100);
     } catch (error) {
       this.errorMessage = 'Ошибка при получении ответа';
       console.error('API Error:', error);
@@ -87,18 +109,13 @@ export class NeuroGuidePageComponent {
     if (!docId) return;
   
     this.documentService.downloadDocument(Number(docId)).subscribe({
-      next: (blob: Blob) => {
-        // Создаем URL для blob
-        const url = window.URL.createObjectURL(blob);
-        
-        // Создаем скрытую ссылку для скачивания
+      next: ({ blob, filename }) => {
+        const url = window.URL.createObjectURL(blob!);
         const a = document.createElement('a');
         a.href = url;
-        a.download = link.textContent + '.pdf'; // Или получите имя файла из сервиса
+        a.download = filename; // Use server-provided filename
         document.body.appendChild(a);
         a.click();
-        
-        // Очищаем ресурсы
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
       },
@@ -107,7 +124,7 @@ export class NeuroGuidePageComponent {
         this.errorMessage = 'Ошибка при загрузке документа';
       }
     });
-    
+  
     event.preventDefault();
   }
 }

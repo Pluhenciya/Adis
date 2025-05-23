@@ -8,6 +8,8 @@ using DocumentFormat.OpenXml;
 using LinqKit;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.IO.Compression;
@@ -20,27 +22,29 @@ namespace Adis.Bll.Services
 {
     public class DocumentService : IDocumentService
     {
-        private const string DIRECTORY_PATH = $"documents";
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly IDocumentRepository _documentRepository;
         private readonly IMapper _mapper;
         private readonly IWorkObjectSectionService _workObjectSectionService;
-        private static int _documentsVersion = 0;
+        private readonly IMemoryCache _memoryCache;
+        private readonly INeuralGuideService _neuralGuideService;
 
-        public DocumentService(IHttpContextAccessor contextAccessor, IDocumentRepository documentRepository, IMapper mapper, IWorkObjectSectionService workObjectSectionService)
+        public string DirectoryPath => "documents";
+
+        public DocumentService(IHttpContextAccessor contextAccessor, IDocumentRepository documentRepository, IMapper mapper, IWorkObjectSectionService workObjectSectionService, IMemoryCache memoryCache, INeuralGuideService neuralGuideService)
         {
             _contextAccessor = contextAccessor;
             _documentRepository = documentRepository;
             _mapper = mapper;
             _workObjectSectionService = workObjectSectionService;
+            _memoryCache = memoryCache;
+            _neuralGuideService = neuralGuideService;
         }
-
-        public int GetCurrentGuideDocumentsVersion() => _documentsVersion;
 
         public async Task<DocumentDto> UploadDocumentAsync(IFormFile file, int? idTask, DocumentType? documentType)
         {
-            if (!Directory.Exists(DIRECTORY_PATH))
-                Directory.CreateDirectory(DIRECTORY_PATH);
+            if (!Directory.Exists(DirectoryPath))
+                Directory.CreateDirectory(DirectoryPath);
 
             var document = new Document
             {
@@ -57,21 +61,31 @@ namespace Adis.Bll.Services
             {
                 document.IdTask = idTask.Value;
             }
-            else
-            {
-                Interlocked.Increment(ref _documentsVersion);
-            }
 
             var createdDocument = await _documentRepository.AddAsync(document);
 
             var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
 
             var uniqueFileName = $"{createdDocument.IdDocument}{fileExtension}";
-            var filePath = Path.Combine(DIRECTORY_PATH, uniqueFileName);
+            var filePath = Path.Combine(DirectoryPath, uniqueFileName);
 
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
                 await file.CopyToAsync(stream);
+            }
+
+            if (!idTask.HasValue)
+            {     
+                _memoryCache.Remove("documents");
+                Task.Run(() =>
+                    SafeInitializeNeuralGuideAsync()
+                   .ContinueWith(t =>
+                   {
+                       if (t.IsFaulted)
+                       {
+                           Console.WriteLine($"Ошибка фоновой инициализации: {t.Exception}");
+                       }
+                   }));
             }
 
             return _mapper.Map<DocumentDto>(createdDocument);
@@ -85,7 +99,7 @@ namespace Adis.Bll.Services
 
             var fileExtension = Path.GetExtension(document.FileName).ToLowerInvariant();
             var fileName = $"{document.IdDocument}{fileExtension}";
-            var filePath = Path.Combine(DIRECTORY_PATH, fileName);
+            var filePath = Path.Combine(DirectoryPath, fileName);
 
             if (!File.Exists(filePath))
                 throw new FileNotFoundException("File not found on server");
@@ -123,7 +137,7 @@ namespace Adis.Bll.Services
 
             var fileExtension = Path.GetExtension(document.FileName).ToLowerInvariant();
             var fileName = $"{document.IdDocument}{fileExtension}";
-            var filePath = Path.Combine(DIRECTORY_PATH, fileName);
+            var filePath = Path.Combine(DirectoryPath, fileName);
             var workbook = new XLWorkbook(filePath);
             var worksheet = workbook.Worksheet(1);
             var rows = worksheet.RangeUsed()!.RowsUsed();
@@ -152,11 +166,6 @@ namespace Adis.Bll.Services
                 }
             }
             return executionTasks;
-        }
-
-        public string GetFilePathByDocument(DocumentDto document)
-        {
-            return $"{DIRECTORY_PATH}/{document.IdDocument}{Path.GetExtension(document.FileName).ToLowerInvariant()}";
         }
 
         public async Task<IEnumerable<DocumentDto>> GetDocumentsAsyncByIdProjectAsync(int idProject)
@@ -192,7 +201,7 @@ namespace Adis.Bll.Services
                     {
                         var fileExtension = Path.GetExtension(doc.FileName).ToLowerInvariant();
                         var fileName = $"{doc.IdDocument}{fileExtension}";
-                        var filePath = Path.Combine(DIRECTORY_PATH, fileName);
+                        var filePath = Path.Combine(DirectoryPath, fileName);
 
                         if (!File.Exists(filePath)) continue;
 
@@ -226,7 +235,7 @@ namespace Adis.Bll.Services
 
             var fileExtension = Path.GetExtension(document.FileName).ToLowerInvariant();
             var fileName = $"{document.IdDocument}{fileExtension}";
-            var filePath = Path.Combine(DIRECTORY_PATH, fileName);
+            var filePath = Path.Combine(DirectoryPath, fileName);
 
             if (!File.Exists(filePath))
                 throw new FileNotFoundException("File not found on server");
@@ -234,6 +243,19 @@ namespace Adis.Bll.Services
             File.Delete(filePath);
 
             await _documentRepository.DeleteAsync(id);
+           
+            _memoryCache.Remove("documents");
+            await Task.Run(async () =>
+            {
+                // Получаем актуальные документы через новый контекст
+                var docs = await GetGuideDocumentsAsync();
+                await _neuralGuideService.InitializeAsync(docs, DirectoryPath);
+            });
+        }
+
+        private async Task SafeInitializeNeuralGuideAsync()
+        {
+            await _neuralGuideService.InitializeAsync(await GetGuideDocumentsAsync(), DirectoryPath);
         }
 
         public async Task<IEnumerable<DocumentDto>> GetGuideDocumentsAsync()

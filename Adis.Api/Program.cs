@@ -150,6 +150,11 @@ using (var scope = app.Services.CreateScope())
 
         var adminInitializer = services.GetRequiredService<IAdminInitializer>();
         await adminInitializer.InitializeAsync();
+
+        var neuralGuideService = services.GetRequiredService<INeuralGuideService>();
+        var documentService = services.GetRequiredService<IDocumentService>();
+
+        await neuralGuideService.InitializeAsync(await documentService.GetGuideDocumentsAsync(), documentService.DirectoryPath);
     }
 }
 
