@@ -24,13 +24,6 @@ services:
       - ollama-data:/root/.ollama
     networks:
       - app-network
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:11434"]
       interval: 10s
