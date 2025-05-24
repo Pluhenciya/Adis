@@ -12,5 +12,7 @@ namespace Adis.Dal.Interfaces
         public Task<IEnumerable<Document>> GetDocumentsByIdProjectAsync(int idProject);
 
         public Task<IEnumerable<Document>> GetDocumentsByIdsAsync(IEnumerable<int> IdsDocuments);
+
+        public Task<IEnumerable<Document>> GetGuideDocumentsAsync();
     }
 }

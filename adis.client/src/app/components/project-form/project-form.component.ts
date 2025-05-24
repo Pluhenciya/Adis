@@ -111,7 +111,7 @@ export class ProjectFormComponent implements OnInit {
   };
 
   async ngAfterViewInit() {
-    await this.mapService.initMapAsync(this.mapContainer.nativeElement, [55.75, 37.57], 10);
+    await this.mapService.initMapAsync(this.mapContainer.nativeElement, [64.539912, 40.515600], 10);
     this.loadExistingGeometry();
   }
 

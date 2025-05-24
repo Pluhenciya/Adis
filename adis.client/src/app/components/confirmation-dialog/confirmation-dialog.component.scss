@@ -1,0 +1,44 @@
+.dialog-header {
+  display: flex;
+  align-items: center;
+  padding: 16px 24px;
+  background: #FFF3E0;
+  margin: 0;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+
+  .warning-icon {
+    color: #FFA000;
+    margin-right: 12px;
+    font-size: 28px;
+  }
+}
+
+.dialog-content {
+  padding: 0 24px;
+  max-height: 60vh;
+  overflow-y: auto;
+  
+  .message-container {
+    padding: 16px 0;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #5F6368;
+    min-height: auto;
+  }
+}
+
+.dialog-actions {
+  padding: 16px 24px;
+  margin: 0;
+  background: #FAFAFA;
+  border-top: 1px solid #EEE;
+  position: sticky;
+  bottom: 0;
+
+  button {
+    margin-left: 12px;
+    padding: 8px 20px;
+  }
+}

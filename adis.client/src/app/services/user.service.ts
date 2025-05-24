@@ -22,12 +22,10 @@ export class UserService {
     return this.http.post<UserDto>(this.apiUrl, user);
   }
 
-  // (Опционально) Обновить пользователя
   updateUser(user: UserDto): Observable<UserDto> {
-    return this.http.put<UserDto>(`${this.apiUrl}/${user.id}`, user);
+    return this.http.put<UserDto>(`${this.apiUrl}`, user);
   }
 
-  // (Опционально) Удалить пользователя
   deleteUser(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }

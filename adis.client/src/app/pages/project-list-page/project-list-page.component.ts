@@ -81,8 +81,8 @@ export class ProjectListPageComponent implements OnInit, OnDestroy, AfterViewIni
   pageIndex = 0;
   hasActiveFilters = false;
   viewMode: 'list' | 'map' = 'list';
-  mapCenter: [number, number] = [55.751244, 37.618423];
-  zoom = 5;
+  mapCenter: [number, number] = [64.539912, 40.515600];
+  zoom = 10;
   selectedProject?: GetProjectDto;
 
   private searchSubject = new Subject<string>();
@@ -379,7 +379,7 @@ export class ProjectListPageComponent implements OnInit, OnDestroy, AfterViewIni
 
     async deleteProject(project: GetProjectDto) {
       const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-        data: { projectName: project.name }
+        data: { message: `Вы уверены что хотите удалить проект \"${project.name}\"`}
       });
     
       dialogRef.afterClosed().subscribe(async result => {
@@ -403,7 +403,7 @@ export class ProjectListPageComponent implements OnInit, OnDestroy, AfterViewIni
     get filteredProjects(): GetProjectDto[] {
       return this.projects.filter(project => 
         project.status !== ProjectStatus.Designing || 
-        this.authService.currentRole === "ProjectManager" || this.authService.currentRole === "Projecter"
+        this.authService.currentRole === "ProjectManager" || this.authService.currentRole === "Projecter" || this.authService.currentRole === "Admin"
       );
     }
 }

@@ -7,6 +7,7 @@ using Adis.Dal.Data;
 using Adis.Dal.Interfaces;
 using Adis.Dal.Repositories;
 using Adis.Dm;
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -66,10 +67,12 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddCors();
 
-builder.Services.AddAutoMapper(typeof(ProjectProfile), typeof(UserProfile), typeof(WorkObjectProfile), typeof(TaskProfile), typeof(DocumentProfile), typeof(CommentProfile));
+builder.Services.AddAutoMapper(typeof(ProjectProfile), typeof(UserProfile), typeof(WorkObjectProfile), typeof(TaskProfile), typeof(DocumentProfile), typeof(CommentProfile), typeof(ExecutionTaskProfile));
 
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
+
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
@@ -95,6 +98,12 @@ builder.Services.AddScoped<IExecutionTaskRepository, ExecutionTaskRepository>();
 
 builder.Services.AddScoped<IWorkObjectSectionService, WorkObjectSectionService>();
 builder.Services.AddScoped<IWorkObjectSectionRepository, WorkObjectSectionRepository>();
+
+builder.Services.AddScoped<INeuralGuideService, NeuralGuideService>();
+
+builder.Services.AddMemoryCache();
+
+builder.Services.Configure<OllamaSetting>(builder.Configuration.GetSection("Ollama"));
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -143,6 +152,11 @@ using (var scope = app.Services.CreateScope())
 
         var adminInitializer = services.GetRequiredService<IAdminInitializer>();
         await adminInitializer.InitializeAsync();
+
+        var neuralGuideService = services.GetRequiredService<INeuralGuideService>();
+        var documentService = services.GetRequiredService<IDocumentService>();
+
+        await neuralGuideService.InitializeAsync(await documentService.GetGuideDocumentsAsync(), documentService.DirectoryPath);
     }
 }
 

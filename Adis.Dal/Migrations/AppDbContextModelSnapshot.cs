@@ -153,7 +153,7 @@ namespace Adis.Dal.Migrations
 
                     b.Property<string>("DocumentType")
                         .IsRequired()
-                        .HasColumnType("enum('estimate', 'other')")
+                        .HasColumnType("enum('GOST', 'SNIP', 'SP', 'TU', 'technicalRegulation', 'estimate', 'other')")
                         .HasColumnName("type");
 
                     b.Property<string>("FileName")

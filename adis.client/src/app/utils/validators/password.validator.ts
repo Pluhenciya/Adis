@@ -8,6 +8,7 @@ export function passwordComplexityValidator(control: AbstractControl): Validatio
     
     if (!/\d/.test(value)) errors['missingNumber'] = true;
     if (!/[A-Z]/.test(value)) errors['missingUpper'] = true;
+    if (!/[a-z]/.test(value)) errors['missingLower'] = true;
     if (!/[`~!@#$%^&*()\-+={}[\]\\|:;"'<>,.?/]/.test(value)) errors['missingSpecial'] = true;
 
     return Object.keys(errors).length ? errors : null;

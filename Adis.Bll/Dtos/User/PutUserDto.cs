@@ -6,12 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Adis.Bll.Dtos
+namespace Adis.Bll.Dtos.User
 {
-    /// <summary>
-    /// DTO для пользователей
-    /// </summary>
-    public class UserDto
+    public class PutUserDto
     {
         /// <summary>
         /// Идентификатор пользователя
@@ -28,8 +25,7 @@ namespace Adis.Bll.Dtos
         /// <summary>
         /// Пароль пользователя
         /// </summary>
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Пароль обязателен")]
-        public string Password { get; set; } = null!;
+        public string? Password { get; set; }
 
         /// <summary>
         /// Роль пользователя
@@ -41,10 +37,5 @@ namespace Adis.Bll.Dtos
         /// ФИО пользователя
         /// </summary>
         public string? FullName { get; set; }
-
-        /// <summary>
-        /// Время создателя проекта
-        /// </summary>
-        public DateTime CreatedAt { get; set; }
     }
 }
