@@ -1,4 +1,5 @@
 ﻿using Adis.Bll.Interfaces;
+using Adis.Dm;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -17,9 +18,9 @@ namespace Adis.Api.Controllers
 
         [HttpPost("upload")]
         [Authorize(Roles = "Admin, Projecter")]
-        public async Task<IActionResult> UploadDocument(IFormFile file, [FromQuery] int? idTask = null)
+        public async Task<IActionResult> UploadDocument(IFormFile file, [FromQuery] int? idTask = null, [FromQuery] DocumentType? documentType = null)
         {
-            return Ok(await _documentService.UploadDocumentAsync(file, idTask));
+            return Ok(await _documentService.UploadDocumentAsync(file, idTask, documentType));
         }
 
         [HttpGet("{id}/download")]
@@ -48,9 +49,18 @@ namespace Adis.Api.Controllers
         }
 
         [HttpGet("guide")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetGuideDocuments()
         {
             return Ok(await _documentService.GetGuideDocumentsAsync());
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteDocument(int id)
+        {
+            await _documentService.DeleteDocumentAsync(id);
+            return Ok();
         }
     }
 }

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../environments/environment';
 import { HttpClient, HttpEvent, HttpEventType, HttpParams, HttpRequest } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
-import { DocumentDto } from '../models/document.model';
+import { DocumentDto, DocumentType } from '../models/document.model';
 
 @Injectable({
   providedIn: 'root'
@@ -16,13 +16,21 @@ export class DocumentService {
     return this.http.get<DocumentDto[]>(`${this.apiUrl}/documents/${idProject}`);
   }
 
-  uploadDocument(file: File, taskId?: number): Observable<{progress: number, result?: any}> {
+  uploadDocument(file: File, taskId?: number, documentType?: DocumentType): Observable<{progress: number, result?: any}> {
     const formData = new FormData();
     formData.append('file', file);
     
     let params = new HttpParams();
     if (taskId) {
       params = params.set('idTask', taskId.toString());
+    }
+    if (documentType) {
+      const typeKey = getEnumKeyByValue(DocumentType, documentType);
+      params = params.set('documentType', typeKey!.toString())
+    }
+
+    function getEnumKeyByValue<T extends Record<string, string>>(enumObj: T, value: string): keyof T | undefined {
+      return Object.keys(enumObj).find(key => enumObj[key] === value) as keyof T;
     }
 
     const req = new HttpRequest(
@@ -56,5 +64,27 @@ export class DocumentService {
       default:
         return { progress: 0, result: null };
     }
+  }
+
+  getGuideDocuments(): Observable<DocumentDto[]> {
+    return this.http.get<DocumentDto[]>(`${this.apiUrl}/documents/guide`);
+  }
+
+  downloadDocument(id: number): Observable<{ blob: Blob | null, filename: string }> {
+    return this.http.get(`${this.apiUrl}/documents/${id}/download`, {
+      responseType: 'blob',
+      observe: 'response'
+    }).pipe(
+      map(response => {
+        const contentDisposition = response.headers.get('Content-Disposition');
+        const filenameMatch = contentDisposition!.match(/filename="?(.+?)"?(;|$)/);
+        const filename = filenameMatch ? filenameMatch[1] : 'document';
+        return { blob: response.body, filename };
+      })
+    );
+  }
+
+  deleteDocument(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/documents/${id}`);
   }
 }

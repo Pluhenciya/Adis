@@ -3,6 +3,7 @@ import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from
 import { AuthStateService } from '../../services/auth-state.service';
 import { AuthService } from '../../services/auth.service';
 import { RefreshTokenRequest } from '../../models/auth.model';
+import { Observable, catchError, of, switchMap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -10,36 +11,44 @@ import { RefreshTokenRequest } from '../../models/auth.model';
 export class AuthGuard implements CanActivate {
   constructor(
     private authStateService: AuthStateService,
-    private authService : AuthService,
+    private authService: AuthService,
     private router: Router
   ) { }
 
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
-  ): boolean {
-    if (this.authStateService.isAuthenticated()) {
-      return true;
-    }
-    
-    var tokens : RefreshTokenRequest = {
-      accessToken : this.authStateService.accessToken!,
-      refreshToken : this.authStateService.refreshToken!
-    }
+  ): Observable<boolean> {
+    return this.authStateService.isAuthenticated().pipe(
+      switchMap(isAuthenticated => {
+        if (isAuthenticated) {
+          return of(true);
+        }
+        
+        // Попытка обновить токен
+        const tokens: RefreshTokenRequest = {
+          accessToken: this.authStateService.accessToken!,
+          refreshToken: this.authStateService.refreshToken!
+        };
 
-    this.authService.refreshToken(tokens).subscribe({
-      next: (response) => {
-        this.authStateService.login(response.accessToken, response.refreshToken);
-        return true;
-      },
-      error: () => {
-        // Перенаправляем на страницу логина с сохранением URL
-        this.router.navigate(['/login'], {
-          queryParams: { returnUrl: state.url }
-        });
-        return false;
-      }
-    });
-    return false;
+        return this.authService.refreshToken(tokens).pipe(
+          switchMap(response => {
+            this.authStateService.login(response.accessToken, response.refreshToken);
+            return of(true);
+          }),
+          catchError(() => {
+            // Перенаправление при ошибке обновления
+            this.router.navigate(['/login'], {
+              queryParams: { returnUrl: state.url }
+            });
+            return of(false);
+          })
+        );
+      }),
+      catchError(() => {
+        this.router.navigate(['/login']);
+        return of(false);
+      })
+    );
   }
 }

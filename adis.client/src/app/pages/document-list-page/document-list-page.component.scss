@@ -1,0 +1,185 @@
+$primary: #FF6D00;
+$surface: #FFFFFF;
+$text-primary: #2D3038;
+$text-secondary: #6C757D;
+$border-color: #E0E0E0;
+
+@mixin card-base {
+  background: $surface;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@mixin hover-effect {
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    transform: translateY(-2px);
+  }
+}
+
+.container {
+  padding: 24px;
+  max-width: 1440px;
+  margin: 0 auto;
+
+  @media (max-width: 768px) {
+    padding: 16px;
+  }
+}
+
+.header {
+  @include card-base;
+  padding: 20px;
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: $text-primary;
+  }
+
+  button {
+    background: $primary;
+    color: $surface;
+    border-radius: 8px;
+    padding: 8px 16px;
+
+    mat-icon {
+      margin-right: 8px;
+    }
+  }
+}
+
+.filters {
+  @include card-base;
+  padding: 16px;
+  margin-bottom: 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+
+  mat-form-field {
+    width: 100%;
+
+    .mat-form-field-wrapper {
+      background: rgba($primary, 0.05);
+      border-radius: 8px;
+      padding: 8px;
+    }
+
+    .mat-form-field-label {
+      color: $text-secondary;
+    }
+  }
+}
+
+.document-card {
+  @include card-base;
+  margin-bottom: 16px;
+  padding: 16px;
+
+  &:hover {
+    @include hover-effect;
+  }
+
+  mat-card-header {
+    padding-bottom: 12px;
+    border-bottom: 1px solid $border-color;
+
+    mat-card-title {
+      font-size: 1.1rem;
+      color: $text-primary;
+    }
+
+    mat-card-subtitle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: $text-secondary;
+      font-size: 0.9rem;
+
+      mat-icon {
+        color: $primary;
+        font-size: 18px;
+      }
+    }
+  }
+
+  mat-card-actions {
+    padding: 12px 0 0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+
+    button {
+      border-radius: 6px;
+      padding: 6px 12px;
+
+      &.download-btn {
+        background: rgba($primary, 0.1);
+        color: $primary;
+
+        &:hover {
+          background: rgba($primary, 0.2);
+        }
+      }
+
+      &.delete-btn {
+        background: rgba(#f44336, 0.1);
+        color: #f44336;
+
+        &:hover {
+          background: rgba(#f44336, 0.2);
+        }
+      }
+
+      mat-icon {
+        margin-right: 6px;
+      }
+    }
+  }
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+
+    button {
+      width: 100%;
+    }
+  }
+
+  .document-card {
+    mat-card-actions {
+      flex-direction: column;
+
+      button {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+}
+
+/* Стили для пустого состояния */
+.empty-state {
+  @include card-base;
+  padding: 40px;
+  text-align: center;
+  color: $text-secondary;
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: $border-color;
+    margin-bottom: 16px;
+  }
+}

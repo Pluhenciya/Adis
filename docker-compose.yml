@@ -15,6 +15,27 @@ services:
         restart: true
     networks:
       - app-network
+      
+     ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    networks:
+      - app-network
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   frontend:
     image: ghcr.io/pluhenciya/adis-frontend:latest
@@ -51,3 +72,4 @@ networks:
 
 volumes:
   mysql-data:
+  ollama-data:

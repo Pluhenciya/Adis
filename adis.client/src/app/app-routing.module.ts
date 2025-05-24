@@ -9,6 +9,8 @@ import { ForbiddenPageComponent } from './pages/forbidden-page/forbidden-page.co
 import { ProjectDetailsPageComponent } from './pages/project-details-page/project-details-page.component';
 import { TaskBoardPageComponent } from './pages/task-board-page/task-board-page.component';
 import { RoleBasedRedirectGuard } from './core/guards/role-based-redirect.guard';
+import { DocumentListPageComponent } from './pages/document-list-page/document-list-page.component';
+import { NeuroGuidePageComponent } from './pages/neuro-guide-page/neuro-guide-page.component';
 
 const routes: Routes = [
   { 
@@ -58,8 +60,21 @@ const routes: Routes = [
   {
     path: '',
     canActivate: [RoleBasedRedirectGuard],
-    children: [] // Пустой чилдрен для активации guard
+    children: [] 
   },
+  { 
+    path: 'documents', 
+    component: DocumentListPageComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { expectedRole: 'Admin' },
+    title: 'База документов'
+  },
+  { 
+    path: 'neuro-guide', 
+    component: NeuroGuidePageComponent,
+    canActivate: [AuthGuard],
+    title: 'Нейросправочник'
+  }
 ];
 
 @NgModule({

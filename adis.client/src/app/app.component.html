@@ -36,6 +36,19 @@
                 <span>Пользователи</span>
               </button>
               
+              <button mat-menu-item routerLink="/tasks" class="menu-item" *appHasRole="'projecter'">
+                <span>Задачи</span>
+              </button>
+
+              <button mat-menu-item routerLink="/documents" class="menu-item" *appHasRole="'admin'">
+                <span>База документов</span>
+              </button>
+              
+              <button mat-menu-item routerLink="/neuro-guide" class="menu-item">
+                <mat-icon>smart_toy</mat-icon>
+                <span>Нейросправочник</span>
+              </button>
+              
               <mat-divider></mat-divider>
               
               <button mat-menu-item (click)="authService.logout()">
@@ -52,4 +65,12 @@
 
 <main class="main-content">
   <router-outlet></router-outlet>
+  <button mat-fab 
+  class="neuro-fab"
+  color="accent"
+  [routerLink]="['/neuro-guide']"
+  matTooltip="Нейросправочник"
+  [class.hidden-header]="router.url.split('?')[0] === '/login' || router.url.split('?')[0] === '/neuro-guide'">
+<mat-icon>smart_toy</mat-icon>
+</button>
 </main>

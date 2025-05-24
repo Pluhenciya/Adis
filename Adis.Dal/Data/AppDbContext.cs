@@ -279,7 +279,7 @@ namespace Adis.Dal.Data
                 entity.Property(d => d.DocumentType)
                     .HasColumnName("type")
                     .HasConversion(new EnumToStringConverter<DocumentType>())
-                    .HasColumnType("enum('estimate', 'other')")
+                    .HasColumnType("enum('GOST', 'SNIP', 'SP', 'TU', 'technicalRegulation', 'estimate', 'other')")
                     .IsRequired();
 
                 entity.Property(d => d.IdUser)

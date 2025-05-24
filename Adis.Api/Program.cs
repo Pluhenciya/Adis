@@ -99,6 +99,12 @@ builder.Services.AddScoped<IExecutionTaskRepository, ExecutionTaskRepository>();
 builder.Services.AddScoped<IWorkObjectSectionService, WorkObjectSectionService>();
 builder.Services.AddScoped<IWorkObjectSectionRepository, WorkObjectSectionRepository>();
 
+builder.Services.AddScoped<INeuralGuideService, NeuralGuideService>();
+
+builder.Services.AddMemoryCache();
+
+builder.Services.Configure<OllamaSetting>(builder.Configuration.GetSection("Ollama"));
+
 builder.Services.AddSwaggerGen(options =>
 {
     var basePath = AppContext.BaseDirectory;
@@ -146,6 +152,11 @@ using (var scope = app.Services.CreateScope())
 
         var adminInitializer = services.GetRequiredService<IAdminInitializer>();
         await adminInitializer.InitializeAsync();
+
+        var neuralGuideService = services.GetRequiredService<INeuralGuideService>();
+        var documentService = services.GetRequiredService<IDocumentService>();
+
+        await neuralGuideService.InitializeAsync(await documentService.GetGuideDocumentsAsync(), documentService.DirectoryPath);
     }
 }
 

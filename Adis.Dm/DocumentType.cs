@@ -10,6 +10,11 @@ namespace Adis.Dm
     [JsonConverter(typeof(JsonStringEnumConverter<DocumentType>))]
     public enum DocumentType
     {
+        GOST,
+        SNIP,
+        SP,
+        TU,
+        TechnicalRegulation,
         Estimate,
         Other
     }

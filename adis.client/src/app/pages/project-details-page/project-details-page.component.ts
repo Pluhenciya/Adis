@@ -159,7 +159,22 @@ export class ProjectDetailsPageComponent implements OnInit, OnDestroy {
     downloadSelectedDocuments() {
       if (this.selectedDocuments.length === 1) {
         const doc = this.documents.find(d => d.idDocument === this.selectedDocuments[0]);
-        if (doc) this.downloadDocument(doc);
+        if (doc)     
+        this.documentService.downloadDocument(Number(doc.idDocument)).subscribe({
+          next: ({ blob, filename }) => {
+            const url = window.URL.createObjectURL(blob!);
+            const a = window.document.createElement('a');
+            a.href = url;
+            a.download = filename; // Use server-provided filename
+            window.document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            window.document.body.removeChild(a);
+          },
+          error: (err) => {
+            console.error('Error downloading document:', err);
+          }
+        });
       } else {
         const docIds = this.selectedDocuments;
         window.open(
