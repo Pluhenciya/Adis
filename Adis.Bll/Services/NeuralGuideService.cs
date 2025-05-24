@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Adis.Bll.Configurations;
 using Adis.Bll.Dtos;
 using Adis.Bll.Interfaces;
 using LangChain.Databases;
@@ -14,6 +15,7 @@ using LangChain.Extensions;
 using LangChain.Providers.Ollama;
 using LangChain.Splitters.Text;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 
 namespace Adis.Bll.Services
 {
@@ -26,13 +28,14 @@ namespace Adis.Bll.Services
         private IVectorCollection _collection;
         private readonly IMemoryCache _cache;
 
-        public NeuralGuideService(IMemoryCache cache)
+        public NeuralGuideService(IMemoryCache cache, IOptions<OllamaSetting> ollamaSetting)
         {
             _cache = cache;
-            var ollamaProvider = new OllamaProvider();
+            var ollamaSettingValue = ollamaSetting.Value;
+            var ollamaProvider = new OllamaProvider(ollamaSettingValue.OllamaUrl);
 
-            _embeddingModel = new OllamaEmbeddingModel(ollamaProvider, "nomic-embed-text");
-            _llm = new OllamaChatModel(ollamaProvider, "qwen3:4b");
+            _embeddingModel = new OllamaEmbeddingModel(ollamaProvider, ollamaSettingValue.EmbeddingModel);
+            _llm = new OllamaChatModel(ollamaProvider, ollamaSettingValue.LlmModel);
             _vectorDatabase = new InMemoryVectorDatabase();
         }
 

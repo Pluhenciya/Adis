@@ -72,7 +72,8 @@ const routes: Routes = [
   { 
     path: 'neuro-guide', 
     component: NeuroGuidePageComponent,
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard],
+    title: 'Нейросправочник'
   }
 ];
 

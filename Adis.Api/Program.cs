@@ -103,6 +103,8 @@ builder.Services.AddScoped<INeuralGuideService, NeuralGuideService>();
 
 builder.Services.AddMemoryCache();
 
+builder.Services.Configure<OllamaSetting>(builder.Configuration.GetSection("Ollama"));
+
 builder.Services.AddSwaggerGen(options =>
 {
     var basePath = AppContext.BaseDirectory;
