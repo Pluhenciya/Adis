@@ -67,7 +67,7 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddCors();
 
-builder.Services.AddAutoMapper(typeof(ProjectProfile), typeof(UserProfile), typeof(WorkObjectProfile), typeof(TaskProfile), typeof(DocumentProfile), typeof(CommentProfile));
+builder.Services.AddAutoMapper(typeof(ProjectProfile), typeof(UserProfile), typeof(WorkObjectProfile), typeof(TaskProfile), typeof(DocumentProfile), typeof(CommentProfile), typeof(ExecutionTaskProfile));
 
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
