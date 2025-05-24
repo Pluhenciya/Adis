@@ -160,7 +160,7 @@ $status-colors: (
   border-radius: 16px;
   padding: 1.5rem;
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 2.5fr 1fr;
   grid-template-rows: 43% 13% 44%;
   gap: 0.5rem 1rem;
   position: relative;
@@ -179,7 +179,8 @@ $status-colors: (
     margin: 0;
     transition: color 0.2s;
     cursor: pointer;
-    padding-right: 60px;
+    overflow-y: hidden;
+    height: 7.5rem;
 
     &:hover {
       color: $primary;

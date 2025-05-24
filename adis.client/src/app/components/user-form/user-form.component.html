@@ -40,7 +40,35 @@
           Оставьте пустым, если не хотите менять пароль
         </mat-hint>
         
-        <!-- Ошибки валидации... -->
+        <mat-error *ngIf="userForm.get('password')?.hasError('required')">
+          Обязательное поле
+        </mat-error>
+        
+        <mat-error *ngIf="!userForm.get('password')?.hasError('required') 
+                  && userForm.get('password')?.hasError('minlength')">
+          Минимум 8 символов
+        </mat-error>
+        
+        <mat-error *ngIf="!userForm.get('password')?.hasError('required') 
+                  && !userForm.get('password')?.hasError('minlength')
+                  && userForm.get('password')?.hasError('missingNumber')">
+          Добавьте хотя бы одну цифру
+        </mat-error>
+        
+        <mat-error *ngIf="!userForm.get('password')?.hasError('required') 
+                  && !userForm.get('password')?.hasError('minlength')
+                  && !userForm.get('password')?.hasError('missingNumber')
+                  && userForm.get('password')?.hasError('missingUpper')">
+          Добавьте хотя бы одну заглавную букву
+        </mat-error>
+        
+        <mat-error *ngIf="!userForm.get('password')?.hasError('required') 
+                  && !userForm.get('password')?.hasError('minlength')
+                  && !userForm.get('password')?.hasError('missingNumber')
+                  && !userForm.get('password')?.hasError('missingUpper')
+                  && userForm.get('password')?.hasError('missingSpecial')">
+          Добавьте спецсимвол: `~!&#64;#$%^&*()-+=&#123;&#125;[]\|:;&quot;&apos;&lt;&gt;,.?/
+        </mat-error>
       </mat-form-field>
     </div>
 
