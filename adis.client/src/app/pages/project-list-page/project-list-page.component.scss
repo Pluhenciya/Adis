@@ -262,6 +262,9 @@ $status-colors: (
       align-items: center;
       gap: 0.75rem;
       color: $text-secondary;
+      height: 3.5rem;
+      overflow-y: hidden;
+  
 
       .mat-icon {
         color: $primary;
