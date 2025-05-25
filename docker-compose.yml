@@ -9,6 +9,8 @@ services:
       - "8081:8081"
     env_file:
       - "./environment/default.env"
+    volumes:
+      - documents-data:/src/Adis.Api/documents
     depends_on:
       mysql:
         condition: service_healthy
@@ -24,13 +26,6 @@ services:
       - ollama-data:/root/.ollama
     networks:
       - app-network
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:11434"]
       interval: 10s
@@ -73,3 +68,4 @@ networks:
 volumes:
   mysql-data:
   ollama-data:
+  documents-data:

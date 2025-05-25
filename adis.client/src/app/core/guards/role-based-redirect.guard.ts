@@ -18,7 +18,7 @@ export class RoleBasedRedirectGuard implements CanActivate {
   ): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     var role = this.authService.currentRole;
     if(!role)
-        return this.router.parseUrl('/login');
+        return this.router.parseUrl('/projects');
 
     switch(role) {
         case 'Projecter':
