@@ -1,4 +1,4 @@
-import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, FormGroupDirective, FormsModule, NgForm, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { ProjectService } from '../../services/project.service';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -15,10 +15,11 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import { UserService } from '../../services/user.service';
-import { debounceTime, distinctUntilChanged, filter } from 'rxjs';
+import { Subject, debounceTime, distinctUntilChanged, filter, takeUntil, tap } from 'rxjs';
 import { UserDto } from '../../models/user.model';
 import { HasRoleDirective } from '../../directives/has-role.directive';
 import { AuthStateService } from '../../services/auth-state.service';
+import {MatStepper, MatStepperModule} from '@angular/material/stepper';
 
 @Component({
   selector: 'app-project-form',
@@ -29,37 +30,53 @@ import { AuthStateService } from '../../services/auth-state.service';
     MatFormFieldModule,
     MatInputModule,
     MatDatepickerModule,
-    NgIf,
     MatButtonModule,
     MatOptionModule,
     NgForOf,
     MatSelectModule,
     MatIconModule,
     MatAutocompleteModule,
-    HasRoleDirective
+    HasRoleDirective,
+    MatStepperModule
   ],
   templateUrl: './project-form.component.html',
   styleUrl: './project-form.component.scss',
 })
-export class ProjectFormComponent implements OnInit {
+export class ProjectFormComponent implements OnInit, AfterViewInit, OnDestroy {
   projectStatuses = Object.values(ProjectStatus);
-  @ViewChild('mapContainer') mapContainer!: ElementRef;
+  @ViewChild('mapContainer', { static: false }) mapContainer!: ElementRef;
   isDrawing = false;
-  projectForm: FormGroup;
+  projectForm!: FormGroup;
   isSubmitting = false;
   errorMessage = '';
   projectManagers: any[] = [];
+  geometryTypes = [
+    { value: 'Point', label: 'Точка', icon: 'fiber_manual_record' },
+    { value: 'LineString', label: 'Линия', icon: 'show_chart' },
+    { value: 'Polygon', label: 'Полигон', icon: 'texture' }
+  ];
+  activeGeometryType: string | null = null;
+  currentStep = 0;
+  private destroy$ = new Subject<void>();
+  private mapInitialized = false;
 
-  get name() { return this.projectForm.get('name')}
-  get status() { return this.projectForm.get('status'); }
-  get responsiblePerson() { return this.projectForm.get('responsiblePerson'); }
-  get nameWorkObject() { return this.projectForm.get('workObject.nameWorkObject'); }
-  get contractor() { return this.projectForm.get('contractorName'); }
-  get designStartDate() { return this.projectForm.get('designStartDate'); }
-  get designEndDate() { return this.projectForm.get('designEndDate'); }
-  get locationType() { return this.projectForm.get('location.type'); }
-  get locationCoordinates() { return this.projectForm.get('location.coordinates'); }
+  basicInfo!: FormGroup;
+  objectInfo!: FormGroup;
+  adminInfo!: FormGroup;
+
+  @ViewChild('stepper') stepper!: MatStepper;
+
+  get name() { return this.basicInfo.get('name'); }
+  get designStartDate() { return this.basicInfo.get('designStartDate'); }
+  get designEndDate() { return this.basicInfo.get('designEndDate'); }
   
+  get nameWorkObject() { return this.objectInfo.get('nameWorkObject'); }
+  get locationType() { return this.objectInfo.get('location.type'); }
+  get locationCoordinates() { return this.objectInfo.get('location.coordinates'); }
+
+  get status() { return this.adminInfo.get('status'); }
+  get responsiblePerson() { return this.adminInfo.get('responsiblePerson'); }
+  get contractor() { return this.adminInfo.get('contractorName'); }
 
   constructor(
     private fb: FormBuilder,
@@ -70,25 +87,37 @@ export class ProjectFormComponent implements OnInit {
     private userService: UserService,
     private authState: AuthStateService
   ) {
+    this.createForms();
+  }
+
+private createForms(): void {
+    // Создаем основную форму с правильными именами групп
     this.projectForm = this.fb.group({
-      // Обновленная структура формы
-      name: ['', Validators.required],
-      status: [ProjectStatus.Designing],
-      responsiblePerson: [null],
-      designStartDate: [null, Validators.required],
-      designEndDate: [null, Validators.required],
-      workObject: this.fb.group({
+      basicInfo: this.fb.group({
+        name: ['', Validators.required],
+        designStartDate: [null, Validators.required],
+        designEndDate: [null, Validators.required]
+      }),
+      objectInfo: this.fb.group({
         nameWorkObject: ['', Validators.required],
         location: this.fb.group({
           type: ['', Validators.required],
           coordinates: [null, Validators.required]
         })
       }),
-      contractorName: [''],
-      executionStartDate: [null],
-      executionEndDate: [null]
-    }, { validators: [this.dateValidator,
-      this.executionValidator] });
+      adminInfo: this.fb.group({
+        status: [ProjectStatus.Designing],
+        responsiblePerson: [null],
+        contractorName: [''],
+        executionStartDate: [null],
+        executionEndDate: [null]
+      }, { validators: [this.executionValidator] })
+    }, { validators: [this.dateValidator] });
+
+    // Инициализируем ссылки на группы
+    this.basicInfo = this.projectForm.get('basicInfo') as FormGroup;
+    this.objectInfo = this.projectForm.get('objectInfo') as FormGroup;
+    this.adminInfo = this.projectForm.get('adminInfo') as FormGroup;
   }
 
   private executionValidator (control: AbstractControl): ValidationErrors | null {
@@ -110,72 +139,127 @@ export class ProjectFormComponent implements OnInit {
     return Object.keys(errors).length ? errors : null;
   };
 
-  async ngAfterViewInit() {
-    await this.mapService.initMapAsync(this.mapContainer.nativeElement, [64.539912, 40.515600], 10);
-    this.loadExistingGeometry();
+  basicInfoValid(): boolean {
+    return this.basicInfo?.valid ?? false;
   }
+  
+  objectInfoValid(): boolean {
+    return this.objectInfo?.valid ?? false;
+  }
+  
 
   private loadExistingGeometry() {
-    const geometry = this.projectForm.get('workObject.location')?.value;
+    const geometry = this.objectInfo.get('location')?.value;
     if (geometry?.type && geometry?.coordinates) {
       this.mapService.addGeometry(geometry);
     }
   }
 
   async startDrawing(geometryType: string) {
+    this.activeGeometryType = geometryType;
     this.isDrawing = true;
     try {
       const geometry = await this.mapService.startDrawing(geometryType as any);
-      this.projectForm.patchValue({
-        workObject: {
-          location: { // Правильный путь до location
+      this.objectInfo.patchValue({
+          location: {
             type: geometry.type,
             coordinates: geometry.coordinates
           }
-        }
       });
-      console.log(this.projectForm)
       this.loadExistingGeometry();
+      console.log(this.projectForm.value.objectInfoForm)
     } catch (err) {
       console.error('Ошибка рисования:', err);
     } finally {
       this.isDrawing = false;
+      this.activeGeometryType = null;
     }
   }
 
-ngOnInit(): void {
-  this.projectForm.get('status')?.valueChanges.subscribe(() => {
-    this.projectForm.get('contractorName')?.updateValueAndValidity();
-    this.projectForm.get('executionStartDate')?.updateValueAndValidity();
-  });
-  if (this.data?.project) {
-    var user =this.loadManagerData(this.data.project.idUser)
+  ngOnInit(): void {
+    this.initForm();
+  }
+
+  private initForm(): void {
+    this.loadExistingProjectData();
+    this.setupResponsiblePersonSearch();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+  
+  ngAfterViewInit(): void {
+    this.stepper.selectionChange
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(event => {
+        if (event.selectedIndex === 1 && !this.mapInitialized) {
+          this.initializeMap();
+        }
+      });
+  }
+
+  private loadExistingProjectData(): void {
+    if (this.data?.project) {
       const initialData = {
-        ...this.data.project,
-        responsiblePerson: user,
-        designStartDate: this.convertToDate(this.data.project.startDate),
-        designEndDate: this.convertToDate(this.data.project.endDate),
-        workObject: {
+        basicInfo: {
+          name: this.data.project.name,
+          designStartDate: this.convertToDate(this.data.project.startDate),
+          designEndDate: this.convertToDate(this.data.project.endDate)
+        },
+        objectInfo: {
           nameWorkObject: this.data.project.workObject.name,
           location: {
             type: this.data.project.workObject.geometry.type,
             coordinates: this.data.project.workObject.geometry.coordinates
           }
+        },
+        adminInfo: {
+          status: this.data.project.status,
+          responsiblePerson: this.loadManagerData(this.data.project.idUser),
+          contractorName: this.data.project.contractorName,
+          executionStartDate: this.data.project.startExecutionDate,
+          executionEndDate: this.data.project.endExecutionDate
         }
       };
+      
       this.projectForm.patchValue(initialData, { emitEvent: false });
+    }
   }
-  if (this.authState.isAdmin()) {
-  this.responsiblePerson?.valueChanges
-    .pipe(
-      filter(value => typeof value === 'string'),
-      debounceTime(300),
-      distinctUntilChanged(),
-      filter(value => value.length > 2)
-    )
-    .subscribe(value => this.onSearchProjectManagers(value));
+  
+  private setupResponsiblePersonSearch(): void {
+    if (this.authState.isAdmin()) {
+      this.responsiblePerson?.valueChanges
+        .pipe(
+          filter(value => typeof value === 'string'),
+          debounceTime(300),
+          distinctUntilChanged(),
+          filter(value => value.length > 2)
+        )
+        .subscribe(value => this.onSearchProjectManagers(value));
+    }
   }
-}
+
+  private async initializeMap(): Promise<void> {
+    try {
+      if (!this.mapContainer?.nativeElement) {
+        console.error('Контейнер карты не найден в DOM');
+        return;
+      }
+
+      await this.mapService.initMapAsync(
+        this.mapContainer.nativeElement,
+        [64.539912, 40.515600],
+        10
+      );
+      
+      this.loadExistingGeometry();
+      this.mapInitialized = true;
+    } catch (err) {
+      console.error('Ошибка инициализации карты:', err);
+    }
+  }
 
 private async loadManagerData(idUser: number): Promise<UserDto | undefined> {
   try {
@@ -195,12 +279,15 @@ private async loadManagerData(idUser: number): Promise<UserDto | undefined> {
     return parseISO(dateString);
   }
 
-  dateValidator(form: FormGroup) {
+  private dateValidator(form: FormGroup): ValidationErrors | null {
     const errors: any = {};
-    const designStart = form.get('designStartDate')?.value;
-    const designEnd = form.get('designEndDate')?.value;
-    const execStart = form.get('executionStartDate')?.value;
-    const execEnd = form.get('executionEndDate')?.value;
+    const basicInfo = form.get('basicInfoForm');
+    const adminInfo = form.get('adminInfoForm');
+  
+    const designStart = basicInfo?.get('designStartDate')?.value;
+    const designEnd = basicInfo?.get('designEndDate')?.value;
+    const execStart = adminInfo?.get('executionStartDate')?.value;
+    const execEnd = adminInfo?.get('executionEndDate')?.value;
 
     if (designStart && designEnd && designStart > designEnd) {
       errors.designDateRange = true;
@@ -224,24 +311,25 @@ private async loadManagerData(idUser: number): Promise<UserDto | undefined> {
     this.isSubmitting = true;
     this.errorMessage = '';
 
+    const formValue = this.projectForm.value;
+
     const projectData: PostProjectDto = {
-      name: this.projectForm.value.name,
-      status: this.projectForm.value.status,
-      idUser: this.projectForm.value.responsiblePerson?.id,
-      startDate: this.projectForm.value.designStartDate,
-      endDate: this.projectForm.value.designEndDate,
+      name: formValue.basicInfo.name,
+      status: formValue.adminInfo.status,
+      idUser: formValue.adminInfo.responsiblePerson?.id,
+      startDate: formValue.basicInfo.designStartDate,
+      endDate: formValue.basicInfo.designEndDate,
       workObject: {
-        name: this.projectForm.value.workObject.nameWorkObject,
+        name: formValue.objectInfo.nameWorkObject,
         geometry: {
-          type: this.projectForm.value.workObject.location.type,
-          coordinates: this.projectForm.value.workObject.location.coordinates
+          type: formValue.objectInfo.location.type,
+          coordinates: formValue.objectInfo.location.coordinates
         }
       },
-      contractorName: this.projectForm.value.contractorName,
-      startExecutionDate: this.projectForm.value.executionStartDate,
-      endExecutionDate: this.projectForm.value.executionEndDate
+      contractorName: formValue.adminInfo.contractorName,
+      startExecutionDate: formValue.adminInfo.executionStartDate,
+      endExecutionDate: formValue.adminInfo.executionEndDate
     };
-
     if (this.data?.project) {
       projectData.idProject = this.data.project.idProject;
     }
