@@ -74,3 +74,11 @@
 <mat-icon>smart_toy</mat-icon>
 </button>
 </main>
+
+<footer class="app-footer" [class.hidden-header]="router.url.split('?')[0] === '/login'">
+  <mat-toolbar color="primary">
+    <div class="footer-content">
+      <span class="copyright">© 2025 АДИС. Все права защищены</span>
+    </div>
+  </mat-toolbar>
+</footer>

@@ -304,7 +304,7 @@ export class ProjectDetailsPageComponent implements OnInit, OnDestroy {
 
   openProjectForm(project?: GetProjectDto): void {
     this.dialog.open(ProjectFormComponent, {
-      width: '800px',
+      maxWidth: '900px',
       data: { project }
     });
   }

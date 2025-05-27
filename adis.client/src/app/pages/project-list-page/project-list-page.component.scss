@@ -23,7 +23,6 @@ $status-colors: (
 
 // Основные стили
 .app-container {
-  min-height: 100vh;
 
   .content-container {
     max-width: 1400px;
@@ -164,6 +163,9 @@ $status-colors: (
   grid-template-rows: 43% 13% 44%;
   gap: 0.5rem 1rem;
   position: relative;
+  overflow: hidden;
+  min-width: 280px; 
+  max-width: 420px; 
 
   @each $status, $color in $status-colors {
     &.#{$status} {
@@ -179,11 +181,19 @@ $status-colors: (
     margin: 0;
     transition: color 0.2s;
     cursor: pointer;
-    overflow-y: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
     height: 7.5rem;
 
     &:hover {
       color: $primary;
+    }
+
+    @media (max-width: 480px) {
+      -webkit-line-clamp: 2;
     }
   }
 
@@ -254,25 +264,40 @@ $status-colors: (
     grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
     margin-top: 0.5rem;
+    overflow: hidden;
+    min-width: 0;
 
     .date-item,
     .responsible,
     .location {
       display: flex;
-      align-items: start;
+      align-items: center;
       gap: 0.75rem;
       color: $text-secondary;
-      height: 3.5rem;
-      overflow-y: hidden;
-  
-
+      
+      
       .mat-icon {
         color: $primary;
         flex-shrink: 0;
       }
     }
+
+    .location span {
+      display: inline-block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
   }
 
+  .details {
+    min-width: 0; 
+    
+    > div {
+      flex: 1;
+      min-width: 0; 
+    }
+  }
   // Кнопки действий
   .actions {
     position: absolute;
