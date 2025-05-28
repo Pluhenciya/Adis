@@ -8,7 +8,7 @@
     <!-- Email Field -->
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Email</mat-label>
-      <input matInput formControlName="email" required [readonly]="isEditMode">
+      <input matInput formControlName="email" required>
       <mat-icon matSuffix>mail</mat-icon>
       
       <mat-error *ngIf="userForm.get('email')?.hasError('required')">
