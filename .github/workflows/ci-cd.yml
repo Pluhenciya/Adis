@@ -136,7 +136,7 @@ jobs:
           echo "AdminSettings__Password=${{ secrets.PROD_ADMIN_PASSWORD }}" >> environment/default.env
           echo "Ollama__OllamaUrl=http://ollama:11434/api" >> environment/default.env
           echo "Ollama__EmbeddingModel=nomic-embed-text" >> environment/default.env
-          echo "Ollama__LlmModel=qwen3:4b" >> environment/default.env
+          echo "Ollama__LlmModel=qwen3:1.7b" >> environment/default.env
 
           echo "MYSQL_ROOT_PASSWORD=${{ secrets.PROD_MYSQL_ROOT_PASSWORD }}" > environment/mysql.env
           echo "MYSQL_DATABASE=${{ secrets.PROD_MYSQL_DATABASE }}" >> environment/mysql.env
