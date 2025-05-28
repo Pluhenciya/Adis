@@ -101,9 +101,17 @@
                         color="primary" 
                         matStepperNext
                         [disabled]="!objectInfo.valid"
-                        type="button">
+                        type="button" 
+                        *appHasRole="['admin']">
                   Далее
                   <mat-icon>arrow_forward</mat-icon>
+                </button>
+                <button mat-raised-button 
+                        color="primary" 
+                        type="submit"
+                        [disabled]="isSubmitting || projectForm.invalid" *appHasRole="['projectManager']">
+                  <mat-icon>{{ isSubmitting ? 'hourglass_top' : 'save' }}</mat-icon>
+                  {{ isSubmitting ? 'Сохранение...' : 'Сохранить проект' }}
                 </button>
               </div>
             </div>
