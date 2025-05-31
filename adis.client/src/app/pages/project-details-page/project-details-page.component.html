@@ -13,17 +13,18 @@
         <div class="info-group">
           <span class="main-info-label">Сроки проектирования:</span>
           <div class="info-row">
-            <mat-icon class="info-icon">event_available</mat-icon>
-            <div class="info-content">
-              <span class="info-label">Начало</span>
-              <span class="info-value">{{ project.startDate | date: 'dd.MM.yyyy' }}</span>
-            </div>
-          </div>
-          <div class="info-row">
             <mat-icon class="info-icon">event_busy</mat-icon>
             <div class="info-content">
               <span class="info-label">Окончание</span>
-              <span class="info-value">{{ project.endDate | date: 'dd.MM.yyyy' }}</span>
+              <span class="info-value">
+                {{ project.plannedEndDate | date: 'dd.MM.yyyy' }}
+                <span *ngIf="isDesigningOverdue(project)" class="overdue-indicator">
+                  <mat-icon>warning</mat-icon> Просрочено
+                </span>
+                <span *ngIf="project.actualEndDate" class="actual-date">
+                  (факт: {{ project.actualEndDate | date: 'dd.MM.yyyy' }})
+                </span>
+              </span>
             </div>
           </div>
         </div>
@@ -33,17 +34,18 @@
                                 || project.status === ProjectStatus.Completed">
           <span class="main-info-label">Сроки выполнения:</span>
           <div class="info-row">
-            <mat-icon class="info-icon">event_available</mat-icon>
-            <div class="info-content">
-              <span class="info-label">Начало</span>
-              <span class="info-value">{{ project.startExecutionDate | date: 'dd.MM.yyyy' }}</span>
-            </div>
-          </div>
-          <div class="info-row">
             <mat-icon class="info-icon">event_busy</mat-icon>
             <div class="info-content">
               <span class="info-label">Окончание</span>
-              <span class="info-value">{{ project.endExecutionDate | date: 'dd.MM.yyyy' }}</span>
+              <span class="info-value">
+                {{ project.plannedEndExecutionDate | date: 'dd.MM.yyyy' }}
+                <span *ngIf="isExecutionOverdue(project)" class="overdue-indicator">
+                  <mat-icon>warning</mat-icon> Просрочено
+                </span>
+                <span *ngIf="project.actualEndExecutionDate" class="actual-date">
+                  (факт: {{ project.actualEndExecutionDate | date: 'dd.MM.yyyy' }})
+                </span>
+              </span>
             </div>
           </div>
         </div>

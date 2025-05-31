@@ -421,4 +421,14 @@ export class ProjectDetailsPageComponent implements OnInit, OnDestroy {
   allExecutionTasksCompleted(): boolean {
     return this.project?.executionTasks?.every(t => t.isCompleted);
   }
+
+isDesigningOverdue(project: GetProjectDto): boolean {
+  if (project.actualEndDate) return false;
+  return new Date() > new Date(project.plannedEndDate);
+}
+
+isExecutionOverdue(project: GetProjectDto): boolean {
+  if (project.actualEndExecutionDate) return false;
+  return new Date() > new Date(project.plannedEndExecutionDate!);
+}
 }

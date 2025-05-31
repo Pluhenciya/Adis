@@ -90,7 +90,7 @@ export class TaskDetailsDialogComponent implements OnInit {
       description: [data.task.description, [Validators.required, Validators.maxLength(2000)]],
       performers: [data.task.performers, [Validators.required]],
       checkers: [data.task.checkers, [Validators.required]],
-      endDate: [data.task.endDate, [Validators.required]],
+      endDate: [data.task.plannedEndDate, [Validators.required]],
       status: [data.task.status]
     });
     this.currentUserId = Number(this.authService.currentUserId);
@@ -327,7 +327,7 @@ export class TaskDetailsDialogComponent implements OnInit {
       description: updatedTask.description,
       idPerformers: updatedTask.performers.map((u: UserDto) => u.id),
       idCheckers: updatedTask.checkers.map((u: UserDto) => u.id),
-      endDate: this.taskForm.value.endDate,
+      plannedEndDate: this.taskForm.value.endDate,
       status: this.taskForm.value.status
     };
   

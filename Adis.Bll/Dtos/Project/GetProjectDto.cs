@@ -31,7 +31,8 @@ namespace Adis.Bll.Dtos.Project
         /// <summary>
         /// Конец проектирования
         /// </summary>
-        public DateOnly EndDate { get; set; }
+        public DateOnly PlannedEndDate { get; set; }
+        public DateOnly? ActualEndDate { get; set; }
 
         /// <summary>
         /// Статус проекта
@@ -71,6 +72,7 @@ namespace Adis.Bll.Dtos.Project
         /// <summary>
         /// Дата окончания выполнения работ
         /// </summary>
-        public DateOnly? EndExecutionDate { get; set; }
+        public DateOnly? PlannedEndExecutionDate { get; set; }
+        public DateOnly? ActualEndExecutionDate { get; set; }
     }
 }

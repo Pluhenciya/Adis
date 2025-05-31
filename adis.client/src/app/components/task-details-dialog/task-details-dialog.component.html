@@ -121,7 +121,7 @@
             <h3>Дата окончания</h3>
           </div>
           <div *ngIf="!isEditing" class="date-view">
-            {{ data.task.endDate ? (data.task.endDate | date:'dd.MM.yyyy') : 'Дата не указана' }}
+            {{ data.task.plannedEndDate ? (data.task.plannedEndDate | date:'dd.MM.yyyy') : 'Дата не указана' }}
           </div>
           <mat-form-field *ngIf="isEditing" appearance="outline">
             <input matInput [matDatepicker]="picker" formControlName="endDate">

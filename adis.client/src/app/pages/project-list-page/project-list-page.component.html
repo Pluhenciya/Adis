@@ -90,21 +90,21 @@
           <div class="details">
             <div class="date-item">
               <mat-icon>event_available</mat-icon>
-              <span *ngIf="project.status !== 'InExecution' && project.status !== 'Completed'">
-                {{ project.startDate | date: 'dd.MM.yyyy' }}
-              </span>
-              <span *ngIf="project.status === 'InExecution' || project.status === 'Completed'">
-                {{ project.startExecutionDate | date: 'dd.MM.yyyy' }}
+              <span>
+                {{ getStartDate(project) | date: 'dd.MM.yyyy' }}
               </span>
             </div>
             
             <div class="date-item">
               <mat-icon>event_busy</mat-icon>
-              <span *ngIf="project.status !== 'InExecution' && project.status !== 'Completed'">
-                {{ project.endDate | date: 'dd.MM.yyyy' }}
-              </span>
-              <span *ngIf="project.status === 'InExecution' || project.status === 'Completed'">
-                {{ project.endExecutionDate | date: 'dd.MM.yyyy' }}
+              <span [class.overdue]="isOverdue(project)">
+                {{ getEndDate(project) | date: 'dd.MM.yyyy' }}
+                <span *ngIf="isOverdue(project)" class="overdue-indicator">
+                  <mat-icon>warning</mat-icon> Просрочено
+                </span>
+                <span *ngIf="hasActualDate(project)" class="actual-date">
+                  (факт: {{ getActualEndDate(project) | date: 'dd.MM.yyyy' }})
+                </span>
               </span>
             </div>
           

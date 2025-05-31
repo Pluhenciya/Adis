@@ -29,7 +29,9 @@ namespace Adis.Dm
         /// <summary>
         /// Конец проектирования
         /// </summary>
-        public DateOnly EndDate { get; set; }
+        public DateOnly PlannedEndDate { get; set; }
+
+        public DateOnly? ActualEndDate { get; set; }
 
         /// <summary>
         /// Статус проекта
@@ -38,7 +40,9 @@ namespace Adis.Dm
 
         public DateOnly? StartExecutionDate { get; set; }
 
-        public DateOnly? EndExecutionDate { get; set; }
+        public DateOnly? PlannedEndExecutionDate { get; set; }
+
+        public DateOnly? ActualEndExecutionDate { get; set; } 
 
         public bool IsDeleted { get; set; }
 

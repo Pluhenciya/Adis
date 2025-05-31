@@ -206,7 +206,7 @@ private createForms(): void {
         basicInfo: {
           name: this.data.project.name,
           designStartDate: this.convertToDate(this.data.project.startDate),
-          designEndDate: this.convertToDate(this.data.project.endDate)
+          designEndDate: this.convertToDate(this.data.project.plannedEndDate)
         },
         objectInfo: {
           nameWorkObject: this.data.project.workObject.name,
@@ -220,7 +220,7 @@ private createForms(): void {
           responsiblePerson: this.loadManagerData(this.data.project.idUser),
           contractorName: this.data.project.contractorName,
           executionStartDate: this.data.project.startExecutionDate,
-          executionEndDate: this.data.project.endExecutionDate
+          executionEndDate: this.data.project.plannedEndExecutionDate
         }
       };
       
@@ -318,7 +318,7 @@ private async loadManagerData(idUser: number): Promise<UserDto | undefined> {
       status: formValue.adminInfo.status,
       idUser: formValue.adminInfo.responsiblePerson?.id,
       startDate: formValue.basicInfo.designStartDate,
-      endDate: formValue.basicInfo.designEndDate,
+      plannedEndDate: formValue.basicInfo.designEndDate,
       workObject: {
         name: formValue.objectInfo.nameWorkObject,
         geometry: {
@@ -328,7 +328,7 @@ private async loadManagerData(idUser: number): Promise<UserDto | undefined> {
       },
       contractorName: formValue.adminInfo.contractorName,
       startExecutionDate: formValue.adminInfo.executionStartDate,
-      endExecutionDate: formValue.adminInfo.executionEndDate
+      plannedEndExecutionDate: formValue.adminInfo.executionEndDate
     };
     if (this.data?.project) {
       projectData.idProject = this.data.project.idProject;

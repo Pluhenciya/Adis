@@ -123,7 +123,7 @@ namespace Adis.Tests
             var project = new PostProjectDto
             {
                 Name = "Test Project",
-                EndDate = new DateOnly(2025, 12, 31),
+                PlannedEndDate = new DateOnly(2025, 12, 31),
                 IdUser = _idTestUser, 
                 WorkObject = new WorkObjectDto
                 { 
@@ -151,7 +151,7 @@ namespace Adis.Tests
             var project = new PostProjectDto
             {
                 Name = "Test Project",
-                EndDate = new DateOnly(2024, 12, 31),
+                PlannedEndDate = new DateOnly(2024, 12, 31),
                 IdUser = _idTestUser,
                 WorkObject = new WorkObjectDto
                 { 
@@ -183,7 +183,7 @@ namespace Adis.Tests
                 new()
                 {
                     Name = "Filtered Project",
-                    EndDate = new DateOnly(2027, 3, 31),
+                    PlannedEndDate = new DateOnly(2027, 3, 31),
                     IdUser = _idTestUser,
                     WorkObject = new WorkObjectDto
                     {
@@ -194,7 +194,7 @@ namespace Adis.Tests
                 new()
                 {
                     Name = "Other Project",
-                    EndDate = new DateOnly(2025, 12, 31),
+                    PlannedEndDate = new DateOnly(2025, 12, 31),
                     IdUser = _idTestUser,
                     WorkObject = new WorkObjectDto
                     {

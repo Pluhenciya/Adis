@@ -101,13 +101,13 @@ namespace Adis.Bll.Services
 
         private async Task ValidateProjectAsync(PostProjectDto projectDto)
         {
-            if (projectDto.StartExecutionDate != null && projectDto.EndExecutionDate != null && projectDto.StartExecutionDate > projectDto.EndExecutionDate)
+            if (projectDto.StartExecutionDate != null && projectDto.PlannedEndExecutionDate != null && projectDto.StartExecutionDate > projectDto.PlannedEndExecutionDate)
                 throw new ArgumentException("Дата начала выполнения работ не может быть позже чем дата оканчания");
 
-            if (projectDto.StartExecutionDate != null && projectDto.EndDate > projectDto.StartExecutionDate)
+            if (projectDto.StartExecutionDate != null && projectDto.PlannedEndDate > projectDto.StartExecutionDate)
                 throw new ArgumentException("Дата начала проектирования не может быть позже чем дата оканчания работ");
 
-            if (projectDto.StartDate != null && projectDto.StartDate > projectDto.EndDate)
+            if (projectDto.StartDate != null && projectDto.StartDate > projectDto.PlannedEndDate)
                 throw new ArgumentException("Дата начала проектирования не может быть позже чем дата оканчания");
 
             if (projectDto.WorkObject == null)
@@ -131,7 +131,7 @@ namespace Adis.Bll.Services
             if((projectDto.Status == ProjectStatus.InExecution
                 || projectDto.Status == ProjectStatus.Completed)
                 && projectDto.StartExecutionDate == null 
-                && projectDto.EndExecutionDate == null
+                && projectDto.PlannedEndExecutionDate == null
                 && (projectDto.ContractorName == null 
                 || projectDto.IdContractor == null))
                 throw new ArgumentException("Данные выполнения отсутствуют при статусе Исполнение или Завершен");
@@ -139,7 +139,7 @@ namespace Adis.Bll.Services
             if (!user.IsInRole(Role.Admin.ToString()))
             {
                 projectDto.StartExecutionDate = null;
-                projectDto.EndExecutionDate = null;
+                projectDto.PlannedEndExecutionDate = null;
                 projectDto.ContractorName = null!;
                 projectDto.IdContractor = null!;
                 projectDto.IdUser = Int32.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
@@ -183,6 +183,7 @@ namespace Adis.Bll.Services
         {
             var project = await _projectRepository.GetByIdAsync(id);
             project.Status = ProjectStatus.ContractorSearch;
+            project.ActualEndDate = DateOnly.FromDateTime(DateTime.Now);
             await _projectRepository.UpdateAsync(project);
             
             var executionTasks = await _documentService.SelectEstimateFromProjectAsync(idEstimate, id);
@@ -198,7 +199,7 @@ namespace Adis.Bll.Services
 
             project.Contractor = new Contractor { Name = dto.Contractor };
             project.StartExecutionDate = dto.StartDate;
-            project.EndExecutionDate = dto.EndDate;
+            project.PlannedEndExecutionDate = dto.EndDate;
             project.Status = ProjectStatus.InExecution;
 
             await _projectRepository.UpdateAsync(project);
@@ -210,6 +211,7 @@ namespace Adis.Bll.Services
         {
             var project = await _projectRepository.GetByIdAsync(id);
             project.Status = ProjectStatus.Completed;
+            project.ActualEndExecutionDate = DateOnly.FromDateTime(DateTime.Now);
 
             await _projectRepository.UpdateAsync(project);
 

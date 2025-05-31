@@ -61,10 +61,15 @@ namespace Adis.Dal.Data
                     .HasColumnType("date")
                     .IsRequired();
 
-                entity.Property(p => p.EndDate)
-                    .HasColumnName("end_date")
+                entity.Property(p => p.PlannedEndDate)
+                    .HasColumnName("planned_end_date")
                     .HasColumnType("date")
                     .IsRequired();
+
+                entity.Property(p => p.ActualEndDate)
+                    .HasColumnName("actual_end_date")
+                    .HasColumnType("date")
+                    .IsRequired(false);
 
                 entity.Property(p => p.Status)
                     .HasColumnName("status")
@@ -77,8 +82,13 @@ namespace Adis.Dal.Data
                     .HasColumnType("date")
                     .IsRequired(false);
 
-                entity.Property(p => p.EndExecutionDate)
-                    .HasColumnName("end_execution_date")
+                entity.Property(p => p.PlannedEndExecutionDate)
+                    .HasColumnName("planned_end_execution_date")
+                    .HasColumnType("date")
+                    .IsRequired(false);
+
+                entity.Property(p => p.ActualEndExecutionDate)
+                    .HasColumnName("actual_end_execution_date")
                     .HasColumnType("date")
                     .IsRequired(false);
 
@@ -100,10 +110,10 @@ namespace Adis.Dal.Data
                 entity.HasIndex(p => p.Status)
                     .HasDatabaseName("ix_projects_status");
 
-                entity.HasIndex(p => new { p.StartDate, p.EndDate })
+                entity.HasIndex(p => new { p.StartDate, p.PlannedEndDate })
                     .HasDatabaseName("ix_projects_dates");
 
-                entity.ToTable(t => t.HasCheckConstraint("chk_projects_dates", "start_date <= end_date"));
+                entity.ToTable(t => t.HasCheckConstraint("chk_projects_dates", "start_date <= planned_end_date"));
 
                 entity.HasOne(p => p.User)
                     .WithMany(u => u.Projects)
@@ -200,8 +210,12 @@ namespace Adis.Dal.Data
                     .HasColumnName("text_result")
                     .HasColumnType("text");
 
-                entity.Property(t => t.EndDate)
-                    .HasColumnName("end_date")
+                entity.Property(t => t.PlannedEndDate)
+                    .HasColumnName("planned_end_date")
+                    .HasColumnType("date");
+
+                entity.Property(t => t.ActualEndDate)
+                    .HasColumnName("actual_end_date")
                     .HasColumnType("date");
 
                 // Indexes
