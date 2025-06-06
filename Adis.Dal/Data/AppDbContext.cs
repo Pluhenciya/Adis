@@ -210,6 +210,11 @@ namespace Adis.Dal.Data
                     .HasColumnName("text_result")
                     .HasColumnType("text");
 
+                entity.Property(t => t.CreatedAt)
+                    .HasColumnName("created_at")
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                    .HasColumnType("datetime");
+
                 entity.Property(t => t.PlannedEndDate)
                     .HasColumnName("planned_end_date")
                     .HasColumnType("date");

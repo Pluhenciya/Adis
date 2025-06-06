@@ -30,6 +30,8 @@ namespace Adis.Bll.Dtos.Task
 
         public string? TextResult { get; set; } = null!;
 
+        public DateTime CreatedAt { get; set; }
+
         public DateOnly PlannedEndDate { get; set; }
         public DateOnly? ActualEndDate { get; set; }
 

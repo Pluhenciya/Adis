@@ -13,6 +13,13 @@
         <div class="info-group">
           <span class="main-info-label">Сроки проектирования:</span>
           <div class="info-row">
+            <mat-icon class="info-icon">event_available</mat-icon>
+            <div class="info-content">
+              <span class="info-label">Начало</span>
+              <span class="info-value">{{ project.startDate | date: 'dd.MM.yyyy' }}</span>
+            </div>
+          </div>
+          <div class="info-row">
             <mat-icon class="info-icon">event_busy</mat-icon>
             <div class="info-content">
               <span class="info-label">Окончание</span>
@@ -33,6 +40,13 @@
         <div class="info-group" *ngIf="project.status === ProjectStatus.InExecution 
                                 || project.status === ProjectStatus.Completed">
           <span class="main-info-label">Сроки выполнения:</span>
+          <div class="info-row">
+            <mat-icon class="info-icon">event_available</mat-icon>
+            <div class="info-content">
+              <span class="info-label">Начало</span>
+              <span class="info-value">{{ project.startExecutionDate | date: 'dd.MM.yyyy' }}</span>
+            </div>
+          </div>
           <div class="info-row">
             <mat-icon class="info-icon">event_busy</mat-icon>
             <div class="info-content">
@@ -102,47 +116,40 @@
       <div class="actions">
         <!-- Кнопка редактирования -->
         <ng-container *appHasRole="['projectManager', 'admin']">
-        <button mat-mini-fab class="edit-btn" 
-                *ngIf="project.status === 'Designing' || authService.isAdmin()"
-                (click)="openProjectForm(project)">
-          <mat-icon>edit</mat-icon>
-        </button>
-      </ng-container>
-      
+          <button mat-mini-fab class="edit-btn" *ngIf="project.status === 'Designing' || authService.isAdmin()"
+            (click)="openProjectForm(project)">
+            <mat-icon>edit</mat-icon>
+          </button>
+        </ng-container>
+
         <!-- Кнопка удаления -->
         <ng-container *appHasRole="['projectManager', 'admin']">
-        <button mat-mini-fab class="delete-btn" 
-        *ngIf="project.status === 'Designing' || authService.isAdmin()"
-                (click)="deleteProject(project)">
-          <mat-icon>delete</mat-icon>
-        </button>
-      </ng-container>
-      
+          <button mat-mini-fab class="delete-btn" *ngIf="project.status === 'Designing' || authService.isAdmin()"
+            (click)="deleteProject(project)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </ng-container>
+
         <!-- Кнопка завершения проектирования -->
         <ng-container *appHasRole="['projectManager', 'admin']">
-        <button mat-mini-fab class="complete-btn" 
-                *ngIf="project.status === 'Designing' && allTasksCompleted()" 
-                (click)="openCompleteProjectDialog()" 
-                matTooltip="Завершить проектирование">
-          <mat-icon>check_circle</mat-icon>
-        </button>
-      </ng-container>
-      
+          <button mat-mini-fab class="complete-btn" *ngIf="project.status === 'Designing' && allTasksCompleted()"
+            (click)="openCompleteProjectDialog()" matTooltip="Завершить проектирование">
+            <mat-icon>check_circle</mat-icon>
+          </button>
+        </ng-container>
+
         <!-- Кнопка завершения поиска подрядчика -->
         <ng-container *appHasRole="['projectManager', 'admin']">
-          <button mat-mini-fab class="contract-btn"
-                  *ngIf="project.status === 'ContractorSearch'"
-                  (click)="completeContractorSearch()" 
-                  matTooltip="Завершить поиск подрядчика">
+          <button mat-mini-fab class="contract-btn" *ngIf="project.status === 'ContractorSearch'"
+            (click)="completeContractorSearch()" matTooltip="Завершить поиск подрядчика">
             <mat-icon>assignment_turned_in</mat-icon>
           </button>
         </ng-container>
 
         <ng-container *appHasRole="['inspector', 'admin']">
           <button mat-mini-fab class="complete-execution-btn"
-                  *ngIf="project.status === ProjectStatus.InExecution && allExecutionTasksCompleted()" 
-                  (click)="completeProjectExecution()" 
-                  matTooltip="Завершить выполнение проекта">
+            *ngIf="project.status === ProjectStatus.InExecution && allExecutionTasksCompleted()"
+            (click)="completeProjectExecution()" matTooltip="Завершить выполнение проекта">
             <mat-icon>check_circle</mat-icon>
           </button>
         </ng-container>
@@ -184,6 +191,16 @@
       <mat-card-title class="header-container">
         <div class="header-content">
           <span class="tasks-title">Задачи проекта</span>
+          <div class="view-toggle">
+            <button mat-stroked-button [color]="viewMode === 'list' ? 'primary' : ''" (click)="switchView('list')">
+              <mat-icon>view_list</mat-icon>
+              Список
+            </button>
+            <button mat-stroked-button [color]="viewMode === 'gantt' ? 'primary' : ''" (click)="switchView('gantt')">
+              <mat-icon>timeline</mat-icon>
+              Диаграмма Ганта
+            </button>
+          </div>
           <button mat-stroked-button color="primary" class="add-task-btn" (click)="openAddTaskDialog()"
             *appHasRole="['admin', 'projectManager']"
             [style.display]="(project.status === 'Designing' || authService.isAdmin()) ? 'flex' : 'none'">
@@ -194,7 +211,8 @@
       </mat-card-title>
     </mat-card-header>
 
-    <div class="tasks-container">
+    <!-- Вид списка -->
+    <div class="tasks-container" *ngIf="viewMode === 'list'">
       <div class="task-column" *ngFor="let column of taskColumns">
         <div class="column-header">
           <h3>{{ column.title }}</h3>
@@ -204,6 +222,49 @@
           <app-task-card *ngFor="let task of column.tasks" [task]="task" [projectStatus]="project.status"
             (taskUpdated)="onTaskUpdated($event)">
           </app-task-card>
+        </div>
+      </div>
+    </div>
+
+    <!-- Вид диаграммы Ганта -->
+    <div class="gantt-container" *ngIf="viewMode === 'gantt'">
+      <div class="gantt-chart">
+        <div class="gantt-header">
+          <div class="gantt-task-name">Задача</div>
+          <div class="gantt-timeline">
+            <div *ngFor="let date of timelineDates" class="gantt-date">
+              {{ date | date: 'dd.MM' }}
+            </div>
+          </div>
+        </div>
+
+        <div class="gantt-body">
+        <div class="project-marker start" [style.left]="'calc(' + getProjectPosition(projectStartDate) + ' * (100% - 216px) + 214px)'">
+          <div class="marker-line"></div>
+        </div>
+
+        <div class="project-marker current" [style.left]="'calc(' + getProjectPosition(currentDate) + ' * (100% - 216px) + 214px)'">
+          <div class="marker-line"></div>
+        </div>
+
+        <div class="project-marker end" [style.left]="'calc(' + getProjectPosition(projectEndDate) + ' * (100% - 216px) + 214px)'">
+          <div class="marker-line"></div>
+        </div>
+          <div *ngFor="let task of ganttData" class="gantt-row">
+            <div class="gantt-task-info">
+              <div class="task-name">{{ task.name }}</div>
+              <div class="task-assignee">{{ task.assignee }}</div>
+            </div>
+            <div class="gantt-bar-container">
+              <div class="gantt-bar" [style.left]="getTaskPosition(task.start) + '%'"
+                [style.width]="getTaskWidth(task.start, task.end) + '%'" [class]="'status-' + task.status">
+                <div class="gantt-bar-progress" [style.width]="task.progress + '%'"></div>
+                <div class="gantt-bar-label">
+                  {{ task.start | date: 'dd.MM' }} - {{ task.end | date: 'dd.MM' }}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

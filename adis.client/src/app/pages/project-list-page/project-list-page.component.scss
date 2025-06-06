@@ -551,11 +551,3 @@ $status-colors: (
   margin-left: 4px;
   font-style: italic;
 }
-
-// Для статуса "Завершен"
-.Completed {
-  .date-item span:not(.actual-date) {
-    text-decoration: line-through;
-    opacity: 0.7;
-  }
-}

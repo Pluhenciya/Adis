@@ -1,4 +1,4 @@
-import { NgForOf, NgIf } from '@angular/common';
+import { DatePipe, NgForOf, NgIf } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -10,7 +10,7 @@ import { TaskDetailsDialogComponent } from '../task-details-dialog/task-details-
 
 @Component({
   selector: 'app-task-card',
-  imports: [MatCardModule, MatIconModule, NgForOf, NgIf],
+  imports: [MatCardModule, MatIconModule, NgForOf, NgIf, DatePipe],
   templateUrl: './task-card.component.html',
   styleUrl: './task-card.component.scss'
 })
@@ -39,5 +39,18 @@ export class TaskCardComponent {
           this.taskUpdated.emit(updatedTask);
       });
     });
+  }
+
+  isOverdue(): boolean {
+    if (!this.task.plannedEndDate || this.task.status === 'Completed') {
+      return false;
+    }
+    const now = new Date();
+    const endDate = new Date(this.task.plannedEndDate);
+    return endDate < now;
+  }
+
+  hasActualDate(): boolean {
+    return !!this.task.actualEndDate;
   }
 }

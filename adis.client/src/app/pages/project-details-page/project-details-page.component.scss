@@ -537,3 +537,273 @@ $status-colors: (
   margin-left: 4px;
   font-style: italic;
 }
+
+// Стили для переключения вида
+.view-toggle {
+  display: flex;
+  gap: 8px;
+  margin: 0 16px;
+  
+  button {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+}
+
+// Стили для диаграммы Ганта
+.gantt-container {
+  margin-top: 20px;
+  overflow-x: auto;
+  padding-bottom: 20px;
+}
+
+.gantt-chart {
+  min-width: 798px;
+  font-size: 14px;
+}
+
+.gantt-header {
+  display: flex;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+}
+
+.gantt-task-name {
+  width: 200px;
+  flex-shrink: 0;
+  font-weight: 500;
+  padding-right: 16px;
+}
+
+.gantt-timeline {
+  display: flex;
+  flex-grow: 1;
+  border-left: 1px solid #eee;
+}
+
+.gantt-date {
+  flex: 1;
+  text-align: center;
+  padding: 0 4px;
+  min-width: 30px;
+  color: #666;
+  position: relative;
+
+  // Add vertical line to separate days
+  &::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: rgba(0, 0, 0, 0.1); // Subtle gray line
+  }
+
+  // Remove line after the last day
+  &:last-child::after {
+    display: none;
+  }
+}
+
+.gantt-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.gantt-row {
+  display: flex;
+  height: 50px;
+  margin-bottom: 8px;
+  align-items: center;
+}
+
+.gantt-task-info {
+  width: 200px;
+  flex-shrink: 0;
+  padding-right: 16px;
+  
+  .task-name {
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .task-assignee {
+    font-size: 12px;
+    color: #666;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.gantt-bar-container {
+  flex-grow: 1;
+  height: 30px;
+  background: #f5f5f5;
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+.gantt-bar {
+  position: absolute;
+  height: 100%;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: white;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    z-index: 10;
+  }
+  
+  .gantt-bar-progress {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    background: rgba(255,255,255,0.3);
+  }
+  
+  .gantt-bar-label {
+    position: relative;
+    z-index: 2;
+    padding: 0 8px;
+    white-space: nowrap;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.3);
+  }
+  
+  // Цвета по статусам
+  &.status-ToDo {
+    background: #3da1ff;
+  }
+  
+  &.status-Doing {
+    background: #ffc107;
+  }
+  
+  &.status-Checking {
+    background: #9c27b0;
+  }
+  
+  &.status-Completed {
+    background: #4caf50;
+  }
+}
+
+// Адаптивность
+@media (max-width: 768px) {
+  .view-toggle {
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 12px;
+  }
+  
+  .gantt-task-name,
+  .gantt-task-info {
+    width: 150px;
+  }
+  
+  .gantt-date {
+    min-width: 25px;
+    font-size: 11px;
+  }
+}
+
+// Стили для маркеров проекта
+.project-marker {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 2px;
+  z-index: 5;
+  
+  .marker-line {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 2px;
+    height: 100%;
+    background: currentColor;
+  }
+  
+  .marker-label {
+    position: absolute;
+    left: 4px;
+    top: 10px;
+    background: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+    
+    .marker-date {
+      margin-left: 4px;
+      color: #666;
+      font-weight: normal;
+    }
+  }
+  
+  &.start {
+    color: #4CAF50;
+    
+    .marker-label {
+      border-left: 2px solid #4CAF50;
+    }
+  }
+
+  &.current {
+    color: #FF6D00;
+    
+    .marker-label {
+      border-left: 2px solid #FF6D00;
+    }
+  }
+  
+  &.end {
+    color: #F44336;
+    
+    .marker-label {
+      border-left: 2px solid #F44336;
+    }
+  }
+}
+
+// Убедимся, что контейнер диаграммы имеет относительное позиционирование
+.gantt-chart {
+  position: relative;
+  min-width: 800px;
+  font-size: 14px;
+}
+
+// Адаптивные стили
+@media (max-width: 768px) {
+  .project-marker .marker-label {
+    max-width: 120px;
+    white-space: normal;
+    line-height: 1.2;
+  }
+}

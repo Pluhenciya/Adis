@@ -33,6 +33,8 @@ namespace Adis.Dm
 
         public Status Status { get; set; }
 
+        public DateTime CreatedAt { get; set; }
+
         public DateOnly PlannedEndDate { get; set; }
 
         public DateOnly? ActualEndDate { get; set; }

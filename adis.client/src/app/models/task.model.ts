@@ -17,6 +17,9 @@ export interface TaskDto {
     status: TaskStatus;
     performers: UserDto[];
     checkers: UserDto[];
+    createdAt: Date;
+    plannedEndDate: Date;
+    actualEndDate?: Date;
   }
 
   export interface TaskDetailsDto {
@@ -29,6 +32,7 @@ export interface TaskDto {
     checkers: UserDto[];
     documents: DocumentDto[];
     comments: CommentDto[];
+    createdAt: Date;
     plannedEndDate: Date;
     actualEndDate?: Date;
   }

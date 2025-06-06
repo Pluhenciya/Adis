@@ -32,6 +32,7 @@ import { environment } from '../../environments/environment';
 import { WorkObjectSectionDto } from '../../models/work-object-section.model';
 import { CompleteContractorSearchDialogComponent } from '../../components/complete-contractor-search-dialog/complete-contractor-search-dialog.component';
 import { CompleteExecutionDialogComponent } from '../../components/complete-execution-dialog/complete-execution-dialog.component';
+import { formatISO } from 'date-fns';
 
 interface TaskColumn {
   title: string;
@@ -75,6 +76,10 @@ export class ProjectDetailsPageComponent implements OnInit, OnDestroy {
   selectedDocuments: number[] = [];
   workSections: WorkObjectSectionDto[] = [];
   isAllSelected = false;
+  viewMode: 'list' | 'gantt' = 'list';
+  projectStartDate!: Date; 
+  projectEndDate!: Date; 
+  currentDate = new Date();
 
   taskColumns: TaskColumn[] = [
     {
@@ -120,6 +125,8 @@ export class ProjectDetailsPageComponent implements OnInit, OnDestroy {
         })
       ).subscribe(project => {
         this.project = project;
+        this.projectStartDate = new Date(new Date(project.startDate).setHours(0,0,0,0));
+        this.projectEndDate = new Date(new Date(project.plannedEndDate).setHours(0,0,0,0));
         this.updateTaskColumns();
         this.checkGeoData();
         if (this.project.status !== ProjectStatus.Designing) {
@@ -207,6 +214,23 @@ export class ProjectDetailsPageComponent implements OnInit, OnDestroy {
           });
         }
       });
+    }
+
+    switchView(mode: 'list' | 'gantt') {
+      this.viewMode = mode;
+    }
+
+    get ganttData() {
+      return this.project.tasks.map(task => ({
+        id: task.idTask,
+        name: task.name,
+        start: new Date(task.createdAt),
+        end: new Date(task.plannedEndDate),
+        status: task.status,
+        progress: task.status === TaskStatus.Completed ? 100 : 
+                 task.status === TaskStatus.ToDo ? 0 : 50,
+        assignee: task.performers.map(p => p.fullName || p.email).join(', ')
+      }));
     }
 
     downloadDocument(doc: DocumentDto) {
@@ -430,5 +454,99 @@ isDesigningOverdue(project: GetProjectDto): boolean {
 isExecutionOverdue(project: GetProjectDto): boolean {
   if (project.actualEndExecutionDate) return false;
   return new Date() > new Date(project.plannedEndExecutionDate!);
+}
+
+// Получаем даты для временной шкалы
+get timelineDates(): Date[] {
+  if (!this.project || !this.project.tasks.length) return [];
+  
+  const dates: Date[] = [];
+  const start = new Date(Math.min(...this.project.tasks.map(t => new Date(t.createdAt).getTime()), this.projectStartDate.getTime()));
+  var end = new Date(Math.max(...this.project.tasks.map(t => new Date(t.plannedEndDate).getTime()), this.projectEndDate.getTime()));
+  end = new Date(end.getTime() - 86400)
+  const current = new Date(start);
+  while (current <= end) {
+    dates.push(new Date(current));
+    current.setDate(current.getDate() + 1);
+  }
+  
+  return dates;
+}
+
+// Рассчитываем позицию задачи на временной шкале
+getTaskPosition(date: Date): number {
+  var currentDate = new Date(date.setHours(0,0,0,0))
+  if (!this.project || !this.project.tasks.length) return 0;
+  
+  const minDate = new Date(Math.min(
+    ...this.project.tasks.map(t => new Date (new Date(t.createdAt).setHours(0,0,0,0)).getTime()),
+    this.projectStartDate.getTime()
+  ));
+  
+  const maxDate = new Date(Math.max(
+    ...this.project.tasks.map(t => new Date(t.plannedEndDate).getTime()),
+    this.projectEndDate.getTime()
+  ));
+  
+  const totalDuration = maxDate.getTime() - 86400 - minDate.getTime();
+  const position = currentDate.getTime() - minDate.getTime();
+  return (position / totalDuration) * 100;
+}
+
+// Рассчитываем ширину задачи на временной шкале
+getTaskWidth(startDate: Date, endDate: Date): number {
+  startDate = new Date(startDate.setHours(0,0,0,0))
+  endDate = new Date(endDate.setHours(0,0,0,0))
+  if (!this.project || !this.project.tasks.length) return 0;
+  
+  const minDate = new Date(Math.min(
+    ...this.project.tasks.map(t => new Date (new Date(t.createdAt).setHours(0,0,0,0)).getTime()),
+    this.projectStartDate.getTime()
+  ));
+  const maxDate = new Date(Math.max(
+    ...this.project.tasks.map(t => new Date(t.plannedEndDate).getTime()),
+    this.projectEndDate.getTime()
+  ));
+  
+  const totalDuration = maxDate.getTime() - 86400 - minDate.getTime();
+  const taskDuration = endDate.getTime() - startDate.getTime();
+  
+  console.log(endDate)
+  return (taskDuration / totalDuration) * 100;
+}
+
+getProjectPosition(date: Date): number {
+  if (!this.project || !this.project.tasks.length) return 0;
+  
+  const minDate = new Date(Math.min(
+    ...this.project.tasks.map(t => new Date (new Date(t.createdAt).setHours(0,0,0,0)).getTime()),
+    this.projectStartDate.getTime())
+  );
+  
+  const maxDate = new Date(Math.max(
+    ...this.project.tasks.map(t => new Date(t.plannedEndDate).getTime()),
+    this.projectEndDate.getTime())
+  );
+
+  const totalDuration = maxDate.getTime() - 86400 - minDate.getTime();
+  const position = date.getTime() - minDate.getTime();
+
+  return (position / totalDuration);
+}
+
+showCurrentDateMarker(): boolean {
+  if (!this.project || !this.project.tasks.length) return false;
+  
+  const minDate = new Date(Math.min(
+    ...this.project.tasks.map(t => new Date(t.createdAt).getTime()),
+    this.projectStartDate.getTime()
+  ));
+  
+  const maxDate = new Date(Math.max(
+    ...this.project.tasks.map(t => new Date(t.plannedEndDate).getTime()),
+    this.projectEndDate.getTime()
+  ));
+  
+  return this.currentDate >= minDate && this.currentDate <= maxDate;
 }
 }

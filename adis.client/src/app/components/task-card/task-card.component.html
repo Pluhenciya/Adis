@@ -33,6 +33,21 @@
           </div>
         </div>
       </div>
+      <div class="meta-group">
+        <mat-icon class="meta-icon">event_busy</mat-icon>
+        <div class="meta-content">
+          <span class="meta-label">Срок выполнения</span>
+          <span [class.overdue]="isOverdue()">
+            {{ task.plannedEndDate | date: 'dd.MM.yyyy' }}
+            <span *ngIf="isOverdue()" class="overdue-indicator">
+              <mat-icon>warning</mat-icon> Просрочено
+            </span>
+            <span *ngIf="hasActualDate()" class="actual-date">
+              (факт: {{ task.actualEndDate | date: 'dd.MM.yyyy' }})
+            </span>
+          </span>
+        </div>
+      </div>
     </div>
     <div class="custom-actions">
         <ng-content></ng-content>

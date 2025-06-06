@@ -121,13 +121,32 @@
             <h3>Дата окончания</h3>
           </div>
           <div *ngIf="!isEditing" class="date-view">
-            {{ data.task.plannedEndDate ? (data.task.plannedEndDate | date:'dd.MM.yyyy') : 'Дата не указана' }}
+            <span [class.overdue]="isOverdue()">
+              {{ data.task.plannedEndDate | date:'dd.MM.yyyy' }}
+              <span *ngIf="isOverdue()" class="overdue-indicator">
+                <mat-icon>warning</mat-icon> Просрочено
+              </span>
+            </span>
           </div>
           <mat-form-field *ngIf="isEditing" appearance="outline">
             <input matInput [matDatepicker]="picker" formControlName="endDate">
             <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
             <mat-datepicker #picker></mat-datepicker>
           </mat-form-field>
+        </div>
+        
+        <!-- Добавляем блок с фактической датой завершения -->
+        <div *ngIf="data.task.actualEndDate" class="date-card">
+          <div class="date-header">
+            <mat-icon class="date-icon">event_available</mat-icon>
+            <h3>Фактическое завершение</h3>
+          </div>
+          <div class="date-view">
+            {{ data.task.actualEndDate | date:'dd.MM.yyyy' }}
+            <span class="time-difference">
+              ({{ getCompletionDifference() }})
+            </span>
+          </div>
         </div>
 
         <div class="status-card" *ngIf="authService.isAdmin()">
