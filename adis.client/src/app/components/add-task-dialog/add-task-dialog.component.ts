@@ -186,7 +186,7 @@ export class AddTaskDialogComponent {
         idPerformers: this.taskForm.value.performers,
         idCheckers: this.taskForm.value.checkers,
         idProject: this.projectId,
-        endDate: formattedEndDate,
+        plannedEndDate: formattedEndDate,
         status: this.taskForm.value.status
     };
   

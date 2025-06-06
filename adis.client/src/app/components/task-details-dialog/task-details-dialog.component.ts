@@ -90,7 +90,7 @@ export class TaskDetailsDialogComponent implements OnInit {
       description: [data.task.description, [Validators.required, Validators.maxLength(2000)]],
       performers: [data.task.performers, [Validators.required]],
       checkers: [data.task.checkers, [Validators.required]],
-      endDate: [data.task.endDate, [Validators.required]],
+      endDate: [data.task.plannedEndDate, [Validators.required]],
       status: [data.task.status]
     });
     this.currentUserId = Number(this.authService.currentUserId);
@@ -327,7 +327,7 @@ export class TaskDetailsDialogComponent implements OnInit {
       description: updatedTask.description,
       idPerformers: updatedTask.performers.map((u: UserDto) => u.id),
       idCheckers: updatedTask.checkers.map((u: UserDto) => u.id),
-      endDate: this.taskForm.value.endDate,
+      plannedEndDate: this.taskForm.value.endDate,
       status: this.taskForm.value.status
     };
   
@@ -376,5 +376,39 @@ export class TaskDetailsDialogComponent implements OnInit {
         console.error(err);
       }
     });
+  }
+
+  isOverdue(): boolean {
+    if (this.data.task.status === 'Completed') return false;
+    
+    const now = new Date();
+    const endDate = new Date(this.data.task.plannedEndDate);
+    return endDate < now;
+  }
+
+  getCompletionDifference(): string {
+    if (!this.data.task.actualEndDate || !this.data.task.plannedEndDate) {
+      return '';
+    }
+
+    const planned = new Date(this.data.task.plannedEndDate);
+    const actual = new Date(this.data.task.actualEndDate);
+    const diffTime = Math.abs(actual.getTime() - planned.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (actual < planned) {
+      return `на ${diffDays} ${this.declension(diffDays, ['день', 'дня', 'дней'])} раньше`;
+    } else {
+      return `на ${diffDays} ${this.declension(diffDays, ['день', 'дня', 'дней'])} позже`;
+    }
+  }
+
+  private declension(number: number, titles: [string, string, string]): string {
+    const cases = [2, 0, 1, 1, 1, 2];
+    return titles[
+      number % 100 > 4 && number % 100 < 20
+        ? 2
+        : cases[number % 10 < 5 ? number % 10 : 5]
+    ];
   }
 }

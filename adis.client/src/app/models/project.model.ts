@@ -11,7 +11,8 @@ export interface GetProjectDto {
   idProject: number;
   name: string;
   startDate: Date;       
-  endDate: Date;         
+  plannedEndDate: Date;         
+  actualEndDate?: Date;         
   status: ProjectStatus;
   idUser: number;
   responsiblePerson: string;
@@ -24,7 +25,8 @@ export interface GetProjectDto {
   };
   contractorName?: string;
   startExecutionDate?: Date;  
-  endExecutionDate?: Date;  
+  plannedEndExecutionDate?: Date;  
+  actualEndExecutionDate?: Date;  
   progress: number;
 }
 
@@ -32,7 +34,7 @@ export interface PostProjectDto {
   idProject?: number;
   name: string;
   startDate: Date;       
-  endDate: Date;         
+  plannedEndDate: Date;       
   status: ProjectStatus;
   idUser: number;
   workObject: {
@@ -44,14 +46,15 @@ export interface PostProjectDto {
   };
   contractorName?: string;
   startExecutionDate?: Date;  
-  endExecutionDate?: Date;    
+  plannedEndExecutionDate?: Date;    
 }
 
 export interface GetProjectWithTasksDto {
   idProject: number;
   name: string;
   startDate: Date;       
-  endDate: Date;         
+  plannedEndDate: Date;         
+  actualEndDate?: Date;      
   status: ProjectStatus;
   idUser: number;
   responsiblePerson: string;
@@ -64,7 +67,8 @@ export interface GetProjectWithTasksDto {
   };
   contractorName?: string;
   startExecutionDate?: Date;  
-  endExecutionDate?: Date;  
+  plannedEndExecutionDate?: Date;  
+  actualEndExecutionDate?: Date;  
   progress: number;
   tasks: TaskDto[];
   executionTasks: ExecutionTaskDto[]

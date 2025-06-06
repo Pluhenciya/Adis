@@ -406,4 +406,56 @@ export class ProjectListPageComponent implements OnInit, OnDestroy, AfterViewIni
         this.authService.currentRole === "ProjectManager" || this.authService.currentRole === "Projecter" || this.authService.currentRole === "Admin"
       );
     }
+
+    isOverdue(project: GetProjectDto): boolean {
+      const now = new Date();
+      
+      if (project.status === ProjectStatus.Designing || 
+          project.status === ProjectStatus.ContractorSearch) {
+        // Для проектирования
+        return !project.actualEndDate && 
+               new Date(project.plannedEndDate) < now;
+      } 
+      else if (project.status === ProjectStatus.InExecution) {
+        // Для исполнения
+        return !project.actualEndExecutionDate && 
+               new Date(project.plannedEndExecutionDate!) < now;
+      }
+      
+      return false;
+    }
+
+    hasActualDate(project: GetProjectDto): boolean {
+      if (project.status === ProjectStatus.Designing || 
+          project.status === ProjectStatus.ContractorSearch) {
+        return !!project.actualEndDate;
+      } 
+      else if (project.status === ProjectStatus.Completed) {
+        return !!project.actualEndExecutionDate;
+      }
+      
+      return false;
+    }
+
+    getStartDate(project: GetProjectDto): Date {
+      return (project.status === 'InExecution' || project.status === 'Completed')
+        ? project.startExecutionDate || new Date(0)
+        : project.startDate;
+    }
+    
+    getEndDate(project: GetProjectDto): Date {
+      if (project.status === 'Designing' || project.status === 'ContractorSearch') {
+        return project.plannedEndDate;
+      } else {
+        return project.plannedEndExecutionDate || new Date(0);
+      }
+    }
+    
+    getActualEndDate(project: GetProjectDto): Date {
+      if (project.status === 'Designing' || project.status === 'ContractorSearch') {
+        return project.actualEndDate || new Date(0);
+      } else {
+        return project.actualEndExecutionDate || new Date(0);
+      }
+    }
 }

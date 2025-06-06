@@ -27,6 +27,11 @@ namespace Adis.Bll.Dtos.Task
 
         public Status Status { get; set; }
 
+        public DateTime CreatedAt { get; set; }
+
+        public DateOnly PlannedEndDate { get; set; }
+        public DateOnly? ActualEndDate { get; set; }
+
         public IEnumerable<UserDto> Performers { get; set; } = null!;
 
         public IEnumerable<UserDto> Checkers { get; set; } = null!;
