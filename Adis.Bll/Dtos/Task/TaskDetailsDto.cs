@@ -30,7 +30,10 @@ namespace Adis.Bll.Dtos.Task
 
         public string? TextResult { get; set; } = null!;
 
-        public DateOnly EndDate { get; set; }
+        public DateTime CreatedAt { get; set; }
+
+        public DateOnly PlannedEndDate { get; set; }
+        public DateOnly? ActualEndDate { get; set; }
 
         public IEnumerable<UserDto> Performers { get; set; } = null!;
 

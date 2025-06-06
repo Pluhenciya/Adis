@@ -98,6 +98,8 @@ namespace Adis.Bll.Services
             if(!Status.TryParse(typeof(Status), status, out var verifedStatus))
                 throw new ArgumentException("Такого статуса нету");
             var task = await _taskRepository.GetByIdAsync(id);
+            if ((Status)verifedStatus == Status.Completed)
+                task.ActualEndDate = DateOnly.FromDateTime(DateTime.Now);
             if (task == null)
                 throw new KeyNotFoundException("Задача с таким id не найдена");
             task.Status = (Status)verifedStatus!;

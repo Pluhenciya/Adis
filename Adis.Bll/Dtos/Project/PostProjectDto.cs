@@ -35,7 +35,7 @@ namespace Adis.Bll.Dtos.Project
         /// Конец проектирования
         /// </summary>
         [Required(AllowEmptyStrings = false, ErrorMessage = "Дата конца обязательна")]
-        public DateOnly EndDate { get; set; }
+        public DateOnly PlannedEndDate { get; set; }
 
         /// <summary>
         /// Статус проекта
@@ -71,6 +71,6 @@ namespace Adis.Bll.Dtos.Project
         /// <summary>
         /// Дата окончания проведения работ
         /// </summary>
-        public DateOnly? EndExecutionDate { get; set; }
+        public DateOnly? PlannedEndExecutionDate { get; set; }
     }
 }

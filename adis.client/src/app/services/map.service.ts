@@ -342,6 +342,7 @@ export class MapService {
       }
     });
   }
+  
   private initGeoObject(geometryType: string) {
     this.currentGeoObject = geometryType === 'Polygon'
       ? new ymaps.Polygon([], {

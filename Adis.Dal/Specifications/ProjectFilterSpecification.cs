@@ -37,7 +37,7 @@ namespace Adis.Dal.Specifications
             if (targetDate.HasValue)
             {
                 ApplyCriteria(p => p.StartDate <= targetDate.Value
-                                && p.EndDate >= targetDate.Value);
+                                && p.PlannedEndDate >= targetDate.Value);
             }
 
             // Фильтр по диапазону дат начала
