@@ -59,6 +59,12 @@ namespace Adis.Bll.Services
             foreach (var documentsDto in documentsDtos)
             {
                 var filePath = $"{directoryPath}/{documentsDto.IdDocument}{Path.GetExtension(documentsDto.FileName).ToLowerInvariant()}";
+
+                if (!File.Exists(filePath))
+                {
+                    continue;
+                }
+
                 var loader = GetDocumentLoader(filePath);
                 var loaded = await loader.LoadAsync(DataSource.FromPath(filePath));
 
