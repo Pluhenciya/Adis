@@ -20,13 +20,21 @@ services:
 
   ollama:
     image: ollama/ollama:latest
-    entrypoint: ["/bin/sh", "-c"]
     command: >
-      "ollama serve & 
-      sleep 15 
-      ollama pull nomic-embed-text || true 
-      ollama pull qwen3:1.7b || true 
-      wait"
+      sh -c "
+      # Запуск сервера в фоне
+      /bin/ollama serve &
+      
+      # Ожидание запуска
+      sleep 15
+      
+      # Загрузка моделей
+      /bin/ollama pull nomic-embed-text || true
+      /bin/ollama pull qwen3:1.7b || true
+      
+      # Бесконечное ожидание
+      tail -f /dev/null
+      "
     environment:
       - OLLAMA_CPU_OVERRIDE=1
     ports:
@@ -36,10 +44,11 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: ["CMD-SHELL", "echo | nc -z localhost 11434"]
+      test: ["CMD", "/bin/ollama", "ps"]
       interval: 30s
-      timeout: 30s
+      timeout: 10s
       retries: 10
+      start_period: 20s
 
   frontend:
     image: ghcr.io/pluhenciya/adis-frontend:latest
