@@ -17,20 +17,18 @@ services:
         restart: true
     networks:
       - app-network
-      
+
   ollama:
     image: ollama/ollama:latest
     entrypoint: ["/bin/sh", "-c"]
     command: >
-      "exec ollama serve &
-      sleep 10
-      ollama pull nomic-embed-text
-      ollama pull qwen3:1.7b
+      "ollama serve & 
+      sleep 15 
+      ollama pull nomic-embed-text || true 
+      ollama pull qwen3:1.7b || true 
       wait"
     environment:
       - OLLAMA_CPU_OVERRIDE=1
-      - OLLAMA_NUM_PARALLEL=1
-      - OLLAMA_MAX_LOADED_MODELS=1
     ports:
       - "11434:11434"
     volumes:
@@ -38,7 +36,7 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: ["sh", "-c", "echo | nc localhost 11434"]
+      test: ["CMD-SHELL", "echo | nc -z localhost 11434"]
       interval: 30s
       timeout: 30s
       retries: 10
