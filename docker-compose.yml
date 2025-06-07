@@ -19,9 +19,24 @@ services:
       - app-network
       
   ollama:
-    build:
-      context: .
-      dockerfile: Ollama.Dockerfile
+    image: ollama/ollama:latest
+    command: >
+      sh -c "
+      # Запускаем сервер в фоне
+      ollama serve &
+      
+      # Ждем инициализации
+      sleep 10
+      
+      # Загружаем модели
+      ollama pull nomic-embed-text
+      ollama pull qwen3:1.7b
+      
+      # Оставляем сервер работать
+      wait
+      "
+    environment:
+      - OLLAMA_CPU_OVERRIDE=1
     ports:
       - "11434:11434"
     volumes:
