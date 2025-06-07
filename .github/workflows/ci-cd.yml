@@ -118,6 +118,7 @@ jobs:
         target: "/opt/adis"
 
     - name: Deploy to production
+      timeout-minutes: 60
       uses: appleboy/ssh-action@v1
       with:
         host: ${{ secrets.PROD_SERVER_HOST }}
