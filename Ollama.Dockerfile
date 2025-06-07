@@ -1,5 +1,8 @@
 FROM ollama/ollama:latest
 
+# Устанавливаем необходимые утилиты
+RUN apk add --no-cache curl
+
 # Устанавливаем переменные окружения для CPU-режима
 ENV OLLAMA_CPU_OVERRIDE=1 \
     OLLAMA_NUM_PARALLEL=1 \
