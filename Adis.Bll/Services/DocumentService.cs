@@ -240,7 +240,6 @@ namespace Adis.Bll.Services
             if (!File.Exists(filePath))
             {
                 await _documentRepository.DeleteAsync(id);
-                throw new FileNotFoundException("File not found on server");
             }
                 
 
