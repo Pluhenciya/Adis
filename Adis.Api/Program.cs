@@ -138,6 +138,12 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(10);
+    options.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(10);
+});
+
 var app = builder.Build();
 
 // »нициализаци€ базы данных с повторными попытками
