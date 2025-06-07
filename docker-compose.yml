@@ -10,7 +10,7 @@ services:
     env_file:
       - "./environment/default.env"
     volumes:
-      - documents-data:/src/Adis.Api/documents
+      - documents-data:/app/documents
     depends_on:
       mysql:
         condition: service_healthy
