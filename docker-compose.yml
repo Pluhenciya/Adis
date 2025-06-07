@@ -22,7 +22,7 @@ services:
     image: ollama/ollama:latest
     entrypoint: ["/bin/sh", "-c"]
     command: >
-      "ollama serve &
+      "exec ollama serve &
       sleep 10
       ollama pull nomic-embed-text
       ollama pull qwen3:1.7b
@@ -38,7 +38,7 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:11434"]
+      test: ["sh", "-c", "echo | nc localhost 11434"]
       interval: 30s
       timeout: 30s
       retries: 10
