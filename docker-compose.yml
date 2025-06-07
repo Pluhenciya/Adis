@@ -20,23 +20,6 @@ services:
 
   ollama:
     image: ollama/ollama:latest
-    command: >
-      sh -c "
-      # Запуск сервера в фоне
-      /bin/ollama serve &
-      
-      # Ожидание запуска
-      sleep 15
-      
-      # Загрузка моделей
-      /bin/ollama pull nomic-embed-text || true
-      /bin/ollama pull qwen3:1.7b || true
-      
-      # Бесконечное ожидание
-      tail -f /dev/null
-      "
-    environment:
-      - OLLAMA_CPU_OVERRIDE=1
     ports:
       - "11434:11434"
     volumes:

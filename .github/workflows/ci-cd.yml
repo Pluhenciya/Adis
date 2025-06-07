@@ -149,4 +149,6 @@ jobs:
           docker compose -f docker-compose.yml down
           docker compose -f docker-compose.yml pull
           docker compose -f docker-compose.yml up -d
+          docker compose exec ollama ollama pull nomic-embed-text
+          docker compose exec ollama ollama pull qwen3:1.7b
           docker system prune -af --volumes
