@@ -10,7 +10,7 @@ services:
     env_file:
       - "./environment/default.env"
     volumes:
-      - ./documents:/app/documents
+      - documents-data:/app/documents
     depends_on:
       mysql:
         condition: service_healthy
@@ -68,3 +68,4 @@ networks:
 volumes:
   mysql-data:
   ollama-data:
+  documents-data:
