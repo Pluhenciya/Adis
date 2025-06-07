@@ -22,22 +22,11 @@ services:
     image: ollama/ollama:latest
     entrypoint: ["/bin/sh", "-c"]
     command: >
-      "
-      # Запускаем сервер в фоне
-      ollama serve &
-      
-      # Ждем инициализации сервера
-      until wget -q --spider http://localhost:11434; do
-        sleep 1
-      done
-      
-      # Загружаем модели
+      "ollama serve &
+      sleep 10
       ollama pull nomic-embed-text
       ollama pull qwen3:1.7b
-      
-      # Оставляем сервер работать в основном процессе
-      wait
-      "
+      wait"
     environment:
       - OLLAMA_CPU_OVERRIDE=1
       - OLLAMA_NUM_PARALLEL=1
