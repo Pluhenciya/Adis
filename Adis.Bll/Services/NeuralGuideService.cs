@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using Adis.Bll.Configurations;
 using Adis.Bll.Dtos;
 using Adis.Bll.Interfaces;
+using Adis.Dal.Interfaces;
+using AutoMapper;
 using LangChain.Databases;
 using LangChain.Databases.InMemory;
 using LangChain.DocumentLoaders;
@@ -27,10 +29,14 @@ namespace Adis.Bll.Services
         private List<Document> _allDocuments = new();
         private IVectorCollection _collection;
         private readonly IMemoryCache _cache;
+        private readonly IDocumentRepository _documentRepository;
+        private readonly IMapper _mapper;
 
-        public NeuralGuideService(IMemoryCache cache, IOptions<OllamaSetting> ollamaSetting)
+        public NeuralGuideService(IMemoryCache cache, IOptions<OllamaSetting> ollamaSetting, IDocumentRepository documentRepository, IMapper mapper)
         {
             _cache = cache;
+            _documentRepository = documentRepository;
+            _mapper = mapper;
             var ollamaSettingValue = ollamaSetting.Value;
             var ollamaProvider = new OllamaProvider(ollamaSettingValue.OllamaUrl);
 
@@ -44,7 +50,8 @@ namespace Adis.Bll.Services
             var cacheKey = $"documents";
 
             // Проверяем кэш для документов и векторной базы
-            if (_cache.TryGetValue(cacheKey, out (List<Document> Docs, IVectorCollection Collection) cacheEntry))
+            if (_cache.TryGetValue(cacheKey, out (List<Document> Docs, IVectorCollection Collection) cacheEntry)
+                && cacheEntry.Docs != null && cacheEntry.Docs.Any())
             {
                 _allDocuments = cacheEntry.Docs;
                 _collection = cacheEntry.Collection;
@@ -52,10 +59,20 @@ namespace Adis.Bll.Services
             }
 
             if (documentsDtos == null || directoryPath == null)
-                throw new ArgumentException("Документов нету");
+            {
+                // Пытаемся получить документы из репозитория
+                var docsFromDb = await _documentRepository.GetGuideDocumentsAsync();
+                documentsDtos = _mapper.Map<IEnumerable<DocumentDto>>(docsFromDb);
+                directoryPath = "documents"; // Из конфигурации
+
+                if (documentsDtos == null || !documentsDtos.Any())
+                {
+                    return;
+                }
+            }
 
             var documents = new List<Document>();
-
+             
             foreach (var documentsDto in documentsDtos)
             {
                 var filePath = $"{directoryPath}/{documentsDto.IdDocument}{Path.GetExtension(documentsDto.FileName).ToLowerInvariant()}";
@@ -102,7 +119,7 @@ namespace Adis.Bll.Services
             }
 
             // Сохраняем в кэш и документы и коллекцию
-            _cache.Set(cacheKey, (_allDocuments, _collection), TimeSpan.FromHours(1));
+            _cache.Set(cacheKey, (_allDocuments, _collection), TimeSpan.FromHours(24));
         }
 
         public async Task<string> SendRequestForGuideAsync(string request)
