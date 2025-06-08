@@ -155,14 +155,30 @@ using (var scope = app.Services.CreateScope())
     if (!dbContext.Database.IsInMemory())
     {
         dbContext.Database.Migrate();
-
         var adminInitializer = services.GetRequiredService<IAdminInitializer>();
         await adminInitializer.InitializeAsync();
 
-        var neuralGuideService = services.GetRequiredService<INeuralGuideService>();
-        var documentService = services.GetRequiredService<IDocumentService>();
+        // Запуск инициализации нейронки в фоне
+        var serviceScopeFactory = services.GetRequiredService<IServiceScopeFactory>();
+        _ = Task.Run(async () =>
+        {
+            using var innerScope = serviceScopeFactory.CreateScope();
+            var neuralService = innerScope.ServiceProvider.GetRequiredService<INeuralGuideService>();
+            var docService = innerScope.ServiceProvider.GetRequiredService<IDocumentService>();
+            var logger = innerScope.ServiceProvider.GetRequiredService<ILogger<Program>>();
 
-        await neuralGuideService.InitializeAsync(await documentService.GetGuideDocumentsAsync(), documentService.DirectoryPath);
+            try
+            {
+                logger.LogInformation("Starting neural initialization in background...");
+                var guideDocs = await docService.GetGuideDocumentsAsync();
+                await neuralService.InitializeAsync(guideDocs, docService.DirectoryPath);
+                logger.LogInformation("Neural initialization completed successfully");
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Neural initialization failed in background task");
+            }
+        });
     }
 }
 
