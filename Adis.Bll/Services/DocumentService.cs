@@ -237,13 +237,10 @@ namespace Adis.Bll.Services
             var fileName = $"{document.IdDocument}{fileExtension}";
             var filePath = Path.Combine(DirectoryPath, fileName);
 
-            if (!File.Exists(filePath))
+            if (File.Exists(filePath))
             {
-                await _documentRepository.DeleteAsync(id);
+                File.Delete(filePath);
             }
-                
-
-            File.Delete(filePath);
 
             await _documentRepository.DeleteAsync(id);
            
