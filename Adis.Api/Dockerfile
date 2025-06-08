@@ -36,4 +36,8 @@ RUN dotnet publish "./Adis.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+RUN mkdir -p documents && \
+    chmod 777 documents
+
 ENTRYPOINT ["dotnet", "Adis.Api.dll"]

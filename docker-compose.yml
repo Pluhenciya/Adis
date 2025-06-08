@@ -10,27 +10,22 @@ services:
     env_file:
       - "./environment/default.env"
     volumes:
-      - documents-data:/src/Adis.Api/documents
+      - documents-data:/app/documents
     depends_on:
       mysql:
         condition: service_healthy
         restart: true
     networks:
       - app-network
-      
+
   ollama:
-    image: ollama/ollama:latest
+    image: ollama/ollama:0.7.0
     ports:
       - "11434:11434"
     volumes:
       - ollama-data:/root/.ollama
     networks:
       - app-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:11434"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
 
   frontend:
     image: ghcr.io/pluhenciya/adis-frontend:latest
