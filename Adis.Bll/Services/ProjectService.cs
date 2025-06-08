@@ -2,11 +2,9 @@
 using Adis.Bll.Dtos.Project;
 using Adis.Bll.Interfaces;
 using Adis.Dal.Interfaces;
-using Adis.Dal.Repositories;
 using Adis.Dm;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 namespace Adis.Bll.Services
@@ -128,11 +126,11 @@ namespace Adis.Bll.Services
             if (projectDto.IdContractor != null)
                 projectDto.ContractorName = null!;
 
-            if((projectDto.Status == ProjectStatus.InExecution
+            if ((projectDto.Status == ProjectStatus.InExecution
                 || projectDto.Status == ProjectStatus.Completed)
-                && projectDto.StartExecutionDate == null 
+                && projectDto.StartExecutionDate == null
                 && projectDto.PlannedEndExecutionDate == null
-                && (projectDto.ContractorName == null 
+                && (projectDto.ContractorName == null
                 || projectDto.IdContractor == null))
                 throw new ArgumentException("Данные выполнения отсутствуют при статусе Исполнение или Завершен");
 
@@ -163,15 +161,9 @@ namespace Adis.Bll.Services
 
         public async Task DeleteProjectAsync(int id)
         {
-            var user = _contextAccessor.HttpContext.User;
-            if (user.IsInRole(Role.Admin.ToString()))
-                await _projectRepository.DeleteAsync(id);
-            else
-            {
-                var project = await _projectRepository.GetByIdAsync(id);
-                project.IsDeleted = true;
-                await _projectRepository.UpdateAsync(project);
-            }
+            var project = await _projectRepository.GetByIdAsync(id);
+            project.IsDeleted = true;
+            await _projectRepository.UpdateAsync(project);
         }
 
         public async Task<GetProjectWithTasksDto?> GetProjectDetailsByIdAsync(int id)
@@ -185,7 +177,7 @@ namespace Adis.Bll.Services
             project.Status = ProjectStatus.ContractorSearch;
             project.ActualEndDate = DateOnly.FromDateTime(DateTime.Now);
             await _projectRepository.UpdateAsync(project);
-            
+
             var executionTasks = await _documentService.SelectEstimateFromProjectAsync(idEstimate, id);
 
             await _executionTaskService.AddExecutionTasksAsync(executionTasks);
