@@ -1,20 +1,20 @@
 # ADIS 🏗️
 **Информационная система управления проектами в строительстве**
 
-[![.NET](https://img.shields.io/badge/.NET-9.0-512BD4?logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
-[![C#](https://img.shields.io/badge/C%23-13.0-239120?logo=csharp&logoColor=white)](https://learn.microsoft.com/dotnet/csharp/)
-[![ASP.NET Core Web API](https://img.shields.io/badge/ASP.NET_Core-Web_API-512BD4?logo=dotnet&logoColor=white)](https://learn.microsoft.com/aspnet/core/web-api/)
-[![EF Core](https://img.shields.io/badge/EF_Core-9.0-512BD4?logo=entity-framework&logoColor=white)](https://learn.microsoft.com/ef/core/)
-[![MySQL](https://img.shields.io/badge/MySQL-8.4-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com/)
-[![Angular](https://img.shields.io/badge/Angular-19-DD0031?logo=angular&logoColor=white)](https://angular.io/)
-[![Angular Material](https://img.shields.io/badge/Angular_Material-19-757575?logo=materialdesign&logoColor=white)](https://material.angular.io/)
-[![JWT](https://img.shields.io/badge/Auth-JWT_Bearer-000000?logo=jsonwebtokens&logoColor=white)](https://jwt.io/)
-[![Swagger](https://img.shields.io/badge/Swagger-OpenAPI-85EA2D?logo=swagger&logoColor=white)](https://swagger.io/)
-[![Yandex Maps](https://img.shields.io/badge/Yandex_Maps-API-5B4BD5?logo=yandex&logoColor=white)](https://yandex.ru/dev/maps/)
-[![Ollama](https://img.shields.io/badge/LLM-Ollama-2C3E50?logo=ollama&logoColor=white)](https://ollama.com/)
-[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
-[![GitHub Actions](https://img.shields.io/badge/CI%2FCD-GitHub_Actions-2088FF?logo=githubactions&logoColor=white)](https://github.com/features/actions)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.txt)
+[![.NET](https://img.shields.io/badge/.NET_9.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
+[![C#](https://img.shields.io/badge/C%23_13.0-purple?style=for-the-badge&logo=csharp&logoColor=white)](https://learn.microsoft.com/dotnet/csharp/)
+[![ASP.NET Core](https://img.shields.io/badge/ASP.NET_Core-Web_API-blueviolet?style=for-the-badge&logo=dotnet&logoColor=white)](https://learn.microsoft.com/aspnet/core/web-api/)
+[![EF Core](https://img.shields.io/badge/EF_Core_9.0-512BD4?style=for-the-badge&logo=entity-framework&logoColor=white)](https://learn.microsoft.com/ef/core/)
+[![MySQL](https://img.shields.io/badge/MySQL_8.4-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
+[![Angular](https://img.shields.io/badge/Angular_19-DD0031?style=for-the-badge&logo=angular&logoColor=white)](https://angular.io/)
+[![Angular Material](https://img.shields.io/badge/Angular_Material_19-green?style=for-the-badge&logo=materialdesign&logoColor=white)](https://material.angular.io/)
+[![JWT](https://img.shields.io/badge/Auth-JWT_Bearer-black?style=for-the-badge&logo=jsonwebtokens&logoColor=white)](https://jwt.io/)
+[![Swagger](https://img.shields.io/badge/Swagger-OpenAPI-85EA2D?style=for-the-badge&logo=swagger&logoColor=white)](https://swagger.io/)
+[![Yandex Maps](https://img.shields.io/badge/Yandex_Maps-API-5B4BD5?style=for-the-badge&logo=yandex&logoColor=white)](https://yandex.ru/dev/maps/)
+[![Ollama](https://img.shields.io/badge/LLM-Ollama-2C3E50?style=for-the-badge&logo=ollama&logoColor=white)](https://ollama.com/)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![GitHub Actions](https://img.shields.io/badge/CI%2FCD-GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/features/actions)
+[![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE.txt)
 
 ---
 
@@ -341,19 +341,19 @@ dotnet test Adis.Tests
 
 | Категория            | Технология                                                                  |
 |----------------------|-----------------------------------------------------------------------------|
-| **Язык**             | [![C#](https://img.shields.io/badge/C%23_13-239120?logo=csharp)](https://learn.microsoft.com/dotnet/csharp/) [![TypeScript](https://img.shields.io/badge/TypeScript_5.7-3178C6?logo=typescript)](https://www.typescriptlang.org/) |
-| **Backend**          | [![.NET 9](https://img.shields.io/badge/.NET_9-512BD4?logo=dotnet)](https://dotnet.microsoft.com/) ASP.NET Core Web API |
-| **ORM**              | [![EF Core 9](https://img.shields.io/badge/EF_Core_9-512BD4?logo=entity-framework)](https://learn.microsoft.com/ef/core/) |
-| **СУБД**             | [![MySQL 8.4](https://img.shields.io/badge/MySQL_8.4-4479A1?logo=mysql)](https://www.mysql.com/) + NetTopologySuite |
-| **Аутентификация**   | [![ASP.NET Identity](https://img.shields.io/badge/ASP.NET_Identity-512BD4?logo=dotnet)](https://learn.microsoft.com/aspnet/core/security/) JWT + Refresh токены |
-| **Frontend**         | [![Angular 19](https://img.shields.io/badge/Angular_19-DD0031?logo=angular)](https://angular.io/) [![Angular Material](https://img.shields.io/badge/Angular_Material-757575?logo=materialdesign)](https://material.angular.io/) |
-| **Карты**            | [![Yandex Maps](https://img.shields.io/badge/Yandex_Maps-5B4BD5?logo=yandex)](https://yandex.ru/dev/maps/) |
-| **AI / RAG**         | [![Ollama](https://img.shields.io/badge/Ollama-2C3E50?logo=ollama)](https://ollama.com/) [![LangChain](https://img.shields.io/badge/LangChain_for_.NET-1C3C3C?logo=langchain)](https://github.com/tryAGI/LangChain) |
-| **Маппинг**          | [![AutoMapper](https://img.shields.io/badge/AutoMapper-FF2D20?logo=dotnet)](https://automapper.org/) |
-| **Документация API** | [![Swagger](https://img.shields.io/badge/Swagger-85EA2D?logo=swagger)](https://swagger.io/) |
-| **Тесты**            | [![xUnit](https://img.shields.io/badge/xUnit-3-512BD4)](https://xunit.net/) |
-| **CI/CD**            | [![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?logo=githubactions)](https://github.com/features/actions) |
-| **Контейнеризация**  | [![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker)](https://www.docker.com/) |
+| **Язык**             | [![C#](https://img.shields.io/badge/C%23_13-purple?style=for-the-badge&logo=csharp)](https://learn.microsoft.com/dotnet/csharp/) [![TypeScript](https://img.shields.io/badge/TypeScript_5.7-3178C6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/) |
+| **Backend**          | [![.NET 9](https://img.shields.io/badge/.NET_9-512BD4?style=for-the-badge&logo=dotnet)](https://dotnet.microsoft.com/) ASP.NET Core Web API |
+| **ORM**              | [![EF Core 9](https://img.shields.io/badge/EF_Core_9-512BD4?style=for-the-badge&logo=entity-framework)](https://learn.microsoft.com/ef/core/) |
+| **СУБД**             | [![MySQL 8.4](https://img.shields.io/badge/MySQL_8.4-4479A1?style=for-the-badge&logo=mysql)](https://www.mysql.com/) + NetTopologySuite |
+| **Аутентификация**   | [![ASP.NET Identity](https://img.shields.io/badge/ASP.NET_Identity-blueviolet?style=for-the-badge&logo=dotnet)](https://learn.microsoft.com/aspnet/core/security/) JWT + Refresh токены |
+| **Frontend**         | [![Angular 19](https://img.shields.io/badge/Angular_19-DD0031?style=for-the-badge&logo=angular)](https://angular.io/) [![Angular Material](https://img.shields.io/badge/Angular_Material-green?style=for-the-badge&logo=materialdesign)](https://material.angular.io/) |
+| **Карты**            | [![Yandex Maps](https://img.shields.io/badge/Yandex_Maps-5B4BD5?style=for-the-badge&logo=yandex)](https://yandex.ru/dev/maps/) |
+| **AI / RAG**         | [![Ollama](https://img.shields.io/badge/Ollama-2C3E50?style=for-the-badge&logo=ollama)](https://ollama.com/) [![LangChain](https://img.shields.io/badge/LangChain_for_.NET-1C3C3C?style=for-the-badge&logo=langchain)](https://github.com/tryAGI/LangChain) |
+| **Маппинг**          | [![AutoMapper](https://img.shields.io/badge/AutoMapper-FF2D20?style=for-the-badge&logo=dotnet)](https://automapper.org/) |
+| **Документация API** | [![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger)](https://swagger.io/) |
+| **Тесты**            | [![xUnit](https://img.shields.io/badge/xUnit-3-512BD4?style=for-the-badge)](https://xunit.net/) |
+| **CI/CD**            | [![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions)](https://github.com/features/actions) |
+| **Контейнеризация**  | [![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker)](https://www.docker.com/) |
 
 ---
 
@@ -426,3 +426,4 @@ Adis/
     <br>
     <sub>Made with ❤️, .NET 9, Angular и локальным LLM</sub>
 </div>
+
