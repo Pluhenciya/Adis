@@ -123,7 +123,7 @@ namespace Adis.Tests
             var project = new PostProjectDto
             {
                 Name = "Test Project",
-                PlannedEndDate = new DateOnly(2025, 12, 31),
+                PlannedEndDate = new DateOnly(2026, 12, 31),
                 IdUser = _idTestUser, 
                 WorkObject = new WorkObjectDto
                 { 
@@ -194,7 +194,7 @@ namespace Adis.Tests
                 new()
                 {
                     Name = "Other Project",
-                    PlannedEndDate = new DateOnly(2025, 12, 31),
+                    PlannedEndDate = new DateOnly(2026, 12, 31),
                     IdUser = _idTestUser,
                     WorkObject = new WorkObjectDto
                     {
@@ -211,7 +211,7 @@ namespace Adis.Tests
             }
 
             // Act
-            var response = await _client.GetAsync("/api/projects?status=designing&targetDate=2026-01-01");
+            var response = await _client.GetAsync("/api/projects?status=designing&targetDate=2027-01-01");
 
             // Assert
             response.EnsureSuccessStatusCode();
