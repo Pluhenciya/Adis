@@ -65,7 +65,7 @@ jobs:
         docker compose --env-file .env -f docker-compose.ci.yml up -d --build
 
   deploy-production:
-    if: github.event_name == 'pull_request' && github.base_ref == 'master'
+    if: github.event_name == 'push' && github.base_ref == 'master'
     needs: build-and-test
     runs-on: ubuntu-latest
     permissions:
