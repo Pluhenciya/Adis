@@ -65,7 +65,7 @@ export class ProjectService {
     return this.http.put<GetProjectDto>(`${this.apiUrl}/projects`, {
       ...project,
       startDate: project.startDate ? this.formatDate(project.startDate) : null,
-      plannedeEndDate: project.plannedEndDate ? this.formatDate(project.plannedEndDate) : null,
+      plannedEndDate: project.plannedEndDate ? this.formatDate(project.plannedEndDate) : null,
       startExecutionDate: project.startExecutionDate ? this.formatDate(project.startExecutionDate) : null,
       plannedEndExecutionDate: project.plannedEndExecutionDate ? this.formatDate(project.plannedEndExecutionDate) : null
     });

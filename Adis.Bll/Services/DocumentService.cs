@@ -237,10 +237,10 @@ namespace Adis.Bll.Services
             var fileName = $"{document.IdDocument}{fileExtension}";
             var filePath = Path.Combine(DirectoryPath, fileName);
 
-            if (!File.Exists(filePath))
-                throw new FileNotFoundException("File not found on server");
-
-            File.Delete(filePath);
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+            }
 
             await _documentRepository.DeleteAsync(id);
            

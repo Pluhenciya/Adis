@@ -118,6 +118,7 @@ jobs:
         target: "/opt/adis"
 
     - name: Deploy to production
+      timeout-minutes: 60
       uses: appleboy/ssh-action@v1
       with:
         host: ${{ secrets.PROD_SERVER_HOST }}
@@ -137,6 +138,7 @@ jobs:
           echo "Ollama__OllamaUrl=http://ollama:11434/api" >> environment/default.env
           echo "Ollama__EmbeddingModel=nomic-embed-text" >> environment/default.env
           echo "Ollama__LlmModel=qwen3:1.7b" >> environment/default.env
+          echo "APP_UID=0" >> environment/default.env
 
           echo "MYSQL_ROOT_PASSWORD=${{ secrets.PROD_MYSQL_ROOT_PASSWORD }}" > environment/mysql.env
           echo "MYSQL_DATABASE=${{ secrets.PROD_MYSQL_DATABASE }}" >> environment/mysql.env
