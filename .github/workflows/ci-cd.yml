@@ -73,7 +73,7 @@ jobs:
       packages: write
     environment: 
       name: production
-      url: http://92.255.104.183/
+      url: http://90.156.208.165/
 
     steps:
     - name: Checkout code
